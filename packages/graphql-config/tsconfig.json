@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "Bundler",
+    "module": "ES2015"
+  },
+  "include": ["src", "tsup.config.ts"],
+}
