@@ -1,3 +1,5 @@
+![cover](./assets/cover.png)
+
 # Fabrix package
 
 | package                           | description                     |
