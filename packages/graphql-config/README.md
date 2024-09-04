@@ -5,7 +5,7 @@ This package provides all fabrix directive definitions
 ## Install
 
 ```bash
-pnpm install -D @fabrix-framework/graphql-config
+npm install -D @fabrix-framework/graphql-config
 ```
 
 ## Usage
