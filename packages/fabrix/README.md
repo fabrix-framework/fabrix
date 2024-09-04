@@ -260,11 +260,3 @@ query getCharacter($id: ID!) {
   }
 }
 ```
-
-# Contributing
-
-Refer to our [contribution guidelines](./CONTRIBUTING.md).
-
-# License
-
-Fabrix is open source software licensed as MIT
