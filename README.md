@@ -1,6 +1,6 @@
 ![cover](./assets/cover.png)
 
-# Fabrix package
+# Packages
 
 | package                           | description                     |
 | --------------------------------- | --------------------------------|
@@ -22,10 +22,10 @@ pnpm install
 pnpm build
 ```
 
-# Contributing
+## Contributing
 
 Refer to our [contribution guidelines](./CONTRIBUTING.md).
 
-# License
+## License
 
 Fabrix is open source software licensed as MIT
