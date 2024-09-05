@@ -7,8 +7,9 @@ export type DirectiveAttributes = Pick<ViewFieldSchema, "label"> & {
   className: string;
 };
 
-type CustomRendererProps = {
-  userProps?: Record<string, string>;
+type UserProps = Record<string, string | undefined>;
+type CustomRendererProps<P extends UserProps> = {
+  userProps?: P;
 };
 
 type BaseComponentProps = {
@@ -21,20 +22,22 @@ type BaseComponentProps = {
 /**
  * The component props that field renderer should implement.
  */
-export type FieldComponentProps = BaseComponentProps &
-  CustomRendererProps & {
-    subFields: Array<SubField>;
-  };
+export type FieldComponentProps<P extends UserProps = UserProps> =
+  BaseComponentProps &
+    CustomRendererProps<P> & {
+      subFields: Array<SubField>;
+    };
 
 /**
  * The component props that table renderer should implement.
  */
-export type TableComponentProps = CustomRendererProps & {
-  name?: string;
-  className?: string;
-  headers: TableComponentHeader[];
-  values: Record<string, unknown>[];
-};
+export type TableComponentProps<P extends UserProps = UserProps> =
+  CustomRendererProps<P> & {
+    name?: string;
+    className?: string;
+    headers: TableComponentHeader[];
+    values: Record<string, unknown>[];
+  };
 export type TableComponentHeader = {
   key: string;
   label: string;
@@ -44,27 +47,29 @@ export type TableComponentHeader = {
 /**
  * The component props that form field renderer should implement.
  */
-export type FormFieldComponentProps = BaseComponentProps &
-  CustomRendererProps & {
-    isRequired: boolean;
-  };
+export type FormFieldComponentProps<P extends UserProps = UserProps> =
+  BaseComponentProps &
+    CustomRendererProps<P> & {
+      isRequired: boolean;
+    };
 
 /**
  * The component props that form renderer should implement.
  */
-export type FormComponentProps = CustomRendererProps & {
-  className?: string;
-  renderFields: () => React.ReactNode;
-  renderSubmit: (
-    renderer: (props: {
-      submit: () => void;
-      isSubmitting: boolean;
-    }) => React.ReactElement,
-  ) => React.ReactNode;
-  renderReset: (
-    renderer: (props: { reset: () => void }) => React.ReactNode,
-  ) => React.ReactNode;
-};
+export type FormComponentProps<P extends UserProps = UserProps> =
+  CustomRendererProps<P> & {
+    className?: string;
+    renderFields: () => React.ReactNode;
+    renderSubmit: (
+      renderer: (props: {
+        submit: () => void;
+        isSubmitting: boolean;
+      }) => React.ReactElement,
+    ) => React.ReactNode;
+    renderReset: (
+      renderer: (props: { reset: () => void }) => React.ReactNode,
+    ) => React.ReactNode;
+  };
 
 type ComponentFunc<P> = (
   props: React.PropsWithChildren<P>,
@@ -72,18 +77,22 @@ type ComponentFunc<P> = (
 
 type CustomComponent =
   | {
+      name: string;
       type: "field";
       component: ComponentFunc<FieldComponentProps>;
     }
   | {
+      name: string;
       type: "formField";
       component: ComponentFunc<FormFieldComponentProps>;
     }
   | {
+      name: string;
       type: "form";
       component: ComponentFunc<FormComponentProps>;
     }
   | {
+      name: string;
       type: "table";
       component: ComponentFunc<TableComponentProps>;
     };
@@ -114,8 +123,7 @@ export class ComponentRegistry {
   constructor(readonly components: ComponentRegistryConstructorProps) {
     if (components.custom) {
       components.custom.forEach((e) => {
-        const c = e.component;
-        this.customComponentMap.set(`${c.name}:${e.type}`, c);
+        this.customComponentMap.set(`${e.name}:${e.type}`, e.component);
       });
     }
   }

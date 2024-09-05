@@ -191,6 +191,13 @@ const renderField = (
     return;
   }
 
+  const userProps = field.config.componentType?.props?.reduce((acc, prop) => {
+    return {
+      ...acc,
+      [prop.name]: prop.value,
+    };
+  }, {});
+
   const className = buildClassName(field.config, extraClassName);
   return createElement(component, {
     key: props.indexKey,
@@ -202,5 +209,6 @@ const renderField = (
       className,
       label: field.config.label,
     },
+    userProps,
   });
 };
