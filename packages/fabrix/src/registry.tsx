@@ -77,18 +77,22 @@ type ComponentFunc<P> = (
 
 type CustomComponent =
   | {
+      name: string;
       type: "field";
       component: ComponentFunc<FieldComponentProps>;
     }
   | {
+      name: string;
       type: "formField";
       component: ComponentFunc<FormFieldComponentProps>;
     }
   | {
+      name: string;
       type: "form";
       component: ComponentFunc<FormComponentProps>;
     }
   | {
+      name: string;
       type: "table";
       component: ComponentFunc<TableComponentProps>;
     };
@@ -119,8 +123,7 @@ export class ComponentRegistry {
   constructor(readonly components: ComponentRegistryConstructorProps) {
     if (components.custom) {
       components.custom.forEach((e) => {
-        const c = e.component;
-        this.customComponentMap.set(`${c.name}:${e.type}`, c);
+        this.customComponentMap.set(`${e.name}:${e.type}`, e.component);
       });
     }
   }
