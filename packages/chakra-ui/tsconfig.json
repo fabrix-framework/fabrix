@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@*": ["./*"]
+    },
+    "lib": ["es2017", "dom"],
+    "target": "es5",
+    "moduleResolution": "Bundler",
+    "module": "ES2015",
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "inlineSources": false,
+    "isolatedModules": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveWatchOutput": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "jsx": "react-jsx",
+  },
+  "include": ["."],
+  "exclude": ["dist", "build", "node_modules"]
+}

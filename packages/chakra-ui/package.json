@@ -1,0 +1,54 @@
+{
+  "name": "@fabrix-framework/chakra-ui",
+  "private": false,
+  "version": "0.1.0",
+  "description": "Chakra UI components for Fabrix",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "dev": "NODE_ENV=development tsup --watch",
+    "build": "tsup",
+    "lint": "eslint '**/*.{ts,tsx}' --ignore-pattern 'dist/*' --max-warnings=0",
+    "type-check": "tsc --noEmit --incremental --pretty"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@emotion/css": "^11.13.0",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@fabrix-framework/fabrix": "workspace:*",
+    "@tanstack/react-table": "^8.19.3",
+    "chakra-react-select": "^4.9.1",
+    "chroma-js": "^3.0.0",
+    "create-color": "^2.0.6",
+    "framer-motion": "^11.3.17",
+    "zod": "^3.23.8"
+  },
+  "peerDependencies": {
+    "@chakra-ui/react": "^2",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@fabrix-framework/eslint-config": "workspace:*",
+    "@fabrix-framework/prettier-config": "workspace:*",
+    "@types/chroma-js": "^2.4.4",
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^9.6.0",
+    "prettier": "^3.3.3",
+    "tsup": "^8.1.0",
+    "typescript": "^5.5.3"
+  },
+  "prettier": "@fabrix-framework/prettier-config"
+}

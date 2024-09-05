@@ -1,0 +1,61 @@
+{
+  "name": "@fabrix-framework/fabrix",
+  "private": false,
+  "version": "0.1.0",
+  "description": "schema-driven UI packages",
+  "exports": {
+    ".": {
+      "types": "./dist/fabrix.d.mts",
+      "default": "./dist/fabrix.mjs"
+    },
+    "./rhf": {
+      "types": "./dist/rhf.d.mts",
+      "default": "./dist/rhf.mjs"
+    }
+  },
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "dev": "NODE_ENV=development tsup --watch",
+    "build": "tsup",
+    "lint": "eslint '**/*.{ts,tsx}' --ignore-pattern 'dist/*' --max-warnings=0",
+    "type-check": "tsc --noEmit --incremental --pretty",
+    "test": "vitest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "deepmerge-ts": "^7.1.0",
+    "graphql-tag": "^2.12.6",
+    "react-hook-form": "^7.53.0",
+    "urql": "^4.1.0",
+    "wonka": "^6.3.4",
+    "zod": "^3.23.8"
+  },
+  "peerDependencies": {
+    "graphql": "^16",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.6.13",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/react": "^16.0.0",
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^9.6.0",
+    "happy-dom": "^14.12.3",
+    "prettier": "^3.3.3",
+    "tsup": "^8.1.0",
+    "typescript": "^5.5.3",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^2.0.3",
+    "@fabrix-framework/eslint-config": "workspace:*",
+    "@fabrix-framework/prettier-config": "workspace:*"
+  },
+  "prettier": "@fabrix-framework/prettier-config"
+}

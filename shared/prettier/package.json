@@ -1,0 +1,11 @@
+{
+  "name": "@fabrix-framework/prettier-config",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    ".": "./index.js"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}

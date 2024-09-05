@@ -1,0 +1,15 @@
+{
+  "name": "fabrix-framework",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build"
+  },
+  "packageManager": "pnpm@9.9.0",
+  "devDependencies": {
+    "turbo": "^2.1.1"
+  }
+}
