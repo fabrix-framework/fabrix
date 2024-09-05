@@ -16,6 +16,7 @@ export const ChakraUIRegistry = new ComponentRegistry({
   custom: [
     {
       type: "field",
+      name: "ImagePreview",
       component: ImagePreview,
     },
   ],
