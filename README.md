@@ -2,11 +2,19 @@
 
 # Packages
 
-| package                           | description                     |
-| --------------------------------- | --------------------------------|
-| @fabrix-framework/fabrix          | Core package                    |
-| @fabrix-framework/graphql-config  | GraphQL LSP support             |
-| @fabrix-framework/chakra-ui       | Chakra UI components for fabrix |
+| package                           | description                     | link                                        |
+| --------------------------------- | --------------------------------| ------------------------------------------- |
+| @fabrix-framework/fabrix          | Core package                    | [Docs](./packages/fabrix/README.md)         |
+| @fabrix-framework/graphql-config  | GraphQL LSP support             | [Docs](./packages/graphql-config/README.md) |
+| @fabrix-framework/chakra-ui       | Chakra UI components for fabrix | [Docs](./packages/chakra-ui/README.md)      |
+
+# Quick start
+
+See the instruction at [the quick start](./packages/fabrix/README.md#quick-start) to use fabrix in your React app, or [online interactive editor](https://fabrix-framework.github.io/editor/) is available to see how fabrix works out without any setups.
+
+# Development
+
+This is an instruction mainly for developers that contribute to this repo.
 
 ## Setup 
 
