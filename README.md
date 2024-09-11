@@ -10,7 +10,7 @@
 
 # Quick start
 
-See the instruction at [the quick start](./packages/fabrix/README.md#quick-start)
+See the instruction at [the quick start](./packages/fabrix/README.md#quick-start) to use fabrix in your React app, or [online interactive editor](https://fabrix-framework.github.io/editor/) is available to see how fabrix works out without any setups.
 
 # Development
 
