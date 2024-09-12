@@ -6,9 +6,6 @@ Fabrix is a powerful framework that harnesses the capabilities of GraphQL to aut
 
 ## Table of Contents <!-- omit in toc -->
 
-- [Concept](#concept)
-  - [What is fabrix?](#what-is-fabrix)
-  - [Why fabrix?](#why-fabrix)
 - [Quick Start](#quick-start)
   - [Install](#install)
   - [Add provider](#add-provider)
@@ -20,40 +17,6 @@ Fabrix is a powerful framework that harnesses the capabilities of GraphQL to aut
   - [Component Registry](#component-registry)
     - [`ComponentRegistry` Interface](#componentregistry-interface)
   - [Using custom Components](#using-custom-components)
-
-## Concept
-
-### What is fabrix?
-
-Fabrix is a framework for build the React applications that are backed by GraphQL backend. In fabrix, React components are generated from queries and mutations, and automatically fetches data required to be rendered.
-
-Consider the component in Starwars application that displays information of a character:
-
-```tsx
-const Character = (id: string) => 
-  <FabrixComponent 
-    query={`
-      query getCharacter($id: ID!) {
-        character(id: $id) {
-          name
-          status
-          profileImage
-        }
-      } 
-    `}
-    variables={{ id }}
-  />
-```
-
-According to the query above, fabrix renders components.
-
-### Why fabrix? 
-
-At Tailor, we frequently build frontend applications with numerous screens and heavy CRUD (Create, Read, Update, Delete) operations, particularly in admin panels and ERP systems.
-
-While generating type definitions and hooks from GraphQL is a common practice in React applications, this approach is often applied on a component-by-component basis. For applications requiring fine-tuned styling and high flexibility, this level of detail is necessary. However, in admin panels and ERP systems—where functionality and data management are prioritized over intricate styling—this granularity often becomes a burden.
-
-Fabrix solves this problem by automating the rendering of React components from GraphQL queries and schemas, significantly streamlining the development of complex, data-driven applications.
 
 ## Quick Start
 
