@@ -24,7 +24,7 @@ Fabrix is designed to work with React applications, so you’ll need to set up a
 
 ### Install
 
-To start using fabrix, we have to install two depepdent packages:
+To start using fabrix, we have to install two dependent packages:
 
 1. Core
 2. Components
@@ -212,7 +212,7 @@ You can use the `fabrixView` and `fabrixForm` directives to specify custom compo
 
 The directives allow you to define how each field in a query or mutation should be displayed. The `name` field in the `componentType` configuration should match the name of the component provided in the `componentRegistry`.
 
-```gql
+```graphql
 query getCharacter($id: ID!) {
   getCharacter(id: $id) @fabrixView(input: [
     { field: "name", config: { label: "Name", componentType: { name: "MyCustomField" } } }
