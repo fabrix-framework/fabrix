@@ -1,0 +1,44 @@
+{
+  "name": "todoapp",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm:mock-server\" \"vite\"",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "mock-server": "ts-node server/server.ts"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.11.0",
+    "@chakra-ui/react": "^2.8.2",
+    "@emotion/css": "^11.13.0",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@fabrix-framework/chakra-ui": "workspace:*",
+    "@fabrix-framework/fabrix": "workspace:*",
+    "framer-motion": "^11.3.17",
+    "graphql-tag": "^2.12.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@fabrix-framework/eslint-config": "workspace:*",
+    "@fabrix-framework/prettier-config": "workspace:*",
+    "@faker-js/faker": "^9.0.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^9.0.1",
+    "eslint": "^9.9.1",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.9.0",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.0.1",
+    "vite": "^5.4.1"
+  },
+  "prettier": "@fabrix-framework/prettier-config"
+}
