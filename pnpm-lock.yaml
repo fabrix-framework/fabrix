@@ -293,16 +293,10 @@ importers:
         version: 9.1.0(eslint@9.9.1)
       eslint-plugin-import:
         specifier: ^2.29.1
-<<<<<<< HEAD
-        version: 2.30.0(@typescript-eslint/parser@8.4.0(eslint@9.9.1)(typescript@5.5.4))(eslint@9.9.1)
+        version: 2.30.0(eslint@9.9.1)
       typescript:
         specifier: ^5
         version: 5.5.4
-||||||| parent of 02c7a5d (Update structure)
-        version: 2.30.0(@typescript-eslint/parser@8.4.0(eslint@9.9.1)(typescript@5.5.4))(eslint@9.9.1)
-=======
-        version: 2.30.0(eslint@9.9.1)
->>>>>>> 02c7a5d (Update structure)
       typescript-eslint:
         specifier: ^8.0.1
         version: 8.4.0(eslint@9.9.1)(typescript@5.5.4)
