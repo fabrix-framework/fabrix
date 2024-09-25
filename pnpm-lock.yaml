@@ -198,7 +198,7 @@ importers:
         specifier: ^1.1.1
         version: 1.1.1
       eslint:
-        specifier: ^9.9.1
+        specifier: ^9
         version: 9.9.1
       eslint-config-prettier:
         specifier: ^9.1.0
@@ -206,14 +206,17 @@ importers:
       eslint-plugin-import:
         specifier: ^2.29.1
         version: 2.30.0(@typescript-eslint/parser@8.4.0(eslint@9.9.1)(typescript@5.5.4))(eslint@9.9.1)
+      typescript:
+        specifier: ^5
+        version: 5.5.4
       typescript-eslint:
         specifier: ^8.0.1
         version: 8.4.0(eslint@9.9.1)(typescript@5.5.4)
 
   shared/prettier:
-    devDependencies:
+    dependencies:
       prettier:
-        specifier: ^3.3.3
+        specifier: ^3
         version: 3.3.3
 
 packages:

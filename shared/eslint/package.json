@@ -7,9 +7,12 @@
   },
   "dependencies": {
     "@eslint/compat": "^1.1.1",
-    "eslint": "^9.9.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "typescript-eslint": "^8.0.1"
+  },
+  "peerDependencies": {
+    "eslint": "^9",
+    "typescript": "^5"
   }
 }
