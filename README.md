@@ -42,7 +42,7 @@ Fabrix solves this problem by automating the rendering of React components from 
 
 ## Fabrix editor
 
-We have [online interactive editor](https://fabrix-framework.github.io/editor/) to see how fabrix works out without any setups.
+We have an [online interactive editor](https://fabrix-framework.github.io/editor/) to see how fabrix works out without any setups.
 
 ![image](https://github.com/user-attachments/assets/9e2143fa-c953-488c-9085-5f689e323311)
 
