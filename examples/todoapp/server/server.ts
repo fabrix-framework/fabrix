@@ -7,23 +7,34 @@ import { faker } from "@faker-js/faker";
 type Todo = {
   id: string;
   name: string;
-  priority: number;
+  priority: "HIGH" | "MEDIUM" | "LOW";
   hasDone: boolean;
 };
 
 // In-memory store for todos
 const todos: Todo[] = [
-  { id: faker.string.uuid(), name: "Task 1", priority: 1, hasDone: true },
-  { id: faker.string.uuid(), name: "Task 2", priority: 2, hasDone: false },
-  { id: faker.string.uuid(), name: "Task 3", priority: 3, hasDone: false },
+  { id: faker.string.uuid(), name: "Task 1", priority: "HIGH", hasDone: true },
+  {
+    id: faker.string.uuid(),
+    name: "Task 2",
+    priority: "MEDIUM",
+    hasDone: false,
+  },
+  { id: faker.string.uuid(), name: "Task 3", priority: "LOW", hasDone: false },
 ];
 
 // Define the GraphQL schema
 const typeDefs = gql`
+  enum TodoPriority {
+    LOW
+    MEDIUM
+    HIGH
+  }
+
   type Todo {
     id: ID!
     name: String!
-    priority: Int!
+    priority: TodoPriority!
     hasDone: Boolean!
   }
 
@@ -33,7 +44,7 @@ const typeDefs = gql`
 
   input TodoInput {
     name: String!
-    priority: Int!
+    priority: TodoPriority!
     hasDone: Boolean
   }
 
