@@ -34,6 +34,8 @@ Fabrix solves this problem by automating the rendering of React components from 
 
 # Quick start
 
+See the instruction at [the quick start](./packages/fabrix/README.md#quick-start) to use fabrix in your React app
+
 > [!WARNING]
 > Fabrix is still in the **early stage of development**.
 > The API may change without any notice.
