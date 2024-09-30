@@ -40,7 +40,15 @@ Fabrix solves this problem by automating the rendering of React components from 
 >
 > We are still actively developing the features. Tell us your idea or feedback on [discussions](https://github.com/fabrix-framework/fabrix/discussions).
 
-See the instruction at [the quick start](./packages/fabrix/README.md#quick-start) to use fabrix in your React app, or [online interactive editor](https://fabrix-framework.github.io/editor/) is available to see how fabrix works out without any setups.
+## Fabrix editor
+
+We have an [online interactive editor](https://fabrix-framework.github.io/editor/) to see how fabrix works out without any setups.
+
+![image](https://github.com/user-attachments/assets/9e2143fa-c953-488c-9085-5f689e323311)
+
+## Examples
+
+We have some [example apps](./examples) in repo.
 
 # Development
 
