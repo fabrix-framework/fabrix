@@ -3,10 +3,13 @@
   "tasks": {
     "build": {
       "outputs": ["dist/**"],
-      "dependsOn": ["^build", "^type-check"]
+      "dependsOn": ["^build"]
     },
     "type-check": {
-      "dependsOn": ["^type-check"]
+      "dependsOn": ["^build", "^type-check"]
+    },
+    "lint": {
+      "dependsOn": ["^build", "^lint"]
     },
     "dev": {
       "persistent": true,

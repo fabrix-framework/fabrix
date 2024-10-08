@@ -1,0 +1,24 @@
+name: Lint
+
+inputs:
+  package:
+    description: 'The package to lint'
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 9.9.0
+        run_install: false
+    - uses: actions/setup-node@v4
+      with:
+        cache: pnpm
+        cache-dependency-path: ./pnpm-lock.yaml
+    - name: Install dependencies
+      run: pnpm install
+      shell: bash
+    - name: Lint
+      run: npx turbo run lint --filter="@fabrix-framework/${{ inputs.package }}"
+      shell: bash
