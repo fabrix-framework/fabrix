@@ -23,8 +23,8 @@ const fieldView = (props: FieldComponentProps) => {
         </thead>
         <tbody>
           {props.value.map((item) => (
-            /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, 
-                @typescript-eslint/no-unsafe-member-access 
+            /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,
+                @typescript-eslint/no-unsafe-member-access
             */
             <tr key={item.id}>
               {props.subFields.map((subField) => (

@@ -11,11 +11,11 @@ type User {
 }
 
 type UsersResult {
-  collection: [User!]! 
+  collection: [User!]!
 }
 
 type Query {
-  users: UsersResult  
+  users: UsersResult
 }
 
 input CreateUserInput {
