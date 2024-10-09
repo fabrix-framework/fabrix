@@ -12,7 +12,8 @@
     "dev": "NODE_ENV=development tsup --watch",
     "build": "tsup",
     "lint": "eslint '**/*.{ts,tsx}' --ignore-pattern 'dist/*' --max-warnings=0",
-    "type-check": "tsc --noEmit --incremental --pretty"
+    "type-check": "tsc --noEmit --incremental --pretty",
+    "test": "exit 0"
   },
   "dependencies": {
     "graphql": "^16.9.0"
