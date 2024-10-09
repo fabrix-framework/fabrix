@@ -1,4 +1,4 @@
-# TODO app example 
+# TODO app example
 
 ## Setup
 

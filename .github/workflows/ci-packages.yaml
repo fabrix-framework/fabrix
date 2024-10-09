@@ -1,0 +1,45 @@
+name: CI (packages)
+
+on:
+  push:
+    paths:
+      - 'packages/**'
+      - '.github/workflows/ci-packages.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    strategy:
+      matrix:
+        packages:
+          - fabrix
+          - graphql-config
+          - chakra-ui
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: tj-actions/changed-files@v45
+        id: changed-files
+        with:
+          files: |
+            packages/${{ matrix.packages }}/**
+      - uses: ./.github/actions/ci
+        if: steps.changed-files.outputs.any_changed == 'true'
+        with:
+          filter: "packages/${{ matrix.packages }}"
+
+  # A job to check if all examples can be built successfully to detect unwanted breaking changes
+  build-examples:
+    needs:
+      - ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/build
+        with:
+          filter: "examples/*"

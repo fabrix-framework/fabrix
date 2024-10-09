@@ -1,8 +1,8 @@
-name: Lint
+name: Build
 
 inputs:
-  package:
-    description: 'The package to lint'
+  filter:
+    description: 'The package to build'
     required: true
 
 runs:
@@ -19,6 +19,6 @@ runs:
     - name: Install dependencies
       run: pnpm install
       shell: bash
-    - name: Lint
-      run: npx turbo run lint --filter="@fabrix-framework/${{ inputs.package }}"
+    - name: Type check
+      run: npx turbo run build --filter="./${{ inputs.filter }}"
       shell: bash

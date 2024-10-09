@@ -1,10 +1,11 @@
-name: Type check
+name: Lint
 
 inputs:
-  package:
-    description: 'The package to type check'
+  filter:
+    description: 'The package to lint'
     required: true
 
+# Run linter and type-checker
 runs:
   using: composite
   steps:
@@ -19,6 +20,6 @@ runs:
     - name: Install dependencies
       run: pnpm install
       shell: bash
-    - name: Type check
-      run: npx turbo run type-check --filter="@fabrix-framework/${{ inputs.package }}"
+    - name: Lint
+      run: npx turbo run lint type-check --filter="./${{ inputs.filter }}"
       shell: bash
