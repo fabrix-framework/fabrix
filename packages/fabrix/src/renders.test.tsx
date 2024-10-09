@@ -43,8 +43,12 @@ describe("mutation", () => {
           }
         `}
       />,
-      () => {
-        expect(1).toBe(1);
+      async () => {
+        const form = await screen.findByRole("form");
+        expect(form).toBeInTheDocument();
+
+        const inputs = await within(form).findAllByRole("textbox");
+        expect(inputs.length).toBe(4);
       },
     );
   });

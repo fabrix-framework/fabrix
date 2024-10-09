@@ -18,9 +18,16 @@ type Query {
   users: UsersResult
 }
 
+enum UserCategory {
+  ADMIN
+  USER
+}
+
 input CreateUserInput {
   name: String!
   code: String!
+  age: Int!
+  category: UserCategory!
 }
 
 type Mutation {

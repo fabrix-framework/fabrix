@@ -48,7 +48,7 @@ const fieldView = (props: FieldComponentProps) => {
 
 const formView = (props: FormComponentProps) => {
   return (
-    <div>
+    <div role="form">
       {props.renderFields()}
       {props.renderSubmit(({ submit }) => (
         <button onClick={() => submit()}>Submit</button>
@@ -58,7 +58,12 @@ const formView = (props: FormComponentProps) => {
 };
 
 const formFieldView = (props: FormFieldComponentProps) => {
-  return <div>{props.name}</div>;
+  return (
+    <div>
+      <label htmlFor={props.name}>{props.name}</label>
+      <input name={props.name} />
+    </div>
+  );
 };
 
 export const testingComponents = new ComponentRegistry({
