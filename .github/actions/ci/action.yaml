@@ -1,0 +1,25 @@
+name: Lint
+
+inputs:
+  filter:
+    description: 'The package to lint'
+    required: true
+
+# Run linter and type-checker
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 9.9.0
+        run_install: false
+    - uses: actions/setup-node@v4
+      with:
+        cache: pnpm
+        cache-dependency-path: ./pnpm-lock.yaml
+    - name: Install dependencies
+      run: pnpm install
+      shell: bash
+    - name: Lint
+      run: npx turbo run lint type-check --filter="./${{ inputs.filter }}"
+      shell: bash

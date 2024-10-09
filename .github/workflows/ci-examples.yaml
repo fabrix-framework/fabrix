@@ -1,0 +1,32 @@
+name: CI (example apps)
+
+on:
+  push:
+    paths:
+      - 'examples/**'
+      - '.github/workflows/ci-examples.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        apps:
+          - todoapp
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: tj-actions/changed-files@v45
+        id: changed-files
+        with:
+          files: |
+            examples/${{ matrix.apps }}/**
+      - uses: ./.github/actions/build
+        if: steps.changed-files.outputs.any_changed == 'true'
+        with:
+          filter: "examples/${{ matrix.apps }}"
