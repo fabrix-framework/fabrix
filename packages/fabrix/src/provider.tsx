@@ -11,9 +11,8 @@ import { addTypenameFieldExchange } from "@exchanges/addTypename";
 import {
   buildSchemaSet,
   BuildFabrixContextProps,
-  emptySchema,
-  SchemaSet,
   FabrixContext,
+  SchemaLoader,
 } from "./context";
 
 type FabrixProviderProps = {
@@ -51,22 +50,27 @@ export const FabrixProvider = (
 const FabrixContextProvider = (
   props: React.PropsWithChildren<BuildFabrixContextProps>,
 ) => {
-  const [schemaSet, setSchemaSet] = useState<SchemaSet>({
-    serverSchema: emptySchema,
+  const [schemaSetStatus, setSchemaSetStatus] = useState<SchemaLoader>({
+    status: "loading",
   });
 
   useEffect(() => {
     buildSchemaSet(props)
-      .then(setSchemaSet)
+      .then((value) => {
+        setSchemaSetStatus({
+          status: "loaded",
+          schemaSet: value,
+        });
+      })
       .catch((e: Error) => {
         throw new Error(`Failed to build Fabrix context (${e.message})`);
       });
-  }, [setSchemaSet, props]);
+  }, [setSchemaSetStatus, props]);
 
   return (
     <FabrixContext.Provider
       value={{
-        schemaSet,
+        schemaLoader: schemaSetStatus,
         componentRegistry: props.componentRegistry,
       }}
     >

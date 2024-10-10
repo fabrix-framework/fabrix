@@ -127,8 +127,13 @@ export const resolveFieldTypesFromTypename = (
     return {};
   }
 
+  if (context.schemaLoader.status === "loading") {
+    return {};
+  }
+
   const typeName = firstValue.__typename;
-  const valueType = context.schemaSet.serverSchema.getType(typeName);
+  const valueType =
+    context.schemaLoader.schemaSet.serverSchema.getType(typeName);
   if (!(valueType instanceof GraphQLObjectType)) {
     return {};
   }
@@ -207,4 +212,12 @@ export const resolveFieldType = (
     // Interface is not supported as well
     return null;
   }
+};
+
+export const Loader = () => {
+  return (
+    <div aria-busy="true" role="status">
+      Loading...
+    </div>
+  );
 };

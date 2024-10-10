@@ -5,7 +5,7 @@ import { users } from "../tests/mocks/data";
 import { testWithUnmount } from "../tests/render";
 
 describe("query", () => {
-  it("should render the view", async () => {
+  it("should render the table with collection", async () => {
     await testWithUnmount(
       <FabrixComponent
         query={`
@@ -48,7 +48,33 @@ describe("mutation", () => {
         expect(form).toBeInTheDocument();
 
         const inputs = await within(form).findAllByRole("textbox");
-        expect(inputs.length).toBe(4);
+        expect(inputs.length).toBe(5);
+      },
+    );
+  });
+
+  it("should render the form with customized labels", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          mutation createUser($input: CreateUserInput!) {
+            createUser(input: $input) @fabrixForm(input: [
+              { field: "id", config: { hidden: true } },
+              { field: "name", config: { label: "UserName" } }
+            ]) {
+              id
+            }
+          }
+        `}
+      />,
+      async () => {
+        const form = await screen.findByRole("form");
+        expect(form).toBeInTheDocument();
+
+        expect(within(form).queryByLabelText("id")).not.toBeInTheDocument();
+        expect(within(form).getByLabelText("name")).toHaveTextContent(
+          "UserName",
+        );
       },
     );
   });
