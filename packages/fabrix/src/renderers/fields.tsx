@@ -12,7 +12,6 @@ import {
   getFieldConfigByKey,
   RendererQuery,
   Loader,
-  ObjectLikeValue,
   resolveFieldTypesFromTypename,
 } from "./shared";
 
@@ -246,9 +245,9 @@ const renderField = (
 
   const component = field.config.componentType?.name
     ? context.componentRegistry.getCustom(
-      field.config.componentType.name,
-      "field",
-    )
+        field.config.componentType.name,
+        "field",
+      )
     : context.componentRegistry.components.default?.field;
   if (!component) {
     return;
