@@ -7,10 +7,6 @@
     ".": {
       "types": "./dist/fabrix.d.mts",
       "default": "./dist/fabrix.mjs"
-    },
-    "./rhf": {
-      "types": "./dist/rhf.d.mts",
-      "default": "./dist/rhf.mjs"
     }
   },
   "files": [
@@ -37,7 +33,8 @@
   "peerDependencies": {
     "graphql": "^16",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-hook-form": "^7"
   },
   "devDependencies": {
     "@fabrix-framework/eslint-config": "workspace:*",
