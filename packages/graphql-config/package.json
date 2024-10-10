@@ -19,7 +19,7 @@
     "graphql": "^16.9.0"
   },
   "devDependencies": {
-    "@types/node": "^20.14.10",
+    "@types/node": "^22.7.5",
     "eslint": "^9.6.0",
     "prettier": "^3.3.3",
     "tsup": "^8.1.0",

@@ -43,7 +43,7 @@
     "@fabrix-framework/eslint-config": "workspace:*",
     "@fabrix-framework/prettier-config": "workspace:*",
     "@types/chroma-js": "^2.4.4",
-    "@types/node": "^20.14.10",
+    "@types/node": "^22.7.5",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "eslint": "^9.6.0",
