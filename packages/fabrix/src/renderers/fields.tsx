@@ -47,7 +47,7 @@ export const ViewRenderer = (
   const rootValue = renderingData?.[query.rootName];
 
   // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
-  const tableMode = useMemo(() => {
+  const tableType = useMemo(() => {
     if (fieldConfigs.fields.some((f) => f.path.getName() === "collection")) {
       return "standard" as const;
     } else if (fieldConfigs.fields.some((f) => f.path.getName() === "edges")) {
@@ -59,10 +59,6 @@ export const ViewRenderer = (
 
   const rootFieldType = resolveFieldTypesFromTypename(context, rootValue);
   const renderFields = useCallback(() => {
-    if (tableMode !== null) {
-      return renderTable(context, rootValue, query, tableMode);
-    }
-
     if (componentFieldsRenderer) {
       return componentFieldsRenderer({
         getField: (name, extraProps) => {
@@ -126,7 +122,9 @@ export const ViewRenderer = (
     throw error;
   }
 
-  return renderFields();
+  return tableType !== null
+    ? renderTable(context, rootValue, query, tableType)
+    : renderFields();
 };
 
 /**
