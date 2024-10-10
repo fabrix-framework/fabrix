@@ -12,7 +12,7 @@ const devOpts =
 
 export default defineConfig({
   format: ["esm"],
-  entry: { fabrix: "src/index.ts", rhf: "rhf/index.ts" },
+  entry: { fabrix: "src/index.ts" },
   clean: true,
   minify: true,
   dts: true,
