@@ -4,4 +4,4 @@ updates:
     directory: /
     schedule:
       interval: weekly
-      timzone: Asia/Tokyo
+      timezone: Asia/Tokyo
