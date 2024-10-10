@@ -17,10 +17,12 @@ export const testWithUnmount = async (
     ),
   });
 
-  await test();
-
-  // Not knowing why this is required, but DOM between tests are unexpectedly shared and not cleaned up.
-  // So we need to unmount the test component to avoid unwanted test results.
-  // Ref: https://github.com/testing-library/react-testing-library/issues/716
-  r.unmount();
+  try {
+    await test();
+  } finally {
+    // Not knowing why this is required, but DOM between tests are unexpectedly shared and not cleaned up.
+    // So we need to unmount the test component to avoid unwanted test results.
+    // Ref: https://github.com/testing-library/react-testing-library/issues/716
+    r.unmount();
+  }
 };
