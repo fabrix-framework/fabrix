@@ -11,6 +11,8 @@ import {
   FieldType,
   getFieldConfigByKey,
   RendererQuery,
+  Loader,
+  ObjectLikeValue,
   resolveFieldTypesFromTypename,
 } from "./shared";
 
@@ -118,7 +120,7 @@ export const ViewRenderer = (
   ]);
 
   if (fetching) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   if (error) {
@@ -244,9 +246,9 @@ const renderField = (
 
   const component = field.config.componentType?.name
     ? context.componentRegistry.getCustom(
-        field.config.componentType.name,
-        "field",
-      )
+      field.config.componentType.name,
+      "field",
+    )
     : context.componentRegistry.components.default?.field;
   if (!component) {
     return;

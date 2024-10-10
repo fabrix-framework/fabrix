@@ -85,7 +85,11 @@ export const buildDefaultFormFieldConfigs = (
     return [];
   }
 
-  const inputType = context.schemaSet.serverSchema.getType(
+  if (context.schemaLoader.status === "loading") {
+    return [];
+  }
+
+  const inputType = context.schemaLoader.schemaSet.serverSchema.getType(
     fieldVariables.input.type,
   );
   if (!inputType) {
