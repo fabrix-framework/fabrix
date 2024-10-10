@@ -46,13 +46,14 @@ export type FabrixComponentFieldsRenderer = (props: {
 }) => React.ReactNode;
 
 export type DocumentResolver = () => string | DocumentNode;
+export type RendererQuery = {
+  rootName: string;
+  variables: Record<string, unknown> | undefined;
+  documentResolver: DocumentResolver;
+  subFields: Fields;
+};
 export type CommonFabrixComponentRendererProps<T = Record<string, unknown>> = {
-  query: {
-    rootName: string;
-    variables: Record<string, unknown> | undefined;
-    documentResolver: DocumentResolver;
-    subFields: Fields;
-  };
+  query: RendererQuery;
   fieldConfigs: T;
   className?: string;
   defaultData: FabrixComponentData | undefined;

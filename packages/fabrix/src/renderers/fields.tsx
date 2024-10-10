@@ -1,6 +1,7 @@
 import { createElement, useCallback, useMemo } from "react";
 import { ViewFieldSchema } from "@directive/schema";
 import { FieldWithDirective } from "@inferer";
+import { FabrixContextType } from "@context";
 import { useDataFetch, Value } from "../fetcher";
 import { RendererCommonProps } from "../renderer";
 import {
@@ -8,14 +9,51 @@ import {
   buildClassName,
   CommonFabrixComponentRendererProps,
   FieldType,
-  FieldTypes,
   getFieldConfigByKey,
+  RendererQuery,
   Loader,
   ObjectLikeValue,
   resolveFieldTypesFromTypename,
 } from "./shared";
 
 type ViewField = FieldWithDirective<ViewFieldSchema>;
+
+const getTypeName = (
+  context: FabrixContextType,
+  baseValue: Value | undefined,
+  name: string,
+) => {
+  if (Array.isArray(baseValue)) {
+    return resolveFieldTypesFromTypename(context, baseValue[0][name]);
+  } else if (typeof baseValue?.[name] === "object") {
+    return resolveFieldTypesFromTypename(context, baseValue?.[name]);
+  } else {
+    return {};
+  }
+};
+
+/**
+ * Get the sub fields of the given field.
+ *
+ *
+ */
+const getSubFields = (
+  context: FabrixContextType,
+  rootValue: Value | undefined,
+  query: RendererQuery,
+  name: string,
+) =>
+  // filters fields by parent key and maps the filtered values to the array of SubField
+  query.subFields
+    .unwrap()
+    .filter(
+      (f) => f.value.path.getParent()?.asKey() === `${query.rootName}.${name}`,
+    )
+    .map<SubField>((p) => ({
+      path: p.value.path.value,
+      name: p.getName(),
+      type: getTypeName(context, rootValue, name)[p.getName()],
+    }));
 
 export const ViewRenderer = (
   props: CommonFabrixComponentRendererProps<{
@@ -35,12 +73,6 @@ export const ViewRenderer = (
     defaultData,
   });
 
-  const resolveFieldType = useCallback(
-    (value: ObjectLikeValue): FieldTypes =>
-      resolveFieldTypesFromTypename(context, value),
-    [context],
-  );
-
   const commonRenderFieldProps = useMemo(() => {
     return {
       context,
@@ -50,43 +82,25 @@ export const ViewRenderer = (
     };
   }, [context, rootName, renderingData, query]);
 
-  const filterSubFieldsByParent = useCallback(
-    (ckey: string) =>
-      query.subFields
-        .unwrap()
-        .filter(
-          (f) =>
-            f.value.path.getParent()?.asKey() === `${query.rootName}.${ckey}`,
-        ),
-    [query],
-  );
-
   const rootValue = renderingData?.[query.rootName];
-  const getTypeName = useCallback(
-    (baseValue: Value | undefined, name: string) => {
-      if (Array.isArray(baseValue)) {
-        return resolveFieldType(baseValue[0][name]);
-      } else if (typeof baseValue?.[name] === "object") {
-        return resolveFieldType(baseValue?.[name]);
-      } else {
-        return {};
-      }
-    },
-    [resolveFieldType],
-  );
 
-  const buildSubFields = useCallback(
-    (name: string) =>
-      filterSubFieldsByParent(name).map<SubField>((p) => ({
-        path: p.value.path.value,
-        name: p.getName(),
-        type: getTypeName(rootValue, name)[p.getName()],
-      })),
-    [filterSubFieldsByParent, getTypeName, rootValue],
-  );
+  // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
+  const tableMode = useMemo(() => {
+    if (fieldConfigs.fields.some((f) => f.path.getName() === "collection")) {
+      return "standard" as const;
+    } else if (fieldConfigs.fields.some((f) => f.path.getName() === "edges")) {
+      return "relay" as const;
+    }
 
-  const rootFieldType = resolveFieldType(rootValue);
+    return null;
+  }, []);
+
+  const rootFieldType = resolveFieldTypesFromTypename(context, rootValue);
   const renderFields = useCallback(() => {
+    if (tableMode !== null) {
+      return renderTable(context, rootValue, query, tableMode);
+    }
+
     if (componentFieldsRenderer) {
       return componentFieldsRenderer({
         getField: (name, extraProps) => {
@@ -100,7 +114,7 @@ export const ViewRenderer = (
             extraClassName: extraProps?.className,
             indexKey: extraProps?.key ?? `${query.rootName}-${name}`,
             fieldTypes: rootFieldType,
-            subFields: buildSubFields(name),
+            subFields: getSubFields(context, rootValue, query, name),
             field: {
               ...field,
               ...extraProps,
@@ -110,7 +124,7 @@ export const ViewRenderer = (
       });
     }
 
-    return fieldConfigs.fields
+    const fieldsComponent = fieldConfigs.fields
       .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
       .flatMap((field, fieldIndex) => {
         const name = field.path.getName();
@@ -123,17 +137,23 @@ export const ViewRenderer = (
           ...commonRenderFieldProps,
           indexKey: `${query.rootName}-${fieldIndex}`,
           fieldTypes: rootFieldType,
-          subFields: buildSubFields(name),
+          subFields: getSubFields(context, rootValue, query, name),
           field,
         });
       });
+
+    return (
+      <div className={`fabrix fields col-row ${props.className ?? ""}`}>
+        {fieldsComponent}
+      </div>
+    );
   }, [
     commonRenderFieldProps,
     componentFieldsRenderer,
     fieldConfigs,
     query.rootName,
     rootFieldType,
-    buildSubFields,
+    getSubFields,
   ]);
 
   if (fetching) {
@@ -144,9 +164,50 @@ export const ViewRenderer = (
     throw error;
   }
 
+  return renderFields();
+};
+
+const renderTable = (
+  context: FabrixContextType,
+  rootValue: Value | undefined,
+  query: RendererQuery,
+  tableMode: "standard" | "relay",
+) => {
+  const renderStandardTable = () => {
+    const subFields = getSubFields(context, rootValue, query, "collection");
+    const headers = subFields.map((subField) => ({
+      key: subField.name,
+      label: subField.name,
+      type: subField.type,
+    }));
+
+    if (!rootValue || !("collection" in rootValue)) {
+      return;
+    }
+
+    const values = rootValue.collection;
+    if (!Array.isArray(values)) {
+      return;
+    }
+
+    const tableComponent = context.componentRegistry.components.default?.table;
+    if (!tableComponent) {
+      return;
+    }
+
+    return createElement(tableComponent, {
+      headers,
+      values,
+    });
+  };
+
+  const renderRelayTable = () => {
+    return <div>TODO: Relay Table</div>;
+  };
+
   return (
-    <div className={`fabrix fields col-row ${props.className ?? ""}`}>
-      {renderFields()}
+    <div className={"fabrix table"}>
+      {tableMode === "standard" ? renderStandardTable() : renderRelayTable()}
     </div>
   );
 };
@@ -184,9 +245,9 @@ const renderField = (
 
   const component = field.config.componentType?.name
     ? context.componentRegistry.getCustom(
-        field.config.componentType.name,
-        "field",
-      )
+      field.config.componentType.name,
+      "field",
+    )
     : context.componentRegistry.components.default?.field;
   if (!component) {
     return;
