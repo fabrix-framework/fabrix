@@ -60,7 +60,9 @@ const formView = (props: FormComponentProps) => {
 const formFieldView = (props: FormFieldComponentProps) => {
   return (
     <div>
-      <label htmlFor={props.name}>{props.name}</label>
+      <label htmlFor={props.name} aria-label={props.name}>
+        {props.attributes.label}
+      </label>
       <input name={props.name} />
     </div>
   );

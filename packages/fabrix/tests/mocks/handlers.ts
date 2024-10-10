@@ -24,6 +24,7 @@ enum UserCategory {
 }
 
 input CreateUserInput {
+  id: ID
   name: String!
   code: String!
   age: Int!
