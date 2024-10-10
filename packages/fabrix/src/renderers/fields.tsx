@@ -18,43 +18,6 @@ import {
 
 type ViewField = FieldWithDirective<ViewFieldSchema>;
 
-const getTypeName = (
-  context: FabrixContextType,
-  baseValue: Value | undefined,
-  name: string,
-) => {
-  if (Array.isArray(baseValue)) {
-    return resolveFieldTypesFromTypename(context, baseValue[0][name]);
-  } else if (typeof baseValue?.[name] === "object") {
-    return resolveFieldTypesFromTypename(context, baseValue?.[name]);
-  } else {
-    return {};
-  }
-};
-
-/**
- * Get the sub fields of the given field.
- *
- *
- */
-const getSubFields = (
-  context: FabrixContextType,
-  rootValue: Value | undefined,
-  query: RendererQuery,
-  name: string,
-) =>
-  // filters fields by parent key and maps the filtered values to the array of SubField
-  query.subFields
-    .unwrap()
-    .filter(
-      (f) => f.value.path.getParent()?.asKey() === `${query.rootName}.${name}`,
-    )
-    .map<SubField>((p) => ({
-      path: p.value.path.value,
-      name: p.getName(),
-      type: getTypeName(context, rootValue, name)[p.getName()],
-    }));
-
 export const ViewRenderer = (
   props: CommonFabrixComponentRendererProps<{
     fields: Array<ViewField>;
@@ -166,6 +129,44 @@ export const ViewRenderer = (
 
   return renderFields();
 };
+
+/**
+ * Get the type name of the given field by looking at the __typename field.
+ */
+const getTypeName = (
+  context: FabrixContextType,
+  rootValue: Value | undefined,
+  name: string,
+) => {
+  if (Array.isArray(rootValue)) {
+    return resolveFieldTypesFromTypename(context, rootValue[0][name]);
+  } else if (typeof rootValue?.[name] === "object") {
+    return resolveFieldTypesFromTypename(context, rootValue?.[name]);
+  } else {
+    return {};
+  }
+};
+
+/**
+ * Get the sub fields of the given field.
+ */
+const getSubFields = (
+  context: FabrixContextType,
+  rootValue: Value | undefined,
+  query: RendererQuery,
+  name: string,
+) =>
+  // filters fields by parent key and maps the filtered values to the array of SubField
+  query.subFields
+    .unwrap()
+    .filter(
+      (f) => f.value.path.getParent()?.asKey() === `${query.rootName}.${name}`,
+    )
+    .map<SubField>((p) => ({
+      path: p.value.path.value,
+      name: p.getName(),
+      type: getTypeName(context, rootValue, name)[p.getName()],
+    }));
 
 const renderTable = (
   context: FabrixContextType,
