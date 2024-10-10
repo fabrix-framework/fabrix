@@ -33,6 +33,7 @@ function App() {
               @fabrixView(
                 input: [
                   { field: "collection", config: { label: "Your tasks" } }
+                  { field: "collection.actions", config: { label: "Actions" } }
                 ]
               ) {
               collection {

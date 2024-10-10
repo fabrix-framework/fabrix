@@ -5,31 +5,33 @@ import {
   buildClientSchema,
   IntrospectionQuery,
   GraphQLSchema,
-  GraphQLObjectType,
   buildSchema,
 } from "graphql";
 import { createContext, useContext } from "react";
 import { ComponentRegistry, emptyComponentRegistry } from "./registry";
 
-export type SchemaSet = {
+type SchemaSet = {
   serverSchema: GraphQLSchema;
   operationSchema?: DocumentNode;
 };
+
+export type SchemaLoader =
+  | {
+      status: "loading";
+    }
+  | {
+      status: "loaded";
+      schemaSet: SchemaSet;
+    };
+
 export type FabrixContextType = {
-  schemaSet: SchemaSet;
+  schemaLoader: SchemaLoader;
   componentRegistry: ComponentRegistry;
 };
 
-export const emptySchema = new GraphQLSchema({
-  query: new GraphQLObjectType({
-    name: "Query",
-    fields: {},
-  }),
-});
-
 export const FabrixContext = createContext<FabrixContextType>({
-  schemaSet: {
-    serverSchema: emptySchema,
+  schemaLoader: {
+    status: "loading",
   },
   componentRegistry: emptyComponentRegistry,
 });

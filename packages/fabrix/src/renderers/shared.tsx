@@ -46,13 +46,14 @@ export type FabrixComponentFieldsRenderer = (props: {
 }) => React.ReactNode;
 
 export type DocumentResolver = () => string | DocumentNode;
+export type RendererQuery = {
+  rootName: string;
+  variables: Record<string, unknown> | undefined;
+  documentResolver: DocumentResolver;
+  subFields: Fields;
+};
 export type CommonFabrixComponentRendererProps<T = Record<string, unknown>> = {
-  query: {
-    rootName: string;
-    variables: Record<string, unknown> | undefined;
-    documentResolver: DocumentResolver;
-    subFields: Fields;
-  };
+  query: RendererQuery;
   fieldConfigs: T;
   className?: string;
   defaultData: FabrixComponentData | undefined;
@@ -127,8 +128,13 @@ export const resolveFieldTypesFromTypename = (
     return {};
   }
 
+  if (context.schemaLoader.status === "loading") {
+    return {};
+  }
+
   const typeName = firstValue.__typename;
-  const valueType = context.schemaSet.serverSchema.getType(typeName);
+  const valueType =
+    context.schemaLoader.schemaSet.serverSchema.getType(typeName);
   if (!(valueType instanceof GraphQLObjectType)) {
     return {};
   }
@@ -207,4 +213,12 @@ export const resolveFieldType = (
     // Interface is not supported as well
     return null;
   }
+};
+
+export const Loader = () => {
+  return (
+    <div aria-busy="true" role="status">
+      Loading...
+    </div>
+  );
 };
