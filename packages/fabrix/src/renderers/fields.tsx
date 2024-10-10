@@ -10,6 +10,7 @@ import {
   FieldType,
   FieldTypes,
   getFieldConfigByKey,
+  Loader,
   ObjectLikeValue,
   resolveFieldTypesFromTypename,
 } from "./shared";
@@ -136,7 +137,7 @@ export const ViewRenderer = (
   ]);
 
   if (fetching) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   if (error) {

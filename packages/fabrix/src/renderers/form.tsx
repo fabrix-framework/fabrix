@@ -9,6 +9,7 @@ import {
   CommonFabrixComponentRendererProps,
   FieldType,
   getFieldConfigByKey,
+  Loader,
 } from "./shared";
 
 const getClearedValue = (values: Record<string, unknown>) =>
@@ -34,10 +35,6 @@ export const FormRenderer = (
   const { context, fieldConfigs, query, componentFieldsRenderer } = props;
   const formContext = useForm();
   const [mutationResult, runMutation] = useMutation(query.documentResolver());
-  const component = context.componentRegistry.components.default?.form;
-  if (!component) {
-    return;
-  }
 
   const runSubmit = useCallback(() => {
     runMutation({
@@ -84,6 +81,15 @@ export const FormRenderer = (
         }),
       );
   }, [context, fieldConfigs, query.rootName, componentFieldsRenderer]);
+
+  if (context.schemaLoader.status === "loading") {
+    return <Loader />;
+  }
+
+  const component = context.componentRegistry.components.default?.form;
+  if (!component) {
+    return;
+  }
 
   return createElement(component, {
     renderFields: () => {
