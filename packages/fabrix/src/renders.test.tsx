@@ -29,6 +29,35 @@ describe("query", () => {
       },
     );
   });
+
+  it("should render the table with customized labels", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          query getUsers {
+            users @fabrixView(input: [
+              { field: "collection.name", config: { label: "UserName" } }
+            ]) {
+              collection {
+                id
+                name
+                code
+              }
+            }
+          }
+        `}
+      />,
+      async () => {
+        const table = await screen.findByRole("table");
+        expect(table).toBeInTheDocument();
+
+        const rows = await within(table).findAllByRole("row");
+        expect(rows.length).toBe(users.length + 1);
+
+        expect(rows[0]).toHaveTextContent("UserName");
+      },
+    );
+  });
 });
 
 describe("mutation", () => {
