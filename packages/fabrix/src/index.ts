@@ -9,6 +9,7 @@ export {
   type FieldComponentProps,
   type TableComponentProps,
   type TableComponentHeader,
+  type TableCellComponentProps,
   type FormComponentProps,
   type FormFieldComponentProps,
   ComponentRegistry,

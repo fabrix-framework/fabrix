@@ -14,12 +14,13 @@ const buildTable = (props: TableComponentProps) => {
   const { headers } = props;
   const columnHelper = createColumnHelper<(typeof props)["values"][0]>();
   return {
-    columns: headers.map((header) => {
-      if (header.type === null) {
+    columns: headers.flatMap((header) => {
+      const renderer = header.render;
+      if (header.type === null && renderer) {
         return columnHelper.display({
           id: header.key,
           header: header.label,
-          cell: () => <div>TODO</div>,
+          cell: (value) => renderer(value.row.original),
         });
       }
 

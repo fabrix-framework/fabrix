@@ -8,12 +8,10 @@ import {
   assertObjectValue,
   buildClassName,
   CommonFabrixComponentRendererProps,
-  FieldType,
   getFieldConfigByKey,
   Loader,
   resolveFieldTypesFromTypename,
 } from "./shared";
-import { Path } from "@visitor";
 
 type ViewField = FieldWithDirective<ViewFieldSchema>;
 type Fields = Array<ViewField>;
@@ -167,10 +165,11 @@ const getSubFields = (
   // filters fields by parent key and maps the filtered values to the array of SubField
   fields
     .filter((f) => f.field.getParent()?.asKey() === name)
-    .map<SubField>((p) => ({
-      path: p.field,
-      name: p.config.label ?? p.field.getName(),
-      type: getTypeName(context, rootValue, name)[p.field.getName()] || null,
+    .map((value) => ({
+      value,
+      type:
+        getTypeName(context, rootValue, name)[value.field.getName()] || null,
+      label: value.config.label || value.field.getName(),
     }));
 
 const renderTable = (
@@ -179,22 +178,49 @@ const renderTable = (
   fields: Fields,
   tableMode: "standard" | "relay",
 ) => {
+  if (!rootValue || !("collection" in rootValue)) {
+    return;
+  }
+
+  const values = rootValue.collection;
+  if (!Array.isArray(values)) {
+    return;
+  }
+
   const renderStandardTable = () => {
     const subFields = getSubFields(context, rootValue, fields, "collection");
-    const headers = subFields.map((subField) => ({
-      key: subField.path.getName(),
-      label: subField.name,
-      type: subField.type,
-    }));
+    const headers = subFields.map((subField) => {
+      // TODO: fallback to default table cell component
+      const component = subField.value.config.componentType?.name
+        ? context.componentRegistry.getCustom(
+            subField.value.config.componentType.name,
+            "tableCell",
+          )
+        : null;
 
-    if (!rootValue || !("collection" in rootValue)) {
-      return;
-    }
+      const key = subField.value.field.getName();
+      const cellRenderer = component
+        ? (value: unknown) => {
+            return createElement(component, {
+              key,
+              name: key,
+              type: null,
+              value,
+              attributes: {
+                className: "",
+                label: subField.label,
+              },
+            });
+          }
+        : null;
 
-    const values = rootValue.collection;
-    if (!Array.isArray(values)) {
-      return;
-    }
+      return {
+        label: subField.label,
+        key: subField.value.field.getName(),
+        type: subField.type,
+        render: cellRenderer,
+      };
+    });
 
     const tableComponent = context.componentRegistry.components.default?.table;
     if (!tableComponent) {
@@ -222,11 +248,7 @@ const renderTable = (
   );
 };
 
-export type SubField = {
-  path: Path;
-  name: string;
-  type: FieldType;
-};
+export type SubField = ReturnType<typeof getSubFields>[number];
 
 const renderField = (
   props: RendererCommonProps & {
@@ -276,7 +298,11 @@ const renderField = (
     name: field.field.asKey(),
     value: values?.[fieldName] ?? "-",
     type: fieldType,
-    subFields,
+    subFields: subFields.map((subField) => ({
+      key: subField.value.field.getName(),
+      label: subField.label,
+      type: subField.type,
+    })),
     attributes: {
       className,
       label: field.config.label,

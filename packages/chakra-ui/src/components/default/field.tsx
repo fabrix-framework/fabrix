@@ -1,8 +1,4 @@
-import {
-  FieldComponentProps,
-  FieldType,
-  TableComponentHeader,
-} from "@fabrix-framework/fabrix";
+import { FieldComponentProps, FieldType } from "@fabrix-framework/fabrix";
 import { Text, Stack, Badge } from "@chakra-ui/react";
 import createColor from "create-color";
 import chroma from "chroma-js";
@@ -70,14 +66,5 @@ export const ListTableField = (props: FieldComponentProps) => {
     return;
   }
 
-  return (
-    <ChakraReactTable
-      values={props.value}
-      headers={props.subFields?.map<TableComponentHeader>((subField) => ({
-        key: subField.name,
-        label: subField.name,
-        type: subField.type,
-      }))}
-    />
-  );
+  return <ChakraReactTable values={props.value} headers={props.subFields} />;
 };

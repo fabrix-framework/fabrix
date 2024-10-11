@@ -15,18 +15,18 @@ function App() {
       <FabrixComponent
         containerClassName={containerClassName}
         query={gql`
-          # mutation createTodo($input: TodoInput!) {
-          #   addTodo(input: $input)
-          #     @fabrixForm(
-          #       input: [
-          #         { field: "hasDone", config: { hidden: true } }
-          #         { field: "name", config: { gridCol: 9 } }
-          #         { field: "priority", config: { gridCol: 3 } }
-          #       ]
-          #     ) {
-          #     id
-          #   }
-          # }
+          mutation createTodo($input: TodoInput!) {
+            addTodo(input: $input)
+              @fabrixForm(
+                input: [
+                  { field: "hasDone", config: { hidden: true } }
+                  { field: "name", config: { gridCol: 9 } }
+                  { field: "priority", config: { gridCol: 3 } }
+                ]
+              ) {
+              id
+            }
+          }
 
           query todos {
             allTodos
@@ -34,7 +34,13 @@ function App() {
                 input: [
                   { field: "collection", config: { label: "Your tasks" } }
                   { field: "collection.name", config: { label: "Task Name" } }
-                  { field: "collection.actions", config: { label: "Actions" } }
+                  {
+                    field: "collection.actions"
+                    config: {
+                      label: "操作"
+                      componentType: { name: "ActionCell" }
+                    }
+                  }
                 ]
               ) {
               collection {
