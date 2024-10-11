@@ -3,6 +3,7 @@ import { Text, Stack, Badge } from "@chakra-ui/react";
 import createColor from "create-color";
 import chroma from "chroma-js";
 import { useMemo } from "react";
+import { CheckCircleIcon } from "@chakra-ui/icons";
 import { ChakraReactTable } from "./table";
 import { LabelledHeading } from "./shared";
 
@@ -30,12 +31,21 @@ export const SingleValueField = (props: {
   type: FieldType | undefined;
   value: unknown;
 }) => {
+  const renderAsText = () => <Text fontSize="md">{String(value)}</Text>;
+
   const { type, value } = props;
   switch (type?.type) {
     case "Enum":
       return <EnumBadgeField {...props} />;
+    case "Scalar":
+      switch (type.name) {
+        case "Boolean":
+          return value ? <CheckCircleIcon /> : "-";
+        default:
+          return renderAsText();
+      }
     default:
-      return <Text fontSize="md">{String(value)}</Text>;
+      return renderAsText();
   }
 };
 

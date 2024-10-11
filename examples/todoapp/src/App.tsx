@@ -19,6 +19,7 @@ function App() {
             addTodo(input: $input)
               @fabrixForm(
                 input: [
+                  { field: "id", config: { hidden: true } }
                   { field: "hasDone", config: { hidden: true } }
                   { field: "name", config: { gridCol: 9 } }
                   { field: "priority", config: { gridCol: 3 } }
