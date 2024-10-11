@@ -286,7 +286,6 @@ export const FabrixComponent = (
           documentResolver: () => field.document,
           variables: props.variables,
           rootName: field.name,
-          // subFields: field.subFields,
         },
         defaultData: props.data,
         className: props.contentClassName,
@@ -295,12 +294,10 @@ export const FabrixComponent = (
       };
 
       switch (field.type) {
-        case "view": {
+        case "view":
           return <ViewRenderer {...commonProps} fieldConfigs={field.configs} />;
-        }
-        case "form": {
+        case "form":
           return <FormRenderer {...commonProps} fieldConfigs={field.configs} />;
-        }
         default:
           return null;
       }
