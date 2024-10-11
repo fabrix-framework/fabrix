@@ -43,6 +43,7 @@ const typeDefs = gql`
   }
 
   input TodoInput {
+    id: ID
     name: String!
     priority: TodoPriority!
     hasDone: Boolean
@@ -54,6 +55,7 @@ const typeDefs = gql`
 
   type Mutation {
     addTodo(input: TodoInput!): Todo
+    markTodoDone(input: TodoInput!): Todo
   }
 `;
 
@@ -74,6 +76,15 @@ const resolvers = {
       };
       todos.push(newTodo);
       return newTodo;
+    },
+
+    markTodoDone: (_: unknown, { input }: { input: Todo }) => {
+      const todoIndex = todos.findIndex((todo) => todo.id === input.id);
+      if (todoIndex === -1) {
+        throw new Error("Todo not found");
+      }
+      todos[todoIndex].hasDone = true;
+      return todos[todoIndex];
     },
   },
 };

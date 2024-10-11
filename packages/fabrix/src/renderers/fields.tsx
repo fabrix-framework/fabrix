@@ -189,7 +189,11 @@ const renderTable = (
 
   const renderStandardTable = () => {
     const subFields = getSubFields(context, rootValue, fields, "collection");
-    const headers = subFields.map((subField) => {
+    const headers = subFields.flatMap((subField) => {
+      if (subField.value.config.hidden) {
+        return [];
+      }
+
       // TODO: fallback to default table cell component
       const component = subField.value.config.componentType?.name
         ? context.componentRegistry.getCustom(
@@ -200,12 +204,12 @@ const renderTable = (
 
       const key = subField.value.field.getName();
       const cellRenderer = component
-        ? (value: unknown) => {
+        ? (rowValue: unknown) => {
             return createElement(component, {
               key,
               name: key,
               type: null,
-              value,
+              value: rowValue,
               attributes: {
                 className: "",
                 label: subField.label,

@@ -66,5 +66,13 @@ export const ListTableField = (props: FieldComponentProps) => {
     return;
   }
 
-  return <ChakraReactTable values={props.value} headers={props.subFields} />;
+  return (
+    <ChakraReactTable
+      values={props.value}
+      headers={props.subFields.map((field) => ({
+        ...field,
+        render: null,
+      }))}
+    />
+  );
 };

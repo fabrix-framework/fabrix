@@ -34,6 +34,7 @@ function App() {
                 input: [
                   { field: "collection", config: { label: "Your tasks" } }
                   { field: "collection.name", config: { label: "Task Name" } }
+                  { field: "collection.id", config: { hidden: true } }
                   {
                     field: "collection.actions"
                     config: {
@@ -44,9 +45,10 @@ function App() {
                 ]
               ) {
               collection {
+                id
+                hasDone
                 name
                 priority
-                hasDone
               }
             }
           }

@@ -18,7 +18,7 @@ type BaseComponentProps = {
   attributes: DirectiveAttributes;
 };
 
-type SubField = {
+export type Field = {
   key: string;
   label: string;
   type: FieldType;
@@ -30,7 +30,7 @@ type SubField = {
 export type FieldComponentProps<P extends UserProps = UserProps> =
   BaseComponentProps &
     CustomRendererProps<P> & {
-      subFields: Array<SubField>;
+      subFields: Array<Field>;
     };
 
 /**
@@ -43,8 +43,8 @@ export type TableComponentProps<P extends UserProps = UserProps> =
     headers: TableComponentHeader[];
     values: Record<string, unknown>[];
   };
-export type TableComponentHeader = SubField & {
-  render: ((rowValue: unknown) => React.ReactNode) | null;
+export type TableComponentHeader = Field & {
+  render: ((rowValue: unknown) => React.ReactElement) | null;
 };
 
 /**
