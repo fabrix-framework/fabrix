@@ -11,7 +11,6 @@ import {
 import { DirectiveAttributes } from "@registry";
 import { FabrixContextType } from "@context";
 import { FieldWithDirective } from "@inferer";
-import { Fields } from "@visitor";
 import { FabrixComponentData } from "../fetcher";
 
 type FabrixComponentFieldsRendererExtraProps = Partial<DirectiveAttributes> & {
@@ -50,7 +49,6 @@ export type RendererQuery = {
   rootName: string;
   variables: Record<string, unknown> | undefined;
   documentResolver: DocumentResolver;
-  subFields: Fields;
 };
 export type CommonFabrixComponentRendererProps<T = Record<string, unknown>> = {
   query: RendererQuery;
@@ -101,7 +99,7 @@ export const getFieldConfigByKey = <
 >(
   fields: Array<FieldWithDirective<C, M>>,
   name: string,
-) => fields.find((f) => f.path.asKey() == name);
+) => fields.find((f) => f.field.asKey() == name);
 
 export type ObjectLikeValue =
   | Record<string, unknown>
