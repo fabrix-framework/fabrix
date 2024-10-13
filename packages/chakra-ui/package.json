@@ -31,7 +31,7 @@
     "chakra-react-select": "^4.9.1",
     "chroma-js": "^3.0.0",
     "create-color": "^2.0.6",
-    "framer-motion": "^11.3.17",
+    "framer-motion": "^11.11.8",
     "zod": "^3.23.8"
   },
   "peerDependencies": {
