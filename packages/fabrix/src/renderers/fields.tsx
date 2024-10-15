@@ -202,6 +202,16 @@ const renderTable = (
           )
         : null;
 
+      const userProps = subField.value.config.componentType?.props?.reduce(
+        (acc, prop) => {
+          return {
+            ...acc,
+            [prop.name]: prop.value,
+          };
+        },
+        {},
+      );
+
       const key = subField.value.field.getName();
       const cellRenderer = component
         ? (rowValue: unknown) => {
@@ -214,6 +224,7 @@ const renderTable = (
                 className: "",
                 label: subField.label,
               },
+              userProps,
             });
           }
         : null;
