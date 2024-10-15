@@ -249,7 +249,7 @@ const renderTable = (
   };
 
   const renderRelayTable = () => {
-    return <div>TODO: Relay Table</div>;
+    return <div>WARN: Relay style table renderer is not supported for now</div>;
   };
 
   const headerConfig = getFieldConfigByKey(fields, "collection");
