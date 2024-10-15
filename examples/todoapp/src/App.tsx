@@ -35,10 +35,7 @@ function App() {
                 input: [
                   { field: "collection", config: { label: "タスク一覧" } }
                   { field: "collection.id", config: { hidden: true } }
-                  {
-                    field: "collection.hasDone"
-                    config: { label: "Status", index: 999 }
-                  }
+                  { field: "collection.hasDone", config: { label: "Status" } }
                   {
                     field: "collection.actions"
                     config: {
