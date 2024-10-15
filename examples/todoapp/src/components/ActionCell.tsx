@@ -4,7 +4,7 @@ import {
   useFabrixClient,
   useFabrixContext,
 } from "@fabrix-framework/fabrix";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 export const ActionCell = {
   name: "ActionCell",
@@ -12,6 +12,7 @@ export const ActionCell = {
   component: (props: TableCellComponentProps) => {
     const client = useFabrixClient();
     const context = useFabrixContext();
+    const [isMutating, setMutating] = useState(false);
     const values = useMemo(() => {
       const label = props.userProps?.["label"] ?? "Action";
       const color = props.userProps?.["color"] ?? "blue";
@@ -26,23 +27,30 @@ export const ActionCell = {
         mutation,
       };
     }, [props]);
-    const markDone = useCallback(() => {
+    const markDone = useCallback(async () => {
       const op = context.getMutation(values.mutation);
       if (!op) {
         return;
       }
 
-      client
-        .mutation(op, {
+      setMutating(true);
+      try {
+        await client.mutation(op, {
           input: props.value,
-        })
-        .then((result) => {
-          console.log(result);
         });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setMutating(false);
+      }
     }, [client, context, values, props]);
 
     return (
-      <Button onClick={markDone} colorScheme={values.color}>
+      <Button
+        onClick={markDone}
+        colorScheme={values.color}
+        isDisabled={isMutating}
+      >
         {values.label}
       </Button>
     );
