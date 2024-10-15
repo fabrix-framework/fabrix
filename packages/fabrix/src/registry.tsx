@@ -11,9 +11,9 @@ type CustomRendererProps<P extends UserProps> = {
   userProps?: P;
 };
 
-type BaseComponentProps = {
+type BaseComponentProps<V = unknown> = {
   name: string;
-  value: unknown;
+  value: V;
   type: FieldType;
   attributes: DirectiveAttributes;
 };
@@ -44,14 +44,16 @@ export type TableComponentProps<P extends UserProps = UserProps> =
     values: Record<string, unknown>[];
   };
 export type TableComponentHeader = Field & {
-  render: ((rowValue: unknown) => React.ReactElement) | null;
+  render: ((rowValue: Record<string, unknown>) => React.ReactElement) | null;
 };
 
 /**
  * The component props that table cell renderer should implement.
  */
-export type TableCellComponentProps<P extends UserProps = UserProps> =
-  BaseComponentProps & CustomRendererProps<P>;
+export type TableCellComponentProps<
+  P extends UserProps = UserProps,
+  V extends Record<string, unknown> = Record<string, unknown>,
+> = BaseComponentProps<V> & CustomRendererProps<P>;
 
 /**
  * The component props that form field renderer should implement.

@@ -6,8 +6,8 @@ import {
 } from "@fabrix-framework/fabrix";
 import { useCallback, useMemo, useState } from "react";
 
-export const ActionCell = {
-  name: "ActionCell",
+export const IDActionCell = {
+  name: "IDActionCell",
   type: "tableCell",
   component: (props: TableCellComponentProps) => {
     const client = useFabrixClient();
@@ -36,7 +36,9 @@ export const ActionCell = {
       setMutating(true);
       try {
         await client.mutation(op, {
-          input: props.value,
+          input: {
+            id: props.value.id,
+          },
         });
       } catch (e) {
         console.error(e);

@@ -217,7 +217,7 @@ const renderTable = (
 
       const key = subField.value.field.getName();
       const cellRenderer = component
-        ? (rowValue: unknown) => {
+        ? (rowValue: Record<string, unknown>) => {
             return createElement(component, {
               key,
               name: key,

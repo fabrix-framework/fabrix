@@ -49,13 +49,17 @@ const typeDefs = gql`
     hasDone: Boolean
   }
 
+  input MarkTodoDoneInput {
+    id: ID
+  }
+
   type Query {
     allTodos: TodosCollection
   }
 
   type Mutation {
     addTodo(input: TodoInput!): Todo
-    markTodoDone(input: TodoInput!): Todo
+    markTodoDone(input: MarkTodoDoneInput!): Todo
   }
 `;
 
@@ -78,7 +82,7 @@ const resolvers = {
       return newTodo;
     },
 
-    markTodoDone: (_: unknown, { input }: { input: Todo }) => {
+    markTodoDone: (_: unknown, { input }: { input: Pick<Todo, "id"> }) => {
       const todoIndex = todos.findIndex((todo) => todo.id === input.id);
       if (todoIndex === -1) {
         throw new Error("Todo not found");

@@ -42,7 +42,7 @@ function App() {
                       label: "操作"
                       index: -1
                       componentType: {
-                        name: "ActionCell"
+                        name: "IDActionCell"
                         props: [
                           { name: "label", value: "Done" }
                           { name: "color", value: "blue" }
