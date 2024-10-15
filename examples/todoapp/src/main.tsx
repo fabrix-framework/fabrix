@@ -7,7 +7,7 @@ import {
 } from "@fabrix-framework/fabrix";
 import { ChakraUIRegistry } from "@fabrix-framework/chakra-ui";
 import { ChakraProvider } from "@chakra-ui/react";
-import { ActionCell } from "./registry.tsx";
+import { ActionCell } from "./components/ActionCell.tsx";
 import App from "./App.tsx";
 import "./index.css";
 import "./columns.css";

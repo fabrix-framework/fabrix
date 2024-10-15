@@ -40,7 +40,14 @@ function App() {
                     field: "collection.actions"
                     config: {
                       label: "操作"
-                      componentType: { name: "ActionCell" }
+                      componentType: {
+                        name: "ActionCell"
+                        props: [
+                          { name: "label", value: "Done" }
+                          { name: "color", value: "blue" }
+                          { name: "mutation", value: "markTodoDone" }
+                        ]
+                      }
                     }
                   }
                 ]
