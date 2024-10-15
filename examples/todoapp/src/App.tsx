@@ -33,13 +33,17 @@ function App() {
             allTodos
               @fabrixView(
                 input: [
-                  { field: "collection", config: { label: "Your tasks" } }
-                  { field: "collection.name", config: { label: "Task Name" } }
+                  { field: "collection", config: { label: "タスク一覧" } }
                   { field: "collection.id", config: { hidden: true } }
+                  {
+                    field: "collection.hasDone"
+                    config: { label: "Status", index: 999 }
+                  }
                   {
                     field: "collection.actions"
                     config: {
                       label: "操作"
+                      index: -1
                       componentType: {
                         name: "ActionCell"
                         props: [
@@ -54,9 +58,9 @@ function App() {
               ) {
               collection {
                 id
-                hasDone
                 name
                 priority
+                hasDone
               }
             }
           }
