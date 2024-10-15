@@ -6,8 +6,10 @@ import {
   IntrospectionQuery,
   GraphQLSchema,
   buildSchema,
+  Kind,
+  OperationTypeNode,
 } from "graphql";
-import { createContext, useContext } from "react";
+import { createContext, useCallback, useContext } from "react";
 import { ComponentRegistry, emptyComponentRegistry } from "./registry";
 
 type SchemaSet = {
@@ -40,7 +42,57 @@ export const FabrixContext = createContext<FabrixContextType>({
  * Hook to access the Fabrix context.
  */
 export const useFabrixContext = () => {
-  return useContext(FabrixContext);
+  const context = useContext(FabrixContext);
+  const getOperation = (opType: OperationTypeNode, name: string) => {
+    if (context.schemaLoader.status === "loading") {
+      return;
+    }
+
+    const opSchema = context.schemaLoader.schemaSet.operationSchema;
+    return opSchema?.definitions.find((def) => {
+      if (
+        def.kind === Kind.OPERATION_DEFINITION &&
+        def.operation === opType &&
+        def.name?.value === name
+      ) {
+        return true;
+      }
+    });
+  };
+
+  const getMutation = useCallback(
+    (name: string): DocumentNode | null => {
+      const op = getOperation(OperationTypeNode.MUTATION, name);
+      if (!op) {
+        return null;
+      }
+
+      return {
+        kind: Kind.DOCUMENT,
+        definitions: [op],
+      };
+    },
+    [context],
+  );
+  const getQuery = useCallback(
+    (name: string): DocumentNode | null => {
+      const op = getOperation(OperationTypeNode.QUERY, name);
+      if (!op) {
+        return null;
+      }
+
+      return {
+        kind: Kind.DOCUMENT,
+        definitions: [op],
+      };
+    },
+    [context],
+  );
+
+  return {
+    getMutation,
+    getQuery,
+  };
 };
 
 export type BuildFabrixContextProps = {
