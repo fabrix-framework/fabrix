@@ -66,7 +66,9 @@ describe("query", () => {
         {
           name: "ActionCell",
           type: "tableCell",
-          component: (props) => <button>{props.userProps?.["label"]}</button>,
+          component: (props) => (
+            <button role="button">{props.userProps?.["label"]}</button>
+          ),
         } as const,
       ],
     });
@@ -77,9 +79,16 @@ describe("query", () => {
           query getUsers {
             users @fabrixView(input: [
               {
+                field: "collection.id",
+                config: {
+                  hidden: true
+                }
+              },
+              {
                 field: "collection.actions",
                 config: {
                   label: "操作",
+                  index: -1
                   componentType: {
                     name: "ActionCell",
                     props: [
@@ -107,7 +116,8 @@ describe("query", () => {
         const rows = await within(table).findAllByRole("row");
         expect(rows.length).toBe(users.length + 1);
 
-        expect(rows[0]).toHaveTextContent("操作");
+        const headers = within(rows[0]).getAllByRole("columnheader");
+        expect(headers[0]).toHaveTextContent("操作");
       },
       { components },
     );

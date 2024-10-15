@@ -155,6 +155,8 @@ const getTypeName = (
 
 /**
  * Get the sub fields of the given field.
+ *
+ * This also sorts the fields by the index value.
  */
 const getSubFields = (
   context: FabrixContextType,
@@ -165,6 +167,7 @@ const getSubFields = (
   // filters fields by parent key and maps the filtered values to the array of SubField
   fields
     .filter((f) => f.field.getParent()?.asKey() === name)
+    .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
     .map((value) => ({
       value,
       type:
