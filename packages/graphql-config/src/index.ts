@@ -1,1 +1,1 @@
-export { generateConfig, schemaDefinition } from "./config";
+export { generateConfig } from "./config";
