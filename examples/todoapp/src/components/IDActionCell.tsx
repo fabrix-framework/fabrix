@@ -4,7 +4,7 @@ import {
   useFabrixClient,
   useFabrixContext,
 } from "@fabrix-framework/fabrix";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 export const IDActionCell = {
   name: "IDActionCell",
@@ -13,22 +13,15 @@ export const IDActionCell = {
     const client = useFabrixClient();
     const context = useFabrixContext();
     const [isMutating, setMutating] = useState(false);
-    const values = useMemo(() => {
-      const label = props.userProps?.["label"] ?? "Action";
-      const color = props.userProps?.["color"] ?? "blue";
-      const mutation = props.userProps?.["mutation"];
-      if (!mutation) {
-        throw new Error("Mutation is required");
-      }
+    const label = props.userProps?.["label"] ?? "Action";
+    const color = props.userProps?.["color"] ?? "blue";
+    const mutation = props.userProps?.["mutation"];
+    if (!mutation) {
+      throw new Error("Mutation is required");
+    }
 
-      return {
-        label,
-        color,
-        mutation,
-      };
-    }, [props]);
-    const markDone = useCallback(async () => {
-      const op = context.getMutation(values.mutation);
+    const mutate = useCallback(async () => {
+      const op = context.getMutation(mutation);
       if (!op) {
         return;
       }
@@ -45,15 +38,11 @@ export const IDActionCell = {
       } finally {
         setMutating(false);
       }
-    }, [client, context, values, props]);
+    }, [client, context, props]);
 
     return (
-      <Button
-        onClick={markDone}
-        colorScheme={values.color}
-        isDisabled={isMutating}
-      >
-        {values.label}
+      <Button onClick={mutate} colorScheme={color} isDisabled={isMutating}>
+        {label}
       </Button>
     );
   },
