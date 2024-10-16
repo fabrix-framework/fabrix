@@ -33,7 +33,7 @@ function App() {
             allTodos
               @fabrixView(
                 input: [
-                  { field: "collection", config: { label: "タスク一覧" } }
+                  { field: "collection", config: { label: "Your tasks" } }
                   { field: "collection.id", config: { hidden: true } }
                   { field: "collection.hasDone", config: { label: "Status" } }
                   {
