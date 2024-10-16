@@ -39,7 +39,7 @@ function App() {
                   {
                     field: "collection.actions"
                     config: {
-                      label: "操作"
+                      label: "Actions"
                       index: -1
                       componentType: {
                         name: "IDActionCell"
