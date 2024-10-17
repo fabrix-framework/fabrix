@@ -117,6 +117,28 @@ input FabrixFormField {
   config: FabrixFormFieldConfig!
 }
 
+input FabrixFormConstraint {
+  """
+  String
+  """
+  minLength: Int
+  maxLength: Int
+  startsWith: String
+  endsWith: String
+  contains: String
+  notContains: String
+  pattern: String
+  format: String
+
+  """
+  Int/Float
+  """
+  min: Int
+  max: Int
+  exclusiveMin: Float
+  exclusiveMax: Float
+}
+
 """
 Fabrix directive for form
 """
