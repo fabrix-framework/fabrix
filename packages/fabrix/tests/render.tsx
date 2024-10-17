@@ -4,17 +4,25 @@ import {
   waitForElementToBeRemoved,
   screen,
 } from "@testing-library/react";
+import { ComponentRegistry } from "@registry";
 import { testingComponents } from "./components";
 
 export const testWithUnmount = async (
   ui: React.ReactNode,
   test: () => Promise<void> | void,
+  options?: {
+    components: ComponentRegistry;
+  },
 ) => {
+  const components = options?.components
+    ? testingComponents.merge(options.components)
+    : testingComponents;
+
   const component = render(ui, {
     wrapper: ({ children }) => (
       <FabrixProvider
         url="http://localhost:1234"
-        componentRegistry={testingComponents}
+        componentRegistry={components}
       >
         {children}
       </FabrixProvider>

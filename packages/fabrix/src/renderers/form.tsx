@@ -20,10 +20,12 @@ const getClearedValue = (values: Record<string, unknown>) =>
     };
   }, {});
 
-export type FormFieldMeta = {
-  fieldType: FieldType;
-  isRequired: boolean;
-};
+export type FormFieldMeta =
+  | {
+      fieldType: FieldType;
+      isRequired: boolean;
+    }
+  | Record<string, never>;
 
 export type FormField = FieldWithDirective<FormFieldSchema, FormFieldMeta>;
 
@@ -140,7 +142,7 @@ const renderField = (props: {
     key: indexKey,
     value: fieldConfig.defaultValue,
     type: field.meta.fieldType,
-    name: field.path.asKey(),
+    name: field.field.asKey(),
     isRequired: field.meta.isRequired,
     attributes: {
       className,

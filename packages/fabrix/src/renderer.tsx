@@ -121,7 +121,6 @@ const getFieldConfig = (
 
 type FieldConfig = ReturnType<typeof getFieldConfig> & {
   document: DocumentNode;
-  subFields: Fields;
 };
 type FieldConfigs = Record<string, FieldConfig>;
 
@@ -140,7 +139,7 @@ const useFieldConfigs = (query: DocumentNode | string) => {
             context,
             field,
             variables,
-            fields.getChildren(field.getName()),
+            fields.getChildrenWithAncestors(field.getName()),
             opType,
           );
           if (!fieldConfig) {
@@ -151,7 +150,6 @@ const useFieldConfigs = (query: DocumentNode | string) => {
             ...acc,
             [field.getName()]: {
               document,
-              subFields: fields.getChildrenWithAncestors(field.getName()),
               ...fieldConfig,
             },
           };
@@ -288,7 +286,6 @@ export const FabrixComponent = (
           documentResolver: () => field.document,
           variables: props.variables,
           rootName: field.name,
-          subFields: field.subFields,
         },
         defaultData: props.data,
         className: props.contentClassName,

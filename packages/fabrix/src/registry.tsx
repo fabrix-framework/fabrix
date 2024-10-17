@@ -1,7 +1,6 @@
 import { ViewFieldSchema } from "@directive/schema";
 import { FieldType } from "renderers/shared";
 import React from "react";
-import { SubField } from "@renderers/fields";
 
 export type DirectiveAttributes = Pick<ViewFieldSchema, "label"> & {
   className: string;
@@ -12,11 +11,17 @@ type CustomRendererProps<P extends UserProps> = {
   userProps?: P;
 };
 
-type BaseComponentProps = {
+type BaseComponentProps<V = unknown> = {
   name: string;
-  value: unknown;
+  value: V;
   type: FieldType;
   attributes: DirectiveAttributes;
+};
+
+export type Field = {
+  key: string;
+  label: string;
+  type: FieldType;
 };
 
 /**
@@ -25,7 +30,7 @@ type BaseComponentProps = {
 export type FieldComponentProps<P extends UserProps = UserProps> =
   BaseComponentProps &
     CustomRendererProps<P> & {
-      subFields: Array<SubField>;
+      subFields: Array<Field>;
     };
 
 /**
@@ -38,11 +43,17 @@ export type TableComponentProps<P extends UserProps = UserProps> =
     headers: TableComponentHeader[];
     values: Record<string, unknown>[];
   };
-export type TableComponentHeader = {
-  key: string;
-  label: string;
-  type: FieldType;
+export type TableComponentHeader = Field & {
+  render: ((rowValue: Record<string, unknown>) => React.ReactElement) | null;
 };
+
+/**
+ * The component props that table cell renderer should implement.
+ */
+export type TableCellComponentProps<
+  P extends UserProps = UserProps,
+  V extends Record<string, unknown> = Record<string, unknown>,
+> = BaseComponentProps<V> & CustomRendererProps<P>;
 
 /**
  * The component props that form field renderer should implement.
@@ -95,6 +106,11 @@ type CustomComponent =
       name: string;
       type: "table";
       component: ComponentFunc<TableComponentProps>;
+    }
+  | {
+      name: string;
+      type: "tableCell";
+      component: ComponentFunc<TableCellComponentProps>;
     };
 
 type ComponentFuncByType<T extends CustomComponent["type"]> = T extends "field"
@@ -105,7 +121,9 @@ type ComponentFuncByType<T extends CustomComponent["type"]> = T extends "field"
       ? ComponentFunc<FormComponentProps>
       : T extends "table"
         ? ComponentFunc<TableComponentProps>
-        : never;
+        : T extends "tableCell"
+          ? ComponentFunc<TableCellComponentProps>
+          : never;
 
 type ComponentRegistryConstructorProps = {
   custom?: Array<CustomComponent>;

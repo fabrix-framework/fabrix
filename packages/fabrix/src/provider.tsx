@@ -8,6 +8,7 @@ import {
 } from "urql";
 import { removeDirectivesExchange } from "@exchanges/removeDirectives";
 import { addTypenameFieldExchange } from "@exchanges/addTypename";
+import { removeTypenameFromVariableExchange } from "@exchanges/removeTypenameFromVariable";
 import {
   buildSchemaSet,
   BuildFabrixContextProps,
@@ -34,6 +35,7 @@ export const FabrixProvider = (
           ...(props.prependExchanges ?? []),
           removeDirectivesExchange(["fabrixView", "fabrixList", "fabrixForm"]),
           addTypenameFieldExchange,
+          removeTypenameFromVariableExchange,
           fetchExchange,
         ],
       }),

@@ -3,47 +3,37 @@ import {
   ComponentRegistry,
   FormComponentProps,
   FormFieldComponentProps,
+  TableComponentProps,
 } from "@registry";
+import { ReactNode } from "react";
 
 const fieldView = (props: FieldComponentProps) => {
-  const { type, value } = props;
-  const renderList = () => {
-    if (props.subFields.length === 0 || !Array.isArray(props.value)) {
-      return <div />;
-    }
+  const { value } = props;
 
-    return (
-      <table>
-        <thead>
-          <tr>
-            {props.subFields.map((subField) => (
-              <th key={subField.name}>{subField.name}</th>
+  return <span>{value as string}</span>;
+};
+
+const tableView = (props: TableComponentProps) => {
+  return (
+    <table>
+      <thead>
+        <tr>
+          {props.headers.map((header) => (
+            <th key={header.key}>{header.label}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {props.values.map((item, index) => (
+          <tr key={index}>
+            {props.headers.map((header) => (
+              <td key={header.key}>{item[header.key] as ReactNode}</td>
             ))}
           </tr>
-        </thead>
-        <tbody>
-          {props.value.map((item) => (
-            /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,
-                @typescript-eslint/no-unsafe-member-access
-            */
-            <tr key={item.id}>
-              {props.subFields.map((subField) => (
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                <td key={subField.name}>{item[subField.name]}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-  };
-
-  switch (type?.type) {
-    case "List":
-      return renderList();
-    default:
-      return <span>{value as string}</span>;
-  }
+        ))}
+      </tbody>
+    </table>
+  );
 };
 
 const formView = (props: FormComponentProps) => {
@@ -73,5 +63,6 @@ export const testingComponents = new ComponentRegistry({
     field: fieldView,
     form: formView,
     formField: formFieldView,
+    table: tableView,
   },
 });

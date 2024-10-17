@@ -1,10 +1,5 @@
 import { FabrixContextType } from "@context";
-import {
-  FormFieldSchema,
-  formFieldSchema,
-  viewFieldSchema,
-} from "@directive/schema";
-import { FormFieldMeta } from "@renderers/form";
+import { formFieldSchema, viewFieldSchema } from "@directive/schema";
 import { resolveFieldType } from "@renderers/shared";
 import { Fields, FieldVariables, Path } from "@visitor";
 import { deepmerge } from "deepmerge-ts";
@@ -14,14 +9,16 @@ export type FieldWithDirective<
   C extends Record<string, unknown> = Record<string, unknown>,
   M extends Record<string, unknown> = Record<string, unknown>,
 > = {
-  path: Path;
+  field: Path;
   config: C;
   meta: M;
 };
 
-type DirectiveInput = Array<{
+type DirectiveInput<
+  C extends Record<string, unknown> = Record<string, unknown>,
+> = Array<{
   field: Path;
-  config: Record<string, unknown>;
+  config: C;
 }>;
 
 /*
@@ -32,23 +29,48 @@ export const mergeFieldConfigs = <
   M extends Record<string, unknown>,
 >(
   fieldConfigs: Array<FieldWithDirective<C, M>>,
-  directiveInput: DirectiveInput,
-) =>
-  fieldConfigs.flatMap((field) => {
-    const pathKey = field.path.asKey();
-    if (!pathKey) {
+  directiveInput: DirectiveInput<C>,
+) => {
+  const allFieldKeys = new Set([
+    ...fieldConfigs.map((f) => f.field.asKey()),
+    ...directiveInput.map((f) => f.field.asKey()),
+  ]);
+
+  return Array.from(allFieldKeys).flatMap((key) => {
+    const directiveValue = directiveInput.find((f) => f.field.asKey() === key);
+    const fieldValue = fieldConfigs.find((f) => f.field.asKey() === key);
+    const field = directiveValue?.field || fieldValue?.field;
+    if (!field) {
       return [];
     }
 
-    const targetInput = directiveInput.find((f) => f.field.asKey() === pathKey);
+    const mergeConfig = () => {
+      if (fieldValue && directiveValue) {
+        return {
+          config: deepmerge<[C, C]>(fieldValue.config, directiveValue.config),
+          meta: fieldValue.meta,
+        };
+      } else if (fieldValue) {
+        return { config: fieldValue.config, meta: fieldValue.meta };
+      } else if (directiveValue) {
+        return { config: directiveValue.config, meta: {} };
+      } else {
+        return null;
+      }
+    };
+
+    const mergedValue = mergeConfig();
+    if (!mergedValue) {
+      return [];
+    }
+
     return {
-      path: field.path,
-      config: targetInput
-        ? deepmerge(field.config, targetInput.config)
-        : field.config,
-      meta: field.meta,
+      field,
+      config: mergedValue.config,
+      meta: mergedValue.meta,
     };
   });
+};
 
 /**
  * Infer the field configuration from the fields
@@ -68,7 +90,7 @@ export const buildDefaultViewFieldConfigs = (fields: Fields) =>
     }
 
     return {
-      path,
+      field: path,
       config,
       meta: {},
     };
@@ -102,14 +124,12 @@ export const buildDefaultFormFieldConfigs = (
   }
 
   const fields = inputType.getFields();
-  return Object.keys(fields).map<
-    FieldWithDirective<FormFieldSchema, FormFieldMeta>
-  >((key, index) => {
+  return Object.keys(fields).map((key, index) => {
     const field = fields[key];
     const path = new Path(key.split("."));
 
     return {
-      path: path,
+      field: path,
       meta: {
         fieldType: resolveFieldType(
           field.type instanceof GraphQLNonNull ? field.type.ofType : field.type,
