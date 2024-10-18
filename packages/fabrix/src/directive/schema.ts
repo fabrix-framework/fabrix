@@ -35,6 +35,24 @@ export const formFieldSchema = baseFieldSchema.merge(
   }),
 );
 
+const formFieldConstraintSchema = z.object({
+  // String constraints
+  minLength: z.number().nullish(),
+  maxLength: z.number().nullish(),
+  startsWith: z.string().nullish(),
+  endsWith: z.string().nullish(),
+  contains: z.string().nullish(),
+  notContais: z.string().nullish(),
+  pattern: z.string().nullish(),
+  format: z.string().nullish(),
+
+  // Number constraints
+  min: z.number().nullish(),
+  max: z.number().nullish(),
+  exclusiveMin: z.number().nullish(),
+  exclusiveMax: z.number().nullish(),
+});
+
 export const viewFieldSchema = baseFieldSchema.merge(
   z.object({
     gridCol: z
@@ -89,6 +107,7 @@ export const directiveSchemaMap = {
               hidden: defaultValues.hidden,
             }),
           ),
+          constraint: formFieldConstraintSchema.nullish(),
         }),
       ),
     }),

@@ -1,6 +1,6 @@
 import { createElement, useCallback, useMemo } from "react";
 import { ViewFieldSchema } from "@directive/schema";
-import { FieldWithDirective } from "@inferer";
+import { FieldWithDirective } from "@readers/shared";
 import { FabrixContextType } from "@context";
 import { useDataFetch, Value } from "../fetcher";
 import { RendererCommonProps } from "../renderer";
