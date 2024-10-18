@@ -11,10 +11,10 @@ import {
 } from "@renderers/shared";
 import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
-import { buildRootDocument, Field, Fields, FieldVariables } from "@/visitor";
-import { FabrixComponentData } from "@/fetcher";
 import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
 import { buildDefaultFormFieldConfigs, formFieldMerger } from "@readers/form";
+import { buildRootDocument, Field, Fields, FieldVariables } from "@/visitor";
+import { FabrixComponentData } from "@/fetcher";
 
 const decideStrategy = (
   directiveNodes: readonly DirectiveNode[],
