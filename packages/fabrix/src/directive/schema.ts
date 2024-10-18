@@ -107,9 +107,7 @@ export const directiveSchemaMap = {
               hidden: defaultValues.hidden,
             }),
           ),
-          constraint: formFieldConstraintSchema
-            .nullish()
-            .transform(fallbackDefault({})),
+          constraint: formFieldConstraintSchema.nullish(),
         }),
       ),
     }),

@@ -2,11 +2,12 @@ import { createElement, useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "urql";
 import { FormFieldSchema } from "@directive/schema";
-import { FieldWithDirective } from "@inferer";
+import { FieldWithDirective } from "@readers/shared";
 import { FabrixContextType } from "../context";
 import {
   buildClassName,
   CommonFabrixComponentRendererProps,
+  defaultFieldType,
   FieldType,
   getFieldConfigByKey,
   Loader,
@@ -141,9 +142,9 @@ const renderField = (props: {
   return createElement(component, {
     key: indexKey,
     value: fieldConfig.defaultValue,
-    type: field.meta.fieldType,
+    type: field.meta?.fieldType ?? defaultFieldType,
     name: field.field.asKey(),
-    isRequired: field.meta.isRequired,
+    isRequired: field.meta?.isRequired ?? false,
     attributes: {
       className,
       label: fieldConfig.label,
