@@ -1,4 +1,2 @@
-declare module "*.graphql" {
-  const Document: string;
-  export default Document;
-}
+declare module "*.gql";
+declare module "*.graphql";
