@@ -6,7 +6,7 @@ vi.mock("node:fs", async () => {
   const { fs } = await vi.importActual("memfs");
   return fs;
 });
-vi.mock("node:os", async () => ({
+vi.mock("node:os", () => ({
   tmpdir: () => "/tmp",
 }));
 
