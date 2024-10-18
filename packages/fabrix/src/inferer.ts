@@ -72,8 +72,7 @@ export const mergeFieldConfigs = <
 
     return {
       field,
-      config: mergedValue.config,
-      meta: mergedValue.meta,
+      ...mergedValue,
     };
   });
 };
