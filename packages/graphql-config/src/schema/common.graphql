@@ -1,0 +1,23 @@
+input FabrixComponentType {
+  """
+  Component name to render the field
+  """
+  name: String!
+
+  """
+  Component props
+  """
+  props: [FabrixComponentProps]
+}
+
+input FabrixComponentProps {
+  """
+  The property name for the component
+  """
+  name: String!
+
+  """
+  The value for the property
+  """
+  value: String!
+}
