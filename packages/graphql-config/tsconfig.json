@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "target": "ES6",
     "moduleResolution": "Bundler",
     "module": "ES2015"
   },
-  "include": ["src", "tsup.config.ts"],
+  "include": ["."],
+  "exclude": ["dist", "node_modules"]
 }

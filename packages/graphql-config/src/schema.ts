@@ -1,4 +1,15 @@
-import { parse } from "graphql";
-import Document from "./directive.graphql";
+import { DocumentNode, Kind } from "graphql";
+import CommonSchema from "./schema/common.graphql";
+import ViewDirectiveSchema from "./schema/view.graphql";
+import FormDirectiveSchema from "./schema/form.graphql";
 
-export const schemaDefinition = parse(Document);
+const mergeDocumentNodes = (docs: DocumentNode[]) => ({
+  kind: Kind.DOCUMENT,
+  definitions: docs.flatMap((doc) => doc.definitions),
+});
+
+export const schemaDefinition = mergeDocumentNodes([
+  CommonSchema,
+  ViewDirectiveSchema,
+  FormDirectiveSchema,
+]);

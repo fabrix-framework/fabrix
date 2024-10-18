@@ -1,4 +1,4 @@
 declare module "*.graphql" {
-  const Document: string;
+  const Document: import("graphql").DocumentNode;
   export default Document;
 }
