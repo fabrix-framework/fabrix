@@ -1,0 +1,43 @@
+input FabrixViewConfig {
+  """
+  The number of grid columns the field (max: 12)
+  """
+  gridCol: Int
+
+  """
+  The 0-based index of the field
+  """
+  index: Int
+
+  """
+  The label of the field on UI
+  """
+  label: String
+
+  """
+  Hide the field on UI
+  """
+  hidden: Boolean
+
+  """
+  The component to render for the field
+  """
+  componentType: FabrixComponentType
+}
+
+input FabrixView {
+  """
+  The field name in the schema
+  """
+  field: String!
+
+  """
+  The configuration for the field
+  """
+  config: FabrixViewConfig!
+}
+
+"""
+Fabrix directive for fields
+"""
+directive @fabrixView(input: [FabrixView!]) on FIELD
