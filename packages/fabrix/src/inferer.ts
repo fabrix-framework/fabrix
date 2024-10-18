@@ -16,10 +16,31 @@ export type FieldWithDirective<
 
 type DirectiveInput<
   C extends Record<string, unknown> = Record<string, unknown>,
-> = Array<{
+> = {
   field: Path;
   config: C;
-}>;
+};
+
+const merger = <
+  C extends Record<string, unknown>,
+  M extends Record<string, unknown>,
+>(
+  fieldValue: FieldWithDirective<C, M> | undefined,
+  directiveValue: DirectiveInput<C> | undefined,
+) => {
+  if (fieldValue && directiveValue) {
+    return {
+      config: deepmerge<[C, C]>(fieldValue.config, directiveValue.config),
+      meta: fieldValue.meta,
+    };
+  } else if (fieldValue) {
+    return { config: fieldValue.config, meta: fieldValue.meta };
+  } else if (directiveValue) {
+    return { config: directiveValue.config, meta: {} };
+  } else {
+    return null;
+  }
+};
 
 /*
  * Merge the default field configs with the input field configs
@@ -29,7 +50,7 @@ export const mergeFieldConfigs = <
   M extends Record<string, unknown>,
 >(
   fieldConfigs: Array<FieldWithDirective<C, M>>,
-  directiveInput: DirectiveInput<C>,
+  directiveInput: Array<DirectiveInput<C>>,
 ) => {
   const allFieldKeys = new Set([
     ...fieldConfigs.map((f) => f.field.asKey()),
@@ -44,22 +65,7 @@ export const mergeFieldConfigs = <
       return [];
     }
 
-    const mergeConfig = () => {
-      if (fieldValue && directiveValue) {
-        return {
-          config: deepmerge<[C, C]>(fieldValue.config, directiveValue.config),
-          meta: fieldValue.meta,
-        };
-      } else if (fieldValue) {
-        return { config: fieldValue.config, meta: fieldValue.meta };
-      } else if (directiveValue) {
-        return { config: directiveValue.config, meta: {} };
-      } else {
-        return null;
-      }
-    };
-
-    const mergedValue = mergeConfig();
+    const mergedValue = merger(fieldValue, directiveValue);
     if (!mergedValue) {
       return [];
     }
