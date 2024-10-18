@@ -2,7 +2,6 @@ import { DocumentNode, Kind } from "graphql";
 import CommonSchema from "./schema/common.graphql";
 import ViewDirectiveSchema from "./schema/view.graphql";
 import FormDirectiveSchema from "./schema/form.graphql";
-import ConstraintSchema from "./schema/constraint.graphql";
 
 const mergeDocumentNodes = (docs: DocumentNode[]) => ({
   kind: Kind.DOCUMENT,
@@ -13,5 +12,4 @@ export const schemaDefinition = mergeDocumentNodes([
   CommonSchema,
   ViewDirectiveSchema,
   FormDirectiveSchema,
-  ConstraintSchema,
 ]);
