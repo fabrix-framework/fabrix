@@ -1,6 +1,6 @@
 # fabrix
 
-![cover](./assets/cover.png)
+![cover](https://github.com/fabrix-framework/.github/blob/main/assets/cover.png)
 
 Fabrix is a framework for building React applications that are backed by GraphQL backend. With fabrix, React components are generated from queries and mutations and automatically rendered with the data fetched from the GraphQL server.
 
