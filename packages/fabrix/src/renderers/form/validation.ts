@@ -12,6 +12,7 @@ const convertToAjvProperty = (field: FormField) => {
             minimum: field.constraint?.min,
             exclusiveMaximum: field.constraint?.exclusiveMax,
             exclusiveMinimum: field.constraint?.exclusiveMin,
+            multipleOf: field.constraint?.multipleOf,
           } as const;
         case "String":
         default:

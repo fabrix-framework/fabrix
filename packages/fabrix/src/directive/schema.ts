@@ -48,6 +48,7 @@ export const formFieldConstraintSchema = z
     max: z.number().nullish(),
     exclusiveMin: z.number().nullish(),
     exclusiveMax: z.number().nullish(),
+    multipleOf: z.number().nullish(),
   })
   .nullish();
 
