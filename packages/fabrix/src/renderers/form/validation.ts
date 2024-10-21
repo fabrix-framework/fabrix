@@ -48,6 +48,6 @@ export const buildAjvSchema = (fields: Array<FormField>) => {
         : { ...acc, [field.field.asKey()]: property };
     }, {}),
     required: requiredFields.map((field) => field.field.asKey()),
-    additionalProperties: false,
+    additionalProperties: true,
   } as const;
 };

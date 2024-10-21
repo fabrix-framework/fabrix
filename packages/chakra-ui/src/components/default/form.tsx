@@ -3,7 +3,7 @@ import {
   FormComponentProps,
   FieldType,
 } from "@fabrix-framework/fabrix";
-import { Switch, Input, Stack, Button, Box } from "@chakra-ui/react";
+import { Text, Switch, Input, Stack, Button, Box } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
 import { useController } from "@fabrix-framework/fabrix/rhf";
 import { LabelledHeading } from "./shared";
@@ -53,6 +53,21 @@ export const ChakraFormField = (props: FormFieldComponentProps) => {
     default:
       return <TextFormField {...props} />;
   }
+};
+
+const ErrorField = (props: FormFieldComponentProps) => {
+  const { formState } = useController({
+    name: props.name,
+  });
+  const error = formState.errors[props.name];
+
+  return (
+    error && (
+      <Text color="red.500" size="sm">
+        {error?.message?.toString()}
+      </Text>
+    )
+  );
 };
 
 type EnumFieldType = Extract<FieldType, { type: "Enum" }>;
@@ -106,6 +121,7 @@ const SelectFormField = (
         onBlur={field.onBlur}
         onChange={(e) => e && field.onChange(e.value)}
       />
+      <ErrorField {...props} />
     </Stack>
   );
 };
@@ -120,6 +136,7 @@ const TextFormField = (props: FormFieldComponentProps) => {
     <Stack className={attributes.className} spacing={2}>
       <LabelledHeading {...props} />
       <Input {...field} placeholder="Enter value" />
+      <ErrorField {...props} />
     </Stack>
   );
 };
@@ -134,6 +151,7 @@ const NumberFormField = (props: FormFieldComponentProps) => {
     <Stack className={className} spacing={2}>
       <LabelledHeading {...props} />
       <Input {...field} type="number" placeholder="Enter value" />
+      <ErrorField {...props} />
     </Stack>
   );
 };
@@ -148,6 +166,7 @@ const BooleanFormField = (props: FormFieldComponentProps) => {
     <Stack className={className} spacing={2}>
       <LabelledHeading {...props} />
       <Switch {...field} size="lg" />
+      <ErrorField {...props} />
     </Stack>
   );
 };

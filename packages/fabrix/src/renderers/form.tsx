@@ -1,4 +1,4 @@
-import { createElement, useCallback } from "react";
+import { createElement, useCallback, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "urql";
 import { FormFieldSchema } from "@directive/schema";
@@ -19,7 +19,7 @@ const getClearedValue = (values: Record<string, unknown>) =>
   Object.keys(values).reduce((acc, key) => {
     return {
       ...acc,
-      [key]: null,
+      [key]: undefined,
     };
   }, {});
 
@@ -35,19 +35,14 @@ export const FormRenderer = (
     resolver: ajvResolver(buildAjvSchema(fieldConfigs.fields)),
   });
   const [mutationResult, runMutation] = useMutation(query.documentResolver());
+  const runSubmit = formContext.handleSubmit(async (input) => {
+    // TODO: sending values should be specifiable by the user through something like `path`
+    await runMutation({
+      input,
+    });
 
-  const runSubmit = useCallback(() => {
-    runMutation({
-      // TODO: here should be specifiable by the user through `path`
-      input: formContext.getValues(),
-    })
-      .then(() => {
-        formContext.reset(getClearedValue(formContext.getValues()));
-      })
-      .catch((error) => {
-        throw error;
-      });
-  }, [formContext, runMutation]);
+    formContext.reset(getClearedValue(formContext.getValues()));
+  });
 
   const renderFields = useCallback(() => {
     if (componentFieldsRenderer) {
