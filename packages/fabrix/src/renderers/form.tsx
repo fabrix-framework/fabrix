@@ -1,4 +1,4 @@
-import { createElement, useCallback, useMemo } from "react";
+import { createElement, useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "urql";
 import { FormFieldSchema } from "@directive/schema";
@@ -14,14 +14,6 @@ import {
   Loader,
 } from "./shared";
 import { buildAjvSchema } from "./form/validation";
-
-const getClearedValue = (values: Record<string, unknown>) =>
-  Object.keys(values).reduce((acc, key) => {
-    return {
-      ...acc,
-      [key]: undefined,
-    };
-  }, {});
 
 export type FormField = FieldConfigWithMeta<FormFieldSchema> & FormFieldExtra;
 
@@ -41,7 +33,7 @@ export const FormRenderer = (
       input,
     });
 
-    formContext.reset(getClearedValue(formContext.getValues()));
+    formContext.reset();
   });
 
   const renderFields = useCallback(() => {
