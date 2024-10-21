@@ -1,6 +1,5 @@
 import { FabrixContextType } from "@context";
 import { formFieldSchema } from "@directive/schema";
-import { FieldConfig, FieldConfigWithMeta } from "@readers/shared";
 import { resolveFieldType } from "@renderers/shared";
 import { FieldVariables, Path } from "@visitor";
 import { deepmerge } from "deepmerge-ts";
@@ -9,6 +8,7 @@ import {
   GraphQLInputType,
   GraphQLNonNull,
 } from "graphql";
+import { FieldWithDirective, DirectiveInput } from "./shared";
 
 const buildFieldMeta = (type: GraphQLInputType) => ({
   fieldType: resolveFieldType(

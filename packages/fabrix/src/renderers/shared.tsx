@@ -93,11 +93,8 @@ export const assertObjectValue: (
 
 export type FieldTypes = ReturnType<typeof resolveFieldTypesFromTypename>;
 
-export const getFieldConfigByKey = <
-  C extends Record<string, unknown> = Record<string, unknown>,
-  M extends Record<string, unknown> = Record<string, unknown>,
->(
-  fields: Array<FieldWithDirective<C, M>>,
+export const getFieldConfigByKey = <C extends Record<string, unknown>>(
+  fields: Array<FieldWithDirective<C>>,
   name: string,
 ) => fields.find((f) => f.field.asKey() == name);
 
