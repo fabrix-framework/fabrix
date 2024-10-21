@@ -1,10 +1,23 @@
 import { FabrixContextType } from "@context";
 import { formFieldSchema } from "@directive/schema";
-import { DirectiveInput, FieldWithDirective } from "@readers/shared";
+import { FieldConfig, FieldConfigWithMeta } from "@readers/shared";
 import { resolveFieldType } from "@renderers/shared";
 import { FieldVariables, Path } from "@visitor";
 import { deepmerge } from "deepmerge-ts";
-import { GraphQLInputObjectType, GraphQLNonNull } from "graphql";
+import {
+  GraphQLInputObjectType,
+  GraphQLInputType,
+  GraphQLNonNull,
+} from "graphql";
+
+const buildFieldMeta = (type: GraphQLInputType) => ({
+  fieldType: resolveFieldType(
+    type instanceof GraphQLNonNull ? type.ofType : type,
+  ),
+  isRequired: type instanceof GraphQLNonNull,
+});
+
+export type FieldMeta = ReturnType<typeof buildFieldMeta> | null;
 
 /**
  * Infer the field configuration from the input object type for the form
@@ -40,12 +53,7 @@ export const buildDefaultFormFieldConfigs = (
 
     return {
       field: path,
-      meta: {
-        fieldType: resolveFieldType(
-          field.type instanceof GraphQLNonNull ? field.type.ofType : field.type,
-        ),
-        isRequired: field.type instanceof GraphQLNonNull,
-      },
+      meta: buildFieldMeta(field.type),
       config: formFieldSchema.parse({
         index,
         label: field.name,
