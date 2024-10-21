@@ -1,5 +1,5 @@
 import { FabrixContextType } from "@context";
-import { formFieldSchema } from "@directive/schema";
+import { FormFieldSchema, formFieldSchema } from "@directive/schema";
 import { resolveFieldType } from "@renderers/shared";
 import { FieldVariables, Path } from "@visitor";
 import { deepmerge } from "deepmerge-ts";
@@ -62,16 +62,13 @@ export const buildDefaultFormFieldConfigs = (
   });
 };
 
-export const formFieldMerger = <C extends Record<string, unknown>>(
-  fieldValue: FieldConfigWithMeta<C> | undefined,
-  directiveValue:
-    | FieldConfig<
-        C,
-        {
-          constraint?: Record<string, unknown> | null;
-        }
-      >
-    | undefined,
+export type FormFieldExtra = {
+  constraint?: Record<string, unknown> | null;
+};
+
+export const formFieldMerger = (
+  fieldValue: FieldConfigWithMeta<FormFieldSchema> | undefined,
+  directiveValue: FieldConfig<FormFieldSchema, FormFieldExtra> | undefined,
 ) => {
   if (fieldValue && directiveValue) {
     return {

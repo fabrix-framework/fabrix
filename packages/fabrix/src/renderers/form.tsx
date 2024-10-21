@@ -3,6 +3,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "urql";
 import { FormFieldSchema } from "@directive/schema";
 import { FieldConfigWithMeta } from "@readers/shared";
+import { FormFieldExtra } from "@readers/form";
 import { FabrixContextType } from "../context";
 import {
   buildClassName,
@@ -20,7 +21,7 @@ const getClearedValue = (values: Record<string, unknown>) =>
     };
   }, {});
 
-export type FormField = FieldConfigWithMeta<FormFieldSchema>;
+export type FormField = FieldConfigWithMeta<FormFieldSchema> & FormFieldExtra;
 
 export const FormRenderer = (
   props: CommonFabrixComponentRendererProps<{
