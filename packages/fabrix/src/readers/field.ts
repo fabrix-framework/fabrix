@@ -23,15 +23,12 @@ export const buildDefaultViewFieldConfigs = (fields: Fields) =>
     return {
       field: path,
       config,
-      meta: {},
+      meta: null,
     };
   });
 
-export const viewFieldMerger = <
-  C extends Record<string, unknown>,
-  M extends Record<string, unknown>,
->(
-  fieldValue: FieldWithDirective<C, M> | undefined,
+export const viewFieldMerger = <C extends Record<string, unknown>>(
+  fieldValue: FieldWithDirective<C> | undefined,
   directiveValue: DirectiveInput<C> | undefined,
 ) => {
   if (fieldValue && directiveValue) {

@@ -1,12 +1,17 @@
+import { FieldType } from "@renderers/shared";
 import { Path } from "@visitor";
+
+type FieldMeta = {
+  fieldType: FieldType;
+  isRequired: boolean;
+} | null;
 
 export type FieldWithDirective<
   C extends Record<string, unknown> = Record<string, unknown>,
-  M extends Record<string, unknown> = Record<string, unknown>,
 > = {
   field: Path;
   config: C;
-  meta: M | null;
+  meta: FieldMeta;
 };
 
 export type DirectiveInput<
@@ -19,24 +24,22 @@ export type DirectiveInput<
 
 type Merger<
   C extends Record<string, unknown>,
-  M extends Record<string, unknown>,
   E extends Record<string, unknown>,
 > = (
-  fieldValue: FieldWithDirective<C, M> | undefined,
+  fieldValue: FieldWithDirective<C> | undefined,
   directiveValue: DirectiveInput<C, E> | undefined,
-) => Omit<FieldWithDirective<C, M> & E, "field"> | null;
+) => Omit<FieldWithDirective<C> & E, "field"> | null;
 
 /*
  * Merge the default field configs with the input field configs
  */
 export const mergeFieldConfigs = <
   C extends Record<string, unknown>,
-  M extends Record<string, unknown>,
   E extends Record<string, unknown>,
 >(
-  fieldConfigs: Array<FieldWithDirective<C, M>>,
+  fieldConfigs: Array<FieldWithDirective<C>>,
   directiveInput: Array<DirectiveInput<C, E>>,
-  merger: Merger<C, M, E>,
+  merger: Merger<C, E>,
 ) => {
   const allFieldKeys = new Set([
     ...fieldConfigs.map((f) => f.field.asKey()),

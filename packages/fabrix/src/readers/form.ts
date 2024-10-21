@@ -54,11 +54,8 @@ export const buildDefaultFormFieldConfigs = (
   });
 };
 
-export const formFieldMerger = <
-  C extends Record<string, unknown>,
-  M extends Record<string, unknown>,
->(
-  fieldValue: FieldWithDirective<C, M> | undefined,
+export const formFieldMerger = <C extends Record<string, unknown>>(
+  fieldValue: FieldWithDirective<C> | undefined,
   directiveValue:
     | DirectiveInput<
         C,
