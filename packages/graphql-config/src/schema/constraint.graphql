@@ -8,10 +8,20 @@ input FabrixFormConstraint {
   format: String
 
   """
-  Int/Float
+  Int
   """
   min: Int
   max: Int
+  exclusiveMin: Int
+  exclusiveMax: Int
+  multipleOf: Int
+
+  """
+  Float
+  """
+  min: Float
+  max: Float
   exclusiveMin: Float
   exclusiveMax: Float
+  multipleOf: Float
 }
