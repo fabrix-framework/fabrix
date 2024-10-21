@@ -6,29 +6,29 @@ type FieldMeta = {
   isRequired: boolean;
 } | null;
 
-export type FieldWithDirective<
-  C extends Record<string, unknown> = Record<string, unknown>,
-> = {
-  field: Path;
-  config: C;
-  meta: FieldMeta;
-};
-
-export type DirectiveInput<
-  C extends Record<string, unknown> = Record<string, unknown>,
+export type FieldConfig<
+  C extends Record<string, unknown>,
   E extends Record<string, unknown> = Record<string, unknown>,
 > = {
   field: Path;
   config: C;
 } & E;
 
+export type FieldConfigWithMeta<C extends Record<string, unknown>> =
+  FieldConfig<
+    C,
+    {
+      meta: FieldMeta;
+    }
+  >;
+
 type Merger<
   C extends Record<string, unknown>,
   E extends Record<string, unknown>,
 > = (
-  fieldValue: FieldWithDirective<C> | undefined,
-  directiveValue: DirectiveInput<C, E> | undefined,
-) => Omit<FieldWithDirective<C> & E, "field"> | null;
+  fieldValue: FieldConfigWithMeta<C> | undefined,
+  directiveValue: FieldConfig<C, E> | undefined,
+) => Omit<FieldConfigWithMeta<C> & E, "field"> | null;
 
 /*
  * Merge the default field configs with the input field configs
@@ -37,8 +37,8 @@ export const mergeFieldConfigs = <
   C extends Record<string, unknown>,
   E extends Record<string, unknown>,
 >(
-  fieldConfigs: Array<FieldWithDirective<C>>,
-  directiveInput: Array<DirectiveInput<C, E>>,
+  fieldConfigs: Array<FieldConfigWithMeta<C>>,
+  directiveInput: Array<FieldConfig<C, E>>,
   merger: Merger<C, E>,
 ) => {
   const allFieldKeys = new Set([

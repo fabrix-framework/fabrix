@@ -2,13 +2,12 @@ import { createElement, useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "urql";
 import { FormFieldSchema } from "@directive/schema";
-import { FieldWithDirective } from "@readers/shared";
+import { FieldConfigWithMeta } from "@readers/shared";
 import { FabrixContextType } from "../context";
 import {
   buildClassName,
   CommonFabrixComponentRendererProps,
   defaultFieldType,
-  FieldType,
   getFieldConfigByKey,
   Loader,
 } from "./shared";
@@ -21,14 +20,7 @@ const getClearedValue = (values: Record<string, unknown>) =>
     };
   }, {});
 
-export type FormFieldMeta =
-  | {
-      fieldType: FieldType;
-      isRequired: boolean;
-    }
-  | Record<string, never>;
-
-export type FormField = FieldWithDirective<FormFieldSchema, FormFieldMeta>;
+export type FormField = FieldConfigWithMeta<FormFieldSchema>;
 
 export const FormRenderer = (
   props: CommonFabrixComponentRendererProps<{

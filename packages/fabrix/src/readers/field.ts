@@ -1,5 +1,5 @@
 import { viewFieldSchema } from "@directive/schema";
-import { FieldWithDirective, DirectiveInput } from "@readers/shared";
+import { FieldConfigWithMeta, FieldConfig } from "@readers/shared";
 import { Fields } from "@visitor";
 import { deepmerge } from "deepmerge-ts";
 
@@ -28,8 +28,8 @@ export const buildDefaultViewFieldConfigs = (fields: Fields) =>
   });
 
 export const viewFieldMerger = <C extends Record<string, unknown>>(
-  fieldValue: FieldWithDirective<C> | undefined,
-  directiveValue: DirectiveInput<C> | undefined,
+  fieldValue: FieldConfigWithMeta<C> | undefined,
+  directiveValue: FieldConfig<C> | undefined,
 ) => {
   if (fieldValue && directiveValue) {
     return {

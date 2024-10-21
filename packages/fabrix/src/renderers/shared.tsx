@@ -10,7 +10,7 @@ import {
 } from "graphql";
 import { DirectiveAttributes } from "@registry";
 import { FabrixContextType } from "@context";
-import { FieldWithDirective } from "@readers/shared";
+import { FieldConfigWithMeta } from "@readers/shared";
 import { FabrixComponentData } from "../fetcher";
 
 type FabrixComponentFieldsRendererExtraProps = Partial<DirectiveAttributes> & {
@@ -94,7 +94,7 @@ export const assertObjectValue: (
 export type FieldTypes = ReturnType<typeof resolveFieldTypesFromTypename>;
 
 export const getFieldConfigByKey = <C extends Record<string, unknown>>(
-  fields: Array<FieldWithDirective<C>>,
+  fields: Array<FieldConfigWithMeta<C>>,
   name: string,
 ) => fields.find((f) => f.field.asKey() == name);
 

@@ -8,7 +8,7 @@ import {
   GraphQLInputType,
   GraphQLNonNull,
 } from "graphql";
-import { FieldWithDirective, DirectiveInput } from "./shared";
+import { FieldConfigWithMeta, FieldConfig } from "./shared";
 
 const buildFieldMeta = (type: GraphQLInputType) => ({
   fieldType: resolveFieldType(
@@ -63,9 +63,9 @@ export const buildDefaultFormFieldConfigs = (
 };
 
 export const formFieldMerger = <C extends Record<string, unknown>>(
-  fieldValue: FieldWithDirective<C> | undefined,
+  fieldValue: FieldConfigWithMeta<C> | undefined,
   directiveValue:
-    | DirectiveInput<
+    | FieldConfig<
         C,
         {
           constraint?: Record<string, unknown> | null;
