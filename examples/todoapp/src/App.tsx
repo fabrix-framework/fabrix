@@ -24,7 +24,7 @@ function App() {
                   {
                     field: "name"
                     config: { gridCol: 9 }
-                    constraint: { minLength: 0, maxLength: 50 }
+                    constraint: { maxLength: 5 }
                   }
                   { field: "priority", config: { gridCol: 3 } }
                 ]

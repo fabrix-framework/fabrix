@@ -40,10 +40,6 @@ export const formFieldConstraintSchema = z
     // String constraints
     minLength: z.number().nullish(),
     maxLength: z.number().nullish(),
-    startsWith: z.string().nullish(),
-    endsWith: z.string().nullish(),
-    contains: z.string().nullish(),
-    notContais: z.string().nullish(),
     pattern: z.string().nullish(),
     format: z.string().nullish(),
 

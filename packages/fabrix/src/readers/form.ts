@@ -1,5 +1,9 @@
 import { FabrixContextType } from "@context";
-import { FormFieldSchema, formFieldSchema } from "@directive/schema";
+import {
+  formFieldConstraintSchema,
+  FormFieldSchema,
+  formFieldSchema,
+} from "@directive/schema";
 import { resolveFieldType } from "@renderers/shared";
 import { FieldVariables, Path } from "@visitor";
 import { deepmerge } from "deepmerge-ts";
@@ -8,6 +12,7 @@ import {
   GraphQLInputType,
   GraphQLNonNull,
 } from "graphql";
+import { z } from "zod";
 import { FieldConfigWithMeta, FieldConfig } from "./shared";
 
 const buildFieldMeta = (type: GraphQLInputType) => ({
@@ -63,7 +68,7 @@ export const buildDefaultFormFieldConfigs = (
 };
 
 export type FormFieldExtra = {
-  constraint?: Record<string, unknown> | null;
+  constraint?: z.infer<typeof formFieldConstraintSchema>;
 };
 
 export const formFieldMerger = (

@@ -4,6 +4,7 @@ import { useMutation } from "urql";
 import { FormFieldSchema } from "@directive/schema";
 import { FieldConfigWithMeta } from "@readers/shared";
 import { FormFieldExtra } from "@readers/form";
+import { ajvResolver } from "@hookform/resolvers/ajv";
 import { FabrixContextType } from "../context";
 import {
   buildClassName,
@@ -12,6 +13,7 @@ import {
   getFieldConfigByKey,
   Loader,
 } from "./shared";
+import { buildAjvSchema } from "./form/validation";
 
 const getClearedValue = (values: Record<string, unknown>) =>
   Object.keys(values).reduce((acc, key) => {
@@ -29,7 +31,9 @@ export const FormRenderer = (
   }>,
 ) => {
   const { context, fieldConfigs, query, componentFieldsRenderer } = props;
-  const formContext = useForm();
+  const formContext = useForm({
+    resolver: ajvResolver(buildAjvSchema(fieldConfigs.fields)),
+  });
   const [mutationResult, runMutation] = useMutation(query.documentResolver());
 
   const runSubmit = useCallback(() => {
