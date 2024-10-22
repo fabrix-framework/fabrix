@@ -6,6 +6,7 @@ input FabrixFormConstraint {
   maxLength: Int
   pattern: String
   format: String
+  oneOf: [String]
 
   """
   Int
@@ -15,6 +16,7 @@ input FabrixFormConstraint {
   exclusiveMin: Int
   exclusiveMax: Int
   multipleOf: Int
+  oneOf: [Int]
 
   """
   Float
@@ -24,4 +26,5 @@ input FabrixFormConstraint {
   exclusiveMin: Float
   exclusiveMax: Float
   multipleOf: Float
+  oneOf: [Float]
 }

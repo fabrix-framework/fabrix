@@ -13,16 +13,19 @@ const convertToAjvProperty = (field: FormField) => {
             exclusiveMaximum: field.constraint?.exclusiveMax,
             exclusiveMinimum: field.constraint?.exclusiveMin,
             multipleOf: field.constraint?.multipleOf,
+            enum: field.constraint?.oneOf,
           } as const;
         case "String":
-        default:
+        default: {
           return {
             type: "string",
             maxLength: field.constraint?.maxLength,
             minLength: field.constraint?.minLength,
             format: field.constraint?.format,
             pattern: field.constraint?.pattern,
+            enum: field.constraint?.oneOf,
           } as const;
+        }
         case "Boolean":
           return {
             type: "boolean",
