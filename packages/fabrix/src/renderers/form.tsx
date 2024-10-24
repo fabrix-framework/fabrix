@@ -4,7 +4,6 @@ import { useMutation } from "urql";
 import { FormFieldSchema } from "@directive/schema";
 import { FieldConfigWithMeta } from "@readers/shared";
 import { FormFieldExtra } from "@readers/form";
-import { ajvResolver } from "@hookform/resolvers/ajv";
 import { FabrixContextType } from "../context";
 import {
   buildClassName,
@@ -14,6 +13,7 @@ import {
   Loader,
 } from "./shared";
 import { buildAjvSchema } from "./form/validation";
+import { ajvResolver } from "./form/ajvResolver";
 
 export type FormField = FieldConfigWithMeta<FormFieldSchema> & FormFieldExtra;
 
