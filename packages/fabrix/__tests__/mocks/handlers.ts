@@ -7,7 +7,7 @@ const mockSchema = buildSchema(`
 type User {
   id: ID!
   name: String!
-  code: String!
+  email: String!
 }
 
 type UsersResult {
@@ -26,9 +26,9 @@ enum UserCategory {
 input CreateUserInput {
   id: ID
   name: String!
-  code: String!
+  email: String
   age: Int!
-  category: UserCategory!
+  category: UserCategory
 }
 
 type Mutation {
