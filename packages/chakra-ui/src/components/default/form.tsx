@@ -3,7 +3,7 @@ import {
   FormComponentProps,
   FieldType,
 } from "@fabrix-framework/fabrix";
-import { Switch, Input, Stack, Button, Box } from "@chakra-ui/react";
+import { Switch, Input, Stack, Button, Box, Text } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
 import { useController } from "@fabrix-framework/fabrix/rhf";
 import { LabelledHeading } from "./shared";
