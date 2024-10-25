@@ -3,7 +3,7 @@ import {
   FormComponentProps,
   FieldType,
 } from "@fabrix-framework/fabrix";
-import { Switch, Input, Stack, Button, Box, Text } from "@chakra-ui/react";
+import { Text, Switch, Input, Stack, Button, Box } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
 import { useController } from "@fabrix-framework/fabrix/rhf";
 import { LabelledHeading } from "./shared";
@@ -121,6 +121,7 @@ const SelectFormField = (
         onBlur={field.onBlur}
         onChange={(e) => e && field.onChange(e.value)}
       />
+      <ErrorField {...props} />
     </Stack>
   );
 };
@@ -136,6 +137,7 @@ const TextFormField = (props: FormFieldComponentProps) => {
     <Stack className={attributes.className} spacing={2}>
       <LabelledHeading {...props} />
       <Input {...field} placeholder="Enter value" />
+      <ErrorField {...props} />
     </Stack>
   );
 };
@@ -173,6 +175,7 @@ const BooleanFormField = (props: FormFieldComponentProps) => {
     <Stack className={className} spacing={2}>
       <LabelledHeading {...props} />
       <Switch {...field} size="lg" />
+      <ErrorField {...props} />
     </Stack>
   );
 };

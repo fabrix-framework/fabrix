@@ -21,7 +21,11 @@ function App() {
                 input: [
                   { field: "id", config: { hidden: true } }
                   { field: "hasDone", config: { hidden: true } }
-                  { field: "name", config: { gridCol: 9 } }
+                  {
+                    field: "name"
+                    config: { gridCol: 9 }
+                    constraint: { maxLength: 50 }
+                  }
                   { field: "priority", config: { gridCol: 3 } }
                 ]
               ) {

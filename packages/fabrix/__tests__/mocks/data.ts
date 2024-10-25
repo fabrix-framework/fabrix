@@ -4,11 +4,11 @@ export const users = [
   {
     id: faker.string.uuid(),
     name: "first user",
-    code: "u001",
+    email: faker.internet.email(),
   },
   {
     id: faker.string.uuid(),
     name: "second user",
-    code: "u002",
+    email: faker.internet.email(),
   },
 ];

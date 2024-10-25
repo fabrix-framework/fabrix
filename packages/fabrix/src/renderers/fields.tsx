@@ -1,6 +1,6 @@
 import { createElement, useCallback, useMemo } from "react";
 import { ViewFieldSchema } from "@directive/schema";
-import { FieldWithDirective } from "@inferer";
+import { FieldConfigWithMeta } from "@readers/shared";
 import { FabrixContextType } from "@context";
 import { useDataFetch, Value } from "../fetcher";
 import { RendererCommonProps } from "../renderer";
@@ -13,7 +13,7 @@ import {
   resolveFieldTypesFromTypename,
 } from "./shared";
 
-type ViewField = FieldWithDirective<ViewFieldSchema>;
+type ViewField = FieldConfigWithMeta<ViewFieldSchema>;
 type Fields = Array<ViewField>;
 
 export const ViewRenderer = (

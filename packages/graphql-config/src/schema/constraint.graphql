@@ -1,0 +1,30 @@
+input FabrixFormConstraint {
+  """
+  String
+  """
+  minLength: Int
+  maxLength: Int
+  pattern: String
+  format: String
+  oneOf: [String]
+
+  """
+  Int
+  """
+  min: Int
+  max: Int
+  exclusiveMin: Int
+  exclusiveMax: Int
+  multipleOf: Int
+  oneOf: [Int]
+
+  """
+  Float
+  """
+  min: Float
+  max: Float
+  exclusiveMin: Float
+  exclusiveMax: Float
+  multipleOf: Float
+  oneOf: [Float]
+}
