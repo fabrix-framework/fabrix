@@ -10,11 +10,9 @@ import {
   CommonFabrixComponentRendererProps,
 } from "@renderers/shared";
 import { directiveSchemaMap } from "@directive/schema";
-import {
-  buildDefaultViewFieldConfigs,
-  buildDefaultFormFieldConfigs,
-  mergeFieldConfigs,
-} from "@inferer";
+import { mergeFieldConfigs } from "@readers/shared";
+import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
+import { buildDefaultFormFieldConfigs, formFieldMerger } from "@readers/form";
 import { buildRootDocument, Field, Fields, FieldVariables } from "@/visitor";
 import { FabrixComponentData } from "@/fetcher";
 
@@ -73,6 +71,7 @@ const getFieldConfig = (
           fields: mergeFieldConfigs(
             buildDefaultViewFieldConfigs(childFields),
             directive.input,
+            viewFieldMerger,
           ),
         },
       };
@@ -100,6 +99,7 @@ const getFieldConfig = (
           fields: mergeFieldConfigs(
             buildDefaultFormFieldConfigs(context, fieldVariables),
             directive.input,
+            formFieldMerger,
           ),
         },
       };

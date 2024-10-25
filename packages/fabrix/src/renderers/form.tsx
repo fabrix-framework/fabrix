@@ -2,32 +2,20 @@ import { createElement, useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "urql";
 import { FormFieldSchema } from "@directive/schema";
-import { FieldWithDirective } from "@inferer";
+import { FieldConfigWithMeta } from "@readers/shared";
+import { FormFieldExtra } from "@readers/form";
 import { FabrixContextType } from "../context";
 import {
   buildClassName,
   CommonFabrixComponentRendererProps,
-  FieldType,
+  defaultFieldType,
   getFieldConfigByKey,
   Loader,
 } from "./shared";
+import { buildAjvSchema } from "./form/validation";
+import { ajvResolver } from "./form/ajvResolver";
 
-const getClearedValue = (values: Record<string, unknown>) =>
-  Object.keys(values).reduce((acc, key) => {
-    return {
-      ...acc,
-      [key]: null,
-    };
-  }, {});
-
-export type FormFieldMeta =
-  | {
-      fieldType: FieldType;
-      isRequired: boolean;
-    }
-  | Record<string, never>;
-
-export type FormField = FieldWithDirective<FormFieldSchema, FormFieldMeta>;
+export type FormField = FieldConfigWithMeta<FormFieldSchema> & FormFieldExtra;
 
 export const FormRenderer = (
   props: CommonFabrixComponentRendererProps<{
@@ -35,21 +23,18 @@ export const FormRenderer = (
   }>,
 ) => {
   const { context, fieldConfigs, query, componentFieldsRenderer } = props;
-  const formContext = useForm();
+  const formContext = useForm({
+    resolver: ajvResolver(buildAjvSchema(fieldConfigs.fields)),
+  });
   const [mutationResult, runMutation] = useMutation(query.documentResolver());
+  const runSubmit = formContext.handleSubmit(async (input) => {
+    // TODO: sending values should be specifiable by the user through something like `path`
+    await runMutation({
+      input,
+    });
 
-  const runSubmit = useCallback(() => {
-    runMutation({
-      // TODO: here should be specifiable by the user through `path`
-      input: formContext.getValues(),
-    })
-      .then(() => {
-        formContext.reset(getClearedValue(formContext.getValues()));
-      })
-      .catch((error) => {
-        throw error;
-      });
-  }, [formContext, runMutation]);
+    formContext.reset();
+  });
 
   const renderFields = useCallback(() => {
     if (componentFieldsRenderer) {
@@ -141,9 +126,9 @@ const renderField = (props: {
   return createElement(component, {
     key: indexKey,
     value: fieldConfig.defaultValue,
-    type: field.meta.fieldType,
+    type: field.meta?.fieldType ?? defaultFieldType,
     name: field.field.asKey(),
-    isRequired: field.meta.isRequired,
+    isRequired: field.meta?.isRequired ?? false,
     attributes: {
       className,
       label: fieldConfig.label,

@@ -27,6 +27,10 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "ajv": "^8.17.1",
+    "ajv-errors": "^3.0.0",
+    "ajv-formats": "^3.0.1",
     "deepmerge-ts": "^7.1.0",
     "graphql-tag": "^2.12.6",
     "react-hook-form": "^7.53.0",

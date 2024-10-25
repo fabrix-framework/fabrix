@@ -10,7 +10,7 @@ import {
 } from "graphql";
 import { DirectiveAttributes } from "@registry";
 import { FabrixContextType } from "@context";
-import { FieldWithDirective } from "@inferer";
+import { FieldConfigWithMeta } from "@readers/shared";
 import { FabrixComponentData } from "../fetcher";
 
 type FabrixComponentFieldsRendererExtraProps = Partial<DirectiveAttributes> & {
@@ -93,11 +93,8 @@ export const assertObjectValue: (
 
 export type FieldTypes = ReturnType<typeof resolveFieldTypesFromTypename>;
 
-export const getFieldConfigByKey = <
-  C extends Record<string, unknown> = Record<string, unknown>,
-  M extends Record<string, unknown> = Record<string, unknown>,
->(
-  fields: Array<FieldWithDirective<C, M>>,
+export const getFieldConfigByKey = <C extends Record<string, unknown>>(
+  fields: Array<FieldConfigWithMeta<C>>,
   name: string,
 ) => fields.find((f) => f.field.asKey() == name);
 
@@ -152,27 +149,34 @@ export const resolveFieldTypesFromTypename = (
   }, {});
 };
 
-export type FieldType =
-  | {
-      type: "Scalar";
-      name: string;
-    }
-  | {
-      type: "Enum";
-      name: string;
-      meta: {
-        values: string[];
-      };
-    }
-  | {
-      type: "Object";
-      name: string;
-    }
-  | {
-      type: "List";
-      innerType: NonNullable<FieldType>;
-    }
-  | null;
+type ScalarType = {
+  type: "Scalar";
+  name: string;
+};
+
+type EnumType = {
+  type: "Enum";
+  name: string;
+  meta: {
+    values: string[];
+  };
+};
+
+type ObjectType = {
+  type: "Object";
+  name: string;
+};
+
+type ListType = {
+  type: "List";
+  innerType: NonNullable<FieldType>;
+};
+
+export type FieldType = ScalarType | EnumType | ObjectType | ListType | null;
+export const defaultFieldType = {
+  type: "Scalar" as const,
+  name: "String",
+};
 
 export const resolveFieldType = (
   field: GraphQLOutputType | GraphQLNullableType,

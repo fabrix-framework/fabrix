@@ -14,35 +14,6 @@ export const parseDirectiveArguments = <S extends ZodRawShape = ZodRawShape>(
   return parsedValue.data;
 };
 
-type FieldConfig<C> = {
-  config: C;
-  field?: string | null;
-};
-
-/**
- * A helper function to build a record from object array that has `field` key
- */
-export const buildRecordByFieldName = <
-  C extends Record<string, unknown>,
-  V extends FieldConfig<C> = FieldConfig<C>,
-  T extends Array<V> = Array<V>,
->(
-  input: T,
-) => {
-  return input.reduce<Record<string, { config: C }>>(
-    (acc, value) =>
-      value.field
-        ? {
-            ...acc,
-            [value.field]: {
-              config: value.config,
-            },
-          }
-        : acc,
-    {},
-  );
-};
-
 export const findDirective = (
   directives: ReadonlyArray<DirectiveNode> | undefined,
 ) => {
