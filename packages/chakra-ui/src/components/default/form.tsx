@@ -63,7 +63,7 @@ const ErrorField = (props: FormFieldComponentProps) => {
 
   return (
     error && (
-      <Text color="red.500" size="sm">
+      <Text color="red.500" size="sm" role="alert">
         {error?.message?.toString()}
       </Text>
     )
@@ -130,6 +130,7 @@ const TextFormField = (props: FormFieldComponentProps) => {
   const { attributes } = props;
   const { field } = useController({
     name: props.name,
+    defaultValue: props.value ?? "",
   });
 
   return (
@@ -145,12 +146,20 @@ const NumberFormField = (props: FormFieldComponentProps) => {
   const { className } = props.attributes;
   const { field } = useController({
     name: props.name,
+    defaultValue: props.value ?? "",
   });
 
   return (
     <Stack className={className} spacing={2}>
       <LabelledHeading {...props} />
-      <Input {...field} type="number" placeholder="Enter value" />
+      <Input
+        {...field}
+        type="number"
+        placeholder="Enter value"
+        onChange={(e) => {
+          field.onChange(parseFloat(e.target.value));
+        }}
+      />
       <ErrorField {...props} />
     </Stack>
   );

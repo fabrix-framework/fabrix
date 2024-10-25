@@ -11,7 +11,7 @@ export const LabelledHeading = (
   const { attributes } = props;
 
   return (
-    <Flex gap={2}>
+    <Flex gap={2} as="label" htmlFor={props.name}>
       <Heading size="xs">{attributes.label}</Heading>
       {isRequired && (
         <Badge colorScheme="red" fontSize="xs">
