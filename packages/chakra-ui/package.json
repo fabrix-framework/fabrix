@@ -32,7 +32,7 @@
     "chakra-react-select": "^5.0.1",
     "chroma-js": "^3.0.0",
     "create-color": "^2.0.6",
-    "framer-motion": "^11.11.8",
+    "framer-motion": "^11.11.10",
     "zod": "^3.23.8"
   },
   "peerDependencies": {
