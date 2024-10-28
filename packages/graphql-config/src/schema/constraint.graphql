@@ -1,3 +1,5 @@
+scalar Number
+
 input FabrixFormConstraint {
   """
   String
@@ -6,25 +8,15 @@ input FabrixFormConstraint {
   maxLength: Int
   pattern: String
   format: String
-  oneOf: [String]
+  OneOfString: [String]
 
   """
-  Int
+  Int/Float
   """
-  min: Int
-  max: Int
-  exclusiveMin: Int
-  exclusiveMax: Int
-  multipleOf: Int
-  oneOf: [Int]
-
-  """
-  Float
-  """
-  min: Float
-  max: Float
-  exclusiveMin: Float
-  exclusiveMax: Float
-  multipleOf: Float
-  oneOf: [Float]
+  min: Number
+  max: Number
+  exclusiveMin: Number
+  exclusiveMax: Number
+  multipleOf: Number
+  OneOfNumber: [Number]
 }

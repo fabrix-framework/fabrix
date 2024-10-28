@@ -36,7 +36,7 @@
     "prettier": "^3.3.3",
     "tsup": "^8.1.0",
     "typescript": "^5.5.3",
-    "vite-plugin-graphql-loader": "^4.0.4",
+    "vite-plugin-string": "^1.2.3",
     "vitest": "^2.0.3"
   },
   "prettier": "@fabrix-framework/prettier-config"
