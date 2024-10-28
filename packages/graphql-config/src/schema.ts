@@ -1,4 +1,4 @@
-import { DocumentNode, Kind, parse } from "graphql";
+import { Kind, parse } from "graphql";
 import CommonSchema from "./schema/common.graphql";
 import ViewDirectiveSchema from "./schema/view.graphql";
 import FormDirectiveSchema from "./schema/form.graphql";

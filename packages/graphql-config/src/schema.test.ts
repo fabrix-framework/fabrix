@@ -1,5 +1,5 @@
-import { schemaDefinition } from "./schema";
 import { describe, it, expect } from "vitest";
+import { schemaDefinition } from "./schema";
 
 describe("schemaDefinitions", () => {
   it("should have valid definitions", () => {
