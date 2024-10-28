@@ -45,7 +45,7 @@
     "@fabrix-framework/prettier-config": "workspace:*",
     "@types/chroma-js": "^2.4.4",
     "@types/node": "^22.7.5",
-    "@types/react": "^18.3.3",
+    "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "eslint": "^9.6.0",
     "prettier": "^3.3.3",
