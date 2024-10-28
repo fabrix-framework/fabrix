@@ -5,7 +5,7 @@ import FormDirectiveSchema from "./schema/form.graphql";
 import ConstraintSchema from "./schema/constraint.graphql";
 
 const mergeDocumentNodes = (docs: DocumentNode[]) => ({
-  kind: Kind.DOCUMENT,
+  kind: Kind.DOCUMENT as const,
   definitions: docs.flatMap((doc) => doc.definitions),
 });
 
