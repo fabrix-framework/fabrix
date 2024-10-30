@@ -1,17 +1,18 @@
-import { DocumentNode, Kind } from "graphql";
+import { parse } from "graphql";
+import { mergeTypeDefs } from "@graphql-tools/merge";
 import CommonSchema from "./schema/common.graphql";
 import ViewDirectiveSchema from "./schema/view.graphql";
 import FormDirectiveSchema from "./schema/form.graphql";
 import ConstraintSchema from "./schema/constraint.graphql";
 
-const mergeDocumentNodes = (docs: DocumentNode[]) => ({
-  kind: Kind.DOCUMENT,
-  definitions: docs.flatMap((doc) => doc.definitions),
-});
+const parseStringSchemas = (rawDefinition: string[]) =>
+  rawDefinition.map((def) => parse(def));
 
-export const schemaDefinition = mergeDocumentNodes([
-  CommonSchema,
-  ViewDirectiveSchema,
-  FormDirectiveSchema,
-  ConstraintSchema,
-]);
+export const schemaDefinition = mergeTypeDefs(
+  parseStringSchemas([
+    CommonSchema,
+    ViewDirectiveSchema,
+    FormDirectiveSchema,
+    ConstraintSchema,
+  ]),
+);
