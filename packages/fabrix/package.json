@@ -59,7 +59,7 @@
     "happy-dom": "^15.7.4",
     "msw": "^2.4.9",
     "prettier": "^3.3.3",
-    "tsup": "^8.1.0",
+    "tsup": "^8.3.5",
     "typescript": "^5.5.3",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^2.0.3"
