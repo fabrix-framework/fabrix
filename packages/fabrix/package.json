@@ -57,7 +57,7 @@
     "@vitejs/plugin-react": "^4.3.3",
     "eslint": "^9.6.0",
     "happy-dom": "^15.7.4",
-    "msw": "^2.4.9",
+    "msw": "^2.6.3",
     "prettier": "^3.3.3",
     "tsup": "^8.3.5",
     "typescript": "^5.5.3",
