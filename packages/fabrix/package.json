@@ -47,7 +47,7 @@
     "@fabrix-framework/eslint-config": "workspace:*",
     "@fabrix-framework/prettier-config": "workspace:*",
     "@faker-js/faker": "^9.0.2",
-    "@swc/core": "^1.7.36",
+    "@swc/core": "^1.9.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.2",
