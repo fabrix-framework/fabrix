@@ -32,7 +32,7 @@
     "@fabrix-framework/eslint-config": "workspace:*",
     "@fabrix-framework/prettier-config": "workspace:*",
     "@types/node": "^22.7.5",
-    "eslint": "^9.6.0",
+    "eslint": "^9.15.0",
     "memfs": "^4.14.0",
     "prettier": "^3.3.3",
     "tsup": "^8.3.5",
