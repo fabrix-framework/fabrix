@@ -1,5 +1,5 @@
 {
-  "name": "todoapp",
+  "name": "vite-todoapp",
   "private": true,
   "type": "module",
   "scripts": {

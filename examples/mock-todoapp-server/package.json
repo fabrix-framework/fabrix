@@ -1,5 +1,5 @@
 {
-  "name": "mock-server",
+  "name": "mock-todoapp-server",
   "private": true,
   "type": "module",
   "scripts": {
