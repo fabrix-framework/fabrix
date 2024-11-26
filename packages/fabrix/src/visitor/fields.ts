@@ -28,9 +28,14 @@ export class Field {
   }
 }
 
+export type SelectionField = {
+  type: "field" | "fragment";
+  name: string;
+};
+
 type AddFieldProps = {
   name: string;
-  fields: Array<string>;
+  fields: Array<SelectionField>;
   directives: ReadonlyArray<DirectiveNode>;
 };
 
@@ -43,8 +48,8 @@ export class Fields {
       new Field({
         path,
         fields: props.fields.map((f) => ({
-          name: f,
-          path: path.append(f),
+          name: f.name,
+          path: path.append(f.name),
         })),
         directives: props.directives,
       }),

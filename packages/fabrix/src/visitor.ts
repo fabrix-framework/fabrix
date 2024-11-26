@@ -1,4 +1,4 @@
-import { Fields } from "@visitor/fields";
+import { Fields, SelectionField } from "@visitor/fields";
 import {
   DirectiveNode,
   DocumentNode,
@@ -95,9 +95,26 @@ const buildQueryStructure = (ast: DocumentNode | string) => {
 };
 
 const extractSelections = (node: FieldNode) =>
-  node.selectionSet?.selections.flatMap((selection) =>
-    selection.kind === Kind.INLINE_FRAGMENT ? [] : [selection.name.value],
-  ) ?? [];
+  node.selectionSet?.selections.flatMap<SelectionField>((selection) => {
+    switch (selection.kind) {
+      case Kind.FIELD:
+        return [
+          {
+            type: "field",
+            name: selection.name.value,
+          },
+        ];
+      case Kind.FRAGMENT_SPREAD:
+        return [
+          {
+            type: "fragment",
+            name: selection.name.value,
+          },
+        ];
+      default:
+        return [];
+    }
+  }) ?? [];
 
 export type DirectiveConfig = {
   name: string;

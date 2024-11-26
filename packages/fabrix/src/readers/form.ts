@@ -5,7 +5,7 @@ import {
   formFieldSchema,
 } from "@directive/schema";
 import { resolveFieldType } from "@renderers/shared";
-import { FieldVariables, Path } from "@visitor";
+import { FieldVariables } from "@visitor";
 import { deepmerge } from "deepmerge-ts";
 import {
   GraphQLInputObjectType,
@@ -13,6 +13,7 @@ import {
   GraphQLNonNull,
 } from "graphql";
 import { z } from "zod";
+import { Path } from "@visitor/path";
 import { FieldConfigWithMeta, FieldConfig } from "./shared";
 
 const buildFieldMeta = (type: GraphQLInputType) => ({
