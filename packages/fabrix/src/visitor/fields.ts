@@ -2,6 +2,7 @@ import { Path } from "@visitor/path";
 import { DirectiveNode } from "graphql";
 
 type SubField = {
+  type: "field" | "fragment";
   name: string;
   path: Path;
 };
@@ -28,10 +29,7 @@ export class Field {
   }
 }
 
-export type SelectionField = {
-  type: "field" | "fragment";
-  name: string;
-};
+export type SelectionField = Omit<SubField, "path">;
 
 type AddFieldProps = {
   name: string;
@@ -48,6 +46,7 @@ export class Fields {
       new Field({
         path,
         fields: props.fields.map((f) => ({
+          type: f.type,
           name: f.name,
           path: path.append(f.name),
         })),
