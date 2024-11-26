@@ -1,0 +1,20 @@
+{
+  "name": "mock-todoapp-server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "@apollo/server": "^4.11.0",
+    "graphql-tag": "^2.12.6"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^9.0.2",
+    "tsx": "^4.19.1",
+    "typescript": "^5.5.3",
+    "globals": "^15.9.0",
+    "prettier": "^3.3.3"
+  },
+  "prettier": "@fabrix-framework/prettier-config"
+}

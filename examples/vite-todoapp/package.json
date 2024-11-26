@@ -1,16 +1,14 @@
 {
-  "name": "todoapp",
+  "name": "vite-todoapp",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"pnpm:mock-server\" \"vite\"",
+    "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "mock-server": "tsx server/server.ts"
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@apollo/server": "^4.11.0",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/css": "^11.13.0",
     "@emotion/react": "^11.13.0",
@@ -26,11 +24,9 @@
     "@eslint/js": "^9.15.0",
     "@fabrix-framework/eslint-config": "workspace:*",
     "@fabrix-framework/prettier-config": "workspace:*",
-    "@faker-js/faker": "^9.0.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
-    "concurrently": "^9.1.0",
     "eslint": "^9.15.0",
     "eslint-plugin-react": "^7.36.1",
     "globals": "^15.9.0",
