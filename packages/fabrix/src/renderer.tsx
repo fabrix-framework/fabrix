@@ -1,4 +1,10 @@
-import { DirectiveNode, DocumentNode, OperationTypeNode, parse } from "graphql";
+import {
+  DirectiveNode,
+  DocumentNode,
+  Kind,
+  OperationTypeNode,
+  parse,
+} from "graphql";
 import { useCallback, useContext, useMemo } from "react";
 import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
@@ -136,11 +142,12 @@ const useFieldConfigs = (query: DocumentNode | string) => {
         .unwrap()
         .filter((f) => !f.getParentName())
         .reduce<FieldConfigs>((acc, field) => {
+          const childFields = fields.getChildrenWithAncestors(field.getName());
           const fieldConfig = getFieldConfig(
             context,
             field,
             variables,
-            fields.getChildrenWithAncestors(field.getName()),
+            childFields,
             opType,
           );
           if (!fieldConfig) {
@@ -284,7 +291,18 @@ export const FabrixComponent = (
       const context = useContext(FabrixContext);
       const commonProps = {
         query: {
-          documentResolver: () => field.document,
+          documentResolver: () => {
+            const fragments = context.componentRegistry.getAllFragments();
+            const mergedDocuments: DocumentNode = {
+              kind: Kind.DOCUMENT,
+              definitions: [
+                ...field.document.definitions,
+                ...fragments.flatMap((f) => f.document.definitions),
+              ],
+            };
+
+            return mergedDocuments;
+          },
           variables: props.variables,
           rootName: field.name,
         },

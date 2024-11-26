@@ -89,6 +89,13 @@ const buildQueryStructure = (ast: DocumentNode | string) => {
         directives: node.directives ?? [],
       });
     },
+    FragmentSpread: (node) => {
+      operationStructure.fields.add({
+        name: node.name.value,
+        fields: [],
+        directives: node.directives ?? [],
+      });
+    },
   });
 
   return operationStructure;

@@ -1,4 +1,5 @@
 import { ComponentRegistry, FieldComponentProps } from "@registry";
+import { gql } from "graphql-tag";
 import { describe, expect, test } from "vitest";
 
 describe("ComponentRegistry", () => {
@@ -59,6 +60,55 @@ describe("ComponentRegistry", () => {
     test("should return undefined if the custom component is not found or with the incorrect type", () => {
       expect(registry.getCustom("NotFound", "field")).toBeUndefined();
       expect(registry.getCustom("CustomField", "form")).toBeUndefined();
+    });
+  });
+
+  describe("addFragment", () => {
+    const registry = new ComponentRegistry({});
+
+    test("should be able to add a fragment to the registry", () => {
+      registry.addFragment<{
+        id: string;
+        name: string;
+      }>({
+        query: gql`
+          fragment TestFragment on Test {
+            id
+            name
+          }
+        `,
+        component: (props) => <div>{props.values.id}</div>,
+      });
+
+      expect(registry.getFragment("TestFragment")).not.toBeUndefined();
+    });
+
+    test("should fail in adding multiple fragments", () => {
+      expect(() => {
+        registry.addFragment({
+          query: gql`
+            fragment Fragment1 on Test {
+              id
+              name
+            }
+
+            fragment Fragment2 on Test {
+              id
+              name
+            }
+          `,
+          component: () => <div />,
+        });
+      }).toThrow();
+    });
+
+    test("should fail if no fragment is added", () => {
+      expect(() => {
+        registry.addFragment({
+          query: gql``,
+          component: () => <div />,
+        });
+      }).toThrow();
     });
   });
 });

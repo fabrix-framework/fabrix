@@ -8,6 +8,7 @@ type User {
   id: ID!
   name: String!
   email: String!
+  imageURL: String
 }
 
 type UsersResult {
@@ -16,6 +17,7 @@ type UsersResult {
 
 type Query {
   users: UsersResult
+  user: User
 }
 
 enum UserCategory {

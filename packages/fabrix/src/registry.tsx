@@ -1,6 +1,8 @@
 import { ViewFieldSchema } from "@directive/schema";
 import { FieldType } from "renderers/shared";
 import React from "react";
+import { DocumentNode, Kind, parse, visit } from "graphql";
+import { SelectionField } from "@visitor/fields";
 
 export type DirectiveAttributes = Pick<ViewFieldSchema, "label"> & {
   className: string;
@@ -82,9 +84,7 @@ export type FormComponentProps<P extends UserProps = UserProps> =
     ) => React.ReactNode;
   };
 
-type ComponentFunc<P> = (
-  props: React.PropsWithChildren<P>,
-) => React.ReactElement;
+type ComponentFunc<P> = (props: P) => React.ReactElement;
 
 type CustomComponent =
   | {
@@ -135,8 +135,33 @@ type ComponentRegistryConstructorProps = {
   };
 };
 
+type FragmentComponentProps<
+  P extends Record<string, unknown> = Record<string, unknown>,
+> = {
+  values: P;
+  fields: Array<Field>;
+};
+
+type AddFragmentComponentProps<
+  P extends Record<string, unknown> = Record<string, unknown>,
+> = {
+  query: string | DocumentNode;
+  component: ComponentFunc<FragmentComponentProps<P>>;
+};
+
+type FragmentComponentDefinition<
+  P extends Record<string, unknown> = Record<string, unknown>,
+> = {
+  name: string;
+  baseType: string;
+  fields: Array<SelectionField>;
+  document: DocumentNode;
+  component: ComponentFunc<FragmentComponentProps<P>>;
+};
+
 export class ComponentRegistry {
   private customComponentMap = new Map<string, CustomComponent["component"]>();
+  private fragmentComponentMap = new Map<string, FragmentComponentDefinition>();
 
   constructor(readonly components: ComponentRegistryConstructorProps) {
     if (components.custom) {
@@ -147,7 +172,7 @@ export class ComponentRegistry {
   }
 
   merge(registry: ComponentRegistry) {
-    return new ComponentRegistry({
+    const mergingRegistry = new ComponentRegistry({
       custom: [
         ...(this.components.custom ?? []),
         ...(registry.components.custom ?? []),
@@ -164,12 +189,79 @@ export class ComponentRegistry {
           registry.components.default?.table ?? this.components.default?.table,
       },
     });
+
+    registry.getAllFragments().forEach((value) => {
+      mergingRegistry.addFragment({
+        query: value.document,
+        component: value.component,
+      });
+    });
+
+    return mergingRegistry;
   }
 
   getCustom<T extends CustomComponent["type"]>(name: string, type: T) {
     return this.customComponentMap.get(`${name}:${type}`) as
       | ComponentFuncByType<T>
       | undefined;
+  }
+
+  addFragment<P extends Record<string, unknown>>(
+    props: AddFragmentComponentProps<P>,
+  ) {
+    let fragmentComponentDefinition =
+      null as null | FragmentComponentDefinition<P>;
+    const document =
+      typeof props.query === "string" ? parse(props.query) : props.query;
+
+    visit(document, {
+      FragmentDefinition: (node) => {
+        if (fragmentComponentDefinition !== null) {
+          throw new Error(
+            "Multiple fragment definitions in a single query is not supported",
+          );
+        }
+
+        fragmentComponentDefinition = {
+          name: node.name.value,
+          baseType: node.typeCondition.name.value,
+          fields: node.selectionSet.selections.flatMap<SelectionField>(
+            (selection) => {
+              switch (selection.kind) {
+                case Kind.FIELD:
+                  return [
+                    {
+                      type: "field",
+                      name: selection.name.value,
+                    },
+                  ];
+                default:
+                  return [];
+              }
+            },
+          ),
+          document: document,
+          component: props.component,
+        };
+      },
+    });
+
+    if (fragmentComponentDefinition === null) {
+      throw new Error("No fragment definition found in the query");
+    }
+
+    this.fragmentComponentMap.set(
+      fragmentComponentDefinition.name,
+      fragmentComponentDefinition as FragmentComponentDefinition,
+    );
+  }
+
+  getFragment(name: string) {
+    return this.fragmentComponentMap.get(name);
+  }
+
+  getAllFragments() {
+    return Array.from(this.fragmentComponentMap.values());
   }
 }
 
