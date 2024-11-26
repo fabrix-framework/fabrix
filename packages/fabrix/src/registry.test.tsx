@@ -6,7 +6,7 @@ describe("ComponentRegistry", () => {
     const registry1 = new ComponentRegistry({
       custom: [
         {
-          name: "CustomField",
+          name: "CustomField1",
           type: "field",
           component: (props: FieldComponentProps) => (
             <div>{props.value as string}</div>
@@ -31,7 +31,7 @@ describe("ComponentRegistry", () => {
 
     test("should be able to get custom components from both registries", () => {
       expect(
-        mergedRegistry.getCustom("CustomField", "field"),
+        mergedRegistry.getCustom("CustomField1", "field"),
       ).not.toBeUndefined();
       expect(
         mergedRegistry.getCustom("CustomField2", "field"),
