@@ -1,5 +1,5 @@
 import { fallbackDefault } from "@directive/zod";
-import { Path } from "@visitor";
+import { Path } from "@visitor/path";
 import { z } from "zod";
 
 const defaultValues = {
