@@ -6,7 +6,16 @@ describe("Fields", () => {
 
   fields.add({
     name: "a",
-    fields: ["b", "c"],
+    fields: [
+      {
+        type: "field",
+        name: "b",
+      },
+      {
+        type: "field",
+        name: "c",
+      },
+    ],
     directives: [],
   });
   fields.add({
@@ -17,7 +26,16 @@ describe("Fields", () => {
 
   fields.add({
     name: "c",
-    fields: ["d", "e"],
+    fields: [
+      {
+        type: "field",
+        name: "d",
+      },
+      {
+        type: "field",
+        name: "e",
+      },
+    ],
     directives: [],
   });
   fields.add({

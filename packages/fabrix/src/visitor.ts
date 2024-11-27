@@ -1,4 +1,4 @@
-import { Fields } from "@visitor/fields";
+import { Fields, SelectionField } from "@visitor/fields";
 import {
   DirectiveNode,
   DocumentNode,
@@ -50,11 +50,6 @@ const buildQueryStructure = (ast: DocumentNode | string) => {
     }
   };
 
-  const extractSelections = (node: FieldNode) =>
-    node.selectionSet?.selections.flatMap((selection) =>
-      selection.kind === Kind.INLINE_FRAGMENT ? [] : [selection.name.value],
-    ) ?? [];
-
   visit(typeof ast === "string" ? parse(ast) : ast, {
     OperationDefinition: (node) => {
       // No fragment support currently
@@ -94,10 +89,39 @@ const buildQueryStructure = (ast: DocumentNode | string) => {
         directives: node.directives ?? [],
       });
     },
+    FragmentSpread: (node) => {
+      operationStructure.fields.add({
+        name: node.name.value,
+        fields: [],
+        directives: node.directives ?? [],
+      });
+    },
   });
 
   return operationStructure;
 };
+
+const extractSelections = (node: FieldNode) =>
+  node.selectionSet?.selections.flatMap<SelectionField>((selection) => {
+    switch (selection.kind) {
+      case Kind.FIELD:
+        return [
+          {
+            type: "field",
+            name: selection.name.value,
+          },
+        ];
+      case Kind.FRAGMENT_SPREAD:
+        return [
+          {
+            type: "fragment",
+            name: selection.name.value,
+          },
+        ];
+      default:
+        return [];
+    }
+  }) ?? [];
 
 export type DirectiveConfig = {
   name: string;
