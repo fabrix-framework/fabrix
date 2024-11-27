@@ -13,7 +13,8 @@ import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
 import { buildDefaultFormFieldConfigs, formFieldMerger } from "@readers/form";
-import { buildRootDocument, Field, Fields, FieldVariables } from "@/visitor";
+import { buildRootDocument, FieldVariables } from "@/visitor";
+import { Field, Fields } from "@/visitor/fields";
 import { FabrixComponentData } from "@/fetcher";
 
 const decideStrategy = (
