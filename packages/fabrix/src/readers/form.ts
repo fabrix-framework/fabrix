@@ -5,7 +5,8 @@ import {
   formFieldSchema,
 } from "@directive/schema";
 import { resolveFieldType } from "@renderers/shared";
-import { FieldVariables, Path } from "@visitor";
+import { FieldVariables } from "@visitor";
+import { Path } from "@visitor/path";
 import { deepmerge } from "deepmerge-ts";
 import {
   GraphQLInputObjectType,
