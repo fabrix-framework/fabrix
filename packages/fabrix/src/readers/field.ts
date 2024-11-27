@@ -1,6 +1,6 @@
 import { viewFieldSchema } from "@directive/schema";
 import { FieldConfigWithMeta, FieldConfig } from "@readers/shared";
-import { Fields } from "@visitor";
+import { Fields } from "@visitor/fields";
 import { deepmerge } from "deepmerge-ts";
 
 /**
