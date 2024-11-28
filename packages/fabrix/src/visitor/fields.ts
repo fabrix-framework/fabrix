@@ -1,5 +1,5 @@
+import { Path } from "@visitor/path";
 import { DirectiveNode } from "graphql";
-import { Path } from "./path";
 
 type SubField = {
   type: "field" | "fragment";

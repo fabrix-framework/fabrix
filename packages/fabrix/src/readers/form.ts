@@ -14,6 +14,7 @@ import {
   GraphQLNonNull,
 } from "graphql";
 import { z } from "zod";
+import { Path } from "@visitor/path";
 import { FieldConfigWithMeta, FieldConfig } from "./shared";
 
 const buildFieldMeta = (type: GraphQLInputType) => ({

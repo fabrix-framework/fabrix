@@ -18,7 +18,7 @@ export type FieldVariables = Record<
   }
 >;
 
-type S = {
+type OpStructure = {
   document: DocumentNode;
   name: string;
   opType: OperationTypeNode;
@@ -35,7 +35,7 @@ export const buildRootDocument = (document: DocumentNode) =>
   );
 
 const buildQueryStructure = (ast: DocumentNode | string) => {
-  const operationStructure = {} as S;
+  const operationStructure = {} as OpStructure;
 
   const extractTypeNode = (node: TypeNode) => {
     switch (node.kind) {
