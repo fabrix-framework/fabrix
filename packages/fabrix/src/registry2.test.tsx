@@ -28,7 +28,7 @@ describe("ComponentRegistryV2", () => {
   });
 
   test("getCustom", () => {
-    const a = cc.getComponent("customField1");
+    const a = cc.getFabrixComponent("customField1");
     expect(a).not.toBeUndefined();
   });
 
