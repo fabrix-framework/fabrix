@@ -52,6 +52,36 @@ describe("buildRootDocument", () => {
     ).toStrictEqual(["roleName"]);
   });
 
+  test("should build root document with nested fields", () => {
+    const documents = buildRootDocument(gql`
+      query getMovie {
+        movie {
+          producer {
+            name
+          }
+          director {
+            name
+          }
+          name
+        }
+      }
+    `);
+
+    expect(documents.length).toBe(1);
+    expect(
+      documents[0].fields
+        .getChildrenWithAncestors("movie")
+        .unwrap()
+        .map((f) => f.value.path.value.join(".")),
+    ).toStrictEqual([
+      "movie.producer",
+      "movie.producer.name",
+      "movie.director",
+      "movie.director.name",
+      "movie.name",
+    ]);
+  });
+
   test("should build root document with a fragment spread", () => {
     const documents = buildRootDocument(gql`
       query getUser {

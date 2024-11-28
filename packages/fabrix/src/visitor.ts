@@ -50,6 +50,7 @@ const buildQueryStructure = (ast: DocumentNode | string) => {
     }
   };
 
+  const currentPath: string[] = [];
   visit(typeof ast === "string" ? parse(ast) : ast, {
     OperationDefinition: (node) => {
       // No fragment support currently
@@ -79,21 +80,27 @@ const buildQueryStructure = (ast: DocumentNode | string) => {
         type: nodeType,
       };
     },
-    Field: (node) => {
-      const fields = extractSelections(node);
-      const name = node.alias?.value ?? node.name.value;
+    Field: {
+      enter: (node) => {
+        const fields = extractSelections(node);
+        const name = node.alias?.value ?? node.name.value;
 
-      operationStructure.fields.add({
-        name,
-        fields,
-        directives: node.directives ?? [],
-      });
+        currentPath.push(name);
+        operationStructure.fields.add({
+          name,
+          fields,
+          directives: node.directives ?? [],
+          path: [...currentPath],
+        });
+      },
+      leave: () => currentPath.pop(),
     },
     FragmentSpread: (node) => {
       operationStructure.fields.add({
         name: node.name.value,
         fields: [],
         directives: node.directives ?? [],
+        path: [...currentPath, node.name.value],
       });
     },
   });

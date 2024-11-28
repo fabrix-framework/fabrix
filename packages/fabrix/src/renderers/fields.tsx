@@ -314,6 +314,7 @@ const renderField = (
   return createElement(component, {
     key: props.indexKey,
     name: field.field.asKey(),
+    path: field.field.value,
     value: values?.[fieldName] ?? "-",
     type: fieldType,
     subFields: subFields.map((subField) => ({
