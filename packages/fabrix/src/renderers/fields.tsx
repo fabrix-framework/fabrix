@@ -255,12 +255,8 @@ const renderTable = (
     return <div>WARN: Relay style table renderer is not supported for now</div>;
   };
 
-  const headerConfig = getFieldConfigByKey(fields, "collection");
   return (
     <div className={"fabrix table"}>
-      {headerConfig && (
-        <h2 className={"fabrix table-title"}>{headerConfig.config.label}</h2>
-      )}
       {tableMode === "standard" ? renderStandardTable() : renderRelayTable()}
     </div>
   );
