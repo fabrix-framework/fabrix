@@ -85,7 +85,7 @@ export type FormComponentProps<P extends UserProps = UserProps> =
 
 type ComponentFunc<P> = (
   props: React.PropsWithChildren<P>,
-) => React.ReactElement;
+) => React.ReactNode;
 
 type CustomComponent =
   | {
