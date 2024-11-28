@@ -1,6 +1,11 @@
+import { BaseComponentProps } from "@registry";
 import { ComponentType } from "react";
 
 type CustomComponentType = "field" | "formField";
+
+export type ComponentProps<P> = BaseComponentProps & {
+  customProps: P;
+};
 
 interface ComponentEntry<P> {
   type: CustomComponentType;
@@ -10,7 +15,7 @@ interface ComponentEntry<P> {
 type ComponentMap = Record<
   string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ComponentEntry<any>
+  ComponentEntry<ComponentProps<any>>
 >;
 
 export class ComponentRegistryV2<T extends ComponentMap> {

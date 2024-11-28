@@ -1,4 +1,4 @@
-import { ComponentRegistryV2 } from "@registry2";
+import { ComponentProps, ComponentRegistryV2 } from "@registry2";
 import { describe, expect, test } from "vitest";
 
 describe("ComponentRegistryV2", () => {
@@ -7,17 +7,21 @@ describe("ComponentRegistryV2", () => {
       custom: {
         customField1: {
           type: "field",
-          component: (props: { name: string }) => <div>{props.name}</div>,
+          component: (props: ComponentProps<{ name: string }>) => (
+            <div>{props.customProps.name}</div>
+          ),
         },
         customField2: {
           type: "field",
-          component: (props: { age: string }) => <div>{props.age}</div>,
+          component: (props: ComponentProps<{ age: number }>) => {
+            return <div>{props.customProps.age}</div>;
+          },
         },
       },
     });
 
     const a = cc.getComponent("customField1");
 
-    expect(1).toBe(1);
+    expect(a).not.toBeUndefined();
   });
 });

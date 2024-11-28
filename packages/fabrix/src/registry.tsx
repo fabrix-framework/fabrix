@@ -11,7 +11,7 @@ type CustomRendererProps<P extends UserProps> = {
   userProps?: P;
 };
 
-type BaseComponentProps<V = unknown> = {
+export type BaseComponentProps<V = unknown> = {
   name: string;
   value: V;
   type: FieldType;
