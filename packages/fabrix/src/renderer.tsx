@@ -188,7 +188,7 @@ type FabrixComponentCommonProps = {
   contentClassName?: string;
 };
 
-type FabrixComponentProps = FabrixComponentCommonProps & {
+export type FabrixComponentProps = FabrixComponentCommonProps & {
   /**
    * The query to render.
    *

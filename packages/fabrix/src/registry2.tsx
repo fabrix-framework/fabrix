@@ -1,5 +1,6 @@
 import { BaseComponentProps, Field, TableComponentHeader } from "@registry";
-import { ComponentType } from "react";
+import { ComponentProps, ComponentType } from "react";
+import { FabrixComponent, FabrixComponentProps } from "@renderer";
 
 export type CustomProps<P> = {
   customProps: P;
@@ -90,8 +91,27 @@ export class ComponentRegistryV2<T extends ComponentMap> {
     },
   ) {}
 
-  getComponent<K extends keyof T>(type: K): T[K]["component"] | undefined {
-    return this.props.custom?.[type].component;
+  getFabrixComponent<N extends keyof T>(name: N) {
+    const componentEntry = this.props.custom?.[name];
+    if (!componentEntry) {
+      return;
+    }
+
+    const hocComponent = (props: {
+      query: FabrixComponentProps["query"];
+      customProps: ComponentProps<T[N]["component"]>["customProps"];
+    }) => {
+      return (
+        <FabrixComponent query={props.query}>
+          {() => {
+            /* TODO: custom component should be rendered here */
+            return <div>Fabrix component wrapper</div>;
+          }}
+        </FabrixComponent>
+      );
+    };
+
+    return hocComponent;
   }
 
   getComponentDynamicWithType<T extends ComponentEntry["type"]>(name: string) {
