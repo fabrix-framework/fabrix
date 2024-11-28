@@ -2,7 +2,7 @@ export { FabrixProvider } from "@provider";
 export { useFabrixContext } from "@context";
 export { gql } from "graphql-tag";
 export { FabrixComponent } from "@renderer";
-export { useFabrixClient } from "@fetcher";
+export { useFabrixClient, useDataFetch } from "@fetcher";
 export { type FieldType } from "@renderers/shared";
 export { type SubField } from "@renderers/fields";
 export {
