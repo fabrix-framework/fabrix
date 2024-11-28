@@ -30,6 +30,7 @@ export type Field = {
 export type FieldComponentProps<P extends UserProps = UserProps> =
   BaseComponentProps &
     CustomRendererProps<P> & {
+      path: string[];
       subFields: Array<Field>;
     };
 
