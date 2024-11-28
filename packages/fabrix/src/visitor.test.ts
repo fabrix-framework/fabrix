@@ -62,6 +62,7 @@ describe("buildRootDocument", () => {
           director {
             name
           }
+          name
         }
       }
     `);
@@ -77,6 +78,7 @@ describe("buildRootDocument", () => {
       "movie.producer.name",
       "movie.director",
       "movie.director.name",
+      "movie.name",
     ]);
   });
 

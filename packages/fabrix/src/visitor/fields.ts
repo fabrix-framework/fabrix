@@ -35,13 +35,14 @@ type AddFieldProps = {
   name: string;
   fields: Array<SelectionField>;
   directives: ReadonlyArray<DirectiveNode>;
+  path: string[];
 };
 
 export class Fields {
   constructor(private value: Array<Field> = []) {}
 
   add(props: AddFieldProps) {
-    const path = this.buildPath(props.name);
+    const path = new Path(props.path);
     this.value.push(
       new Field({
         path,
@@ -86,17 +87,5 @@ export class Fields {
 
   unwrap() {
     return this.value;
-  }
-
-  /**
-   * Recursively build the path key for a field
-   */
-  private buildPath(name: string, acc: string[] = []): Path {
-    const parent = this.getParent(name);
-    if (parent) {
-      return this.buildPath(parent.getName(), [name, ...acc]);
-    }
-
-    return new Path([name, ...acc]);
   }
 }

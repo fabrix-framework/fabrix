@@ -17,11 +17,13 @@ describe("Fields", () => {
       },
     ],
     directives: [],
+    path: ["a"],
   });
   fields.add({
     name: "b",
     fields: [],
     directives: [],
+    path: ["a", "b"],
   });
 
   fields.add({
@@ -37,16 +39,19 @@ describe("Fields", () => {
       },
     ],
     directives: [],
+    path: ["a", "c"],
   });
   fields.add({
     name: "d",
     fields: [],
     directives: [],
+    path: ["a", "c", "d"],
   });
   fields.add({
     name: "e",
     fields: [],
     directives: [],
+    path: ["a", "c", "e"],
   });
 
   test.each(["a.b", "a.c", "a.c.d", "a.c.e"])(
