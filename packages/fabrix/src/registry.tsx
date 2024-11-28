@@ -44,6 +44,7 @@ export type TableComponentProps<P extends UserProps = UserProps> =
     headers: TableComponentHeader[];
     values: Record<string, unknown>[];
   };
+
 export type TableComponentHeader = Field & {
   render: ((rowValue: Record<string, unknown>) => React.ReactElement) | null;
 };
