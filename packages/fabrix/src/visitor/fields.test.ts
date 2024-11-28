@@ -70,16 +70,6 @@ describe("Fields", () => {
   });
 
   test.each([
-    ["b", "a"],
-    ["c", "a"],
-    ["d", "c"],
-    ["e", "c"],
-    ["a", undefined],
-  ])("getParent of '%s' should be '%s'", (child, parent) => {
-    expect(fields.getParent(child)?.getName()).toBe(parent);
-  });
-
-  test.each([
     ["a.b", "a"],
     ["a.c", "a"],
     ["a.c.d", "c"],

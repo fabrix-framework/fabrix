@@ -75,12 +75,6 @@ export class Fields {
     return new Fields(getChildrenRecursively(parentName));
   }
 
-  getParent(childName: string) {
-    return Array.from(this.value)
-      .reverse()
-      .find((f) => f.value.fields.map((f) => f.name).includes(childName));
-  }
-
   getByPathKey(key: string) {
     return this.value.find((f) => f.value.path.asKey() === key);
   }
