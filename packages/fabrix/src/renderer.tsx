@@ -134,7 +134,7 @@ const useFieldConfigs = (query: DocumentNode | string) => {
     return rootDocument.map(({ document, fields, opType, variables }) =>
       fields
         .unwrap()
-        .filter((f) => !f.getParentName())
+        .filter((f) => f.value.path.value.length === 2)
         .reduce<FieldConfigs>((acc, field) => {
           const fieldConfig = getFieldConfig(
             context,

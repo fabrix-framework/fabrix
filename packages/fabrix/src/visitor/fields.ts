@@ -75,9 +75,9 @@ export class Fields {
   }
 
   getParent(childName: string) {
-    return this.value.find((f) =>
-      f.value.fields.map((f) => f.name).includes(childName),
-    );
+    return Array.from(this.value)
+      .reverse()
+      .find((f) => f.value.fields.map((f) => f.name).includes(childName));
   }
 
   getByPathKey(key: string) {
