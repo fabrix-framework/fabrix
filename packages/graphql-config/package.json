@@ -25,7 +25,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@graphql-tools/merge": "^9.0.8",
+    "@graphql-tools/merge": "^9.0.11",
     "graphql": "^16.9.0"
   },
   "devDependencies": {

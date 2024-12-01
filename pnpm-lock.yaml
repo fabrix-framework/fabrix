@@ -292,8 +292,8 @@ importers:
   packages/graphql-config:
     dependencies:
       '@graphql-tools/merge':
-        specifier: ^9.0.8
-        version: 9.0.8(graphql@16.9.0)
+        specifier: ^9.0.11
+        version: 9.0.11(graphql@16.9.0)
       graphql:
         specifier: ^16.9.0
         version: 16.9.0
@@ -1165,8 +1165,8 @@ packages:
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@graphql-tools/merge@9.0.8':
-    resolution: {integrity: sha512-RG9NEp4fi0MoFi0te4ahqTMYuavQnXlpEZxxMomdCa6CI5tfekcVm/rsLF5Zt8O4HY+esDt9+4dCL+aOKvG79w==}
+  '@graphql-tools/merge@9.0.11':
+    resolution: {integrity: sha512-AJL0XTozn31HoZN8tULzEkbDXyETA5vAFu4Q65kxJDu027p+auaNFYj/y51HP4BhMR4wykoteWyO7/VxKfdpiw==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
@@ -1176,8 +1176,8 @@ packages:
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@graphql-tools/utils@10.5.5':
-    resolution: {integrity: sha512-LF/UDWmMT0mnobL2UZETwYghV7HYBzNaGj0SAkCYOMy/C3+6sQdbcTksnoFaKR9XIVD78jNXEGfivbB8Zd+cwA==}
+  '@graphql-tools/utils@10.6.1':
+    resolution: {integrity: sha512-XHl0/DWkMf/8Dmw1F3RRoMPt6ZwU4J707YWcbPjS+49WZNoTVz6f+prQ4GuwZT8RqTPtrRawnGU93AV73ZLTfQ==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
@@ -4658,9 +4658,9 @@ snapshots:
       graphql: 16.9.0
       tslib: 2.7.0
 
-  '@graphql-tools/merge@9.0.8(graphql@16.9.0)':
+  '@graphql-tools/merge@9.0.11(graphql@16.9.0)':
     dependencies:
-      '@graphql-tools/utils': 10.5.5(graphql@16.9.0)
+      '@graphql-tools/utils': 10.6.1(graphql@16.9.0)
       graphql: 16.9.0
       tslib: 2.7.0
 
@@ -4672,7 +4672,7 @@ snapshots:
       tslib: 2.7.0
       value-or-promise: 1.0.12
 
-  '@graphql-tools/utils@10.5.5(graphql@16.9.0)':
+  '@graphql-tools/utils@10.6.1(graphql@16.9.0)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
       cross-inspect: 1.0.1
