@@ -106,7 +106,7 @@ const getFieldConfig = (
 export type FieldConfig = ReturnType<typeof getFieldConfig> & {
   document: DocumentNode;
 };
-type FieldConfigs = Record<string, FieldConfig>;
+export type FieldConfigs = Record<string, FieldConfig>;
 
 export const useFieldConfigs = (query: DocumentNode | string) => {
   const rootDocument = buildRootDocument(
@@ -114,31 +114,34 @@ export const useFieldConfigs = (query: DocumentNode | string) => {
   );
   const context = useContext(FabrixContext);
   const fieldConfigs = useMemo(() => {
-    return rootDocument.map(({ document, fields, opType, variables }) =>
-      fields
-        .unwrap()
-        .filter((f) => !f.getParentName())
-        .reduce<FieldConfigs>((acc, field) => {
-          const fieldConfig = getFieldConfig(
-            context,
-            field,
-            variables,
-            fields.getChildrenWithAncestors(field.getName()),
-            opType,
-          );
-          if (!fieldConfig) {
-            return acc;
-          }
+    return rootDocument.map(({ document, fields, opType, variables }) => {
+      return {
+        opType,
+        fields: fields
+          .unwrap()
+          .filter((f) => !f.getParentName())
+          .reduce<FieldConfigs>((acc, field) => {
+            const fieldConfig = getFieldConfig(
+              context,
+              field,
+              variables,
+              fields.getChildrenWithAncestors(field.getName()),
+              opType,
+            );
+            if (!fieldConfig) {
+              return acc;
+            }
 
-          return {
-            ...acc,
-            [field.getName()]: {
-              document,
-              ...fieldConfig,
-            },
-          };
-        }, {}),
-    );
+            return {
+              ...acc,
+              [field.getName()]: {
+                document,
+                ...fieldConfig,
+              },
+            };
+          }, {}),
+      };
+    });
   }, [rootDocument, context]);
 
   return {
@@ -146,7 +149,7 @@ export const useFieldConfigs = (query: DocumentNode | string) => {
   };
 };
 
-type FabrixComponentCommonProps = {
+export type FabrixComponentCommonProps = {
   /**
    * The variables to call the query with.
    */
@@ -296,7 +299,7 @@ export const FabrixComponent = (
         extraProps?: FabrixComponentChildrenExtraProps,
         componentFieldsRenderer?: FabrixComponentFieldsRenderer,
       ) => {
-        const fieldConfig = fieldConfigs.find((c) => c[name]);
+        const fieldConfig = fieldConfigs.find((c) => c.fields[name]);
         if (!fieldConfig) {
           return null;
         }
@@ -306,7 +309,7 @@ export const FabrixComponent = (
             key={extraProps?.key}
             className={`fabrix renderer container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
           >
-            {renderByField(fieldConfig[name], componentFieldsRenderer)}
+            {renderByField(fieldConfig.fields[name], componentFieldsRenderer)}
           </div>
         );
       },

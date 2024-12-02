@@ -1,26 +1,22 @@
 import { FabrixContext, FabrixContextType } from "@context";
 import { FabrixComponentData } from "@fetcher";
 import { TableComponentEntry } from "@registry2";
-import { FabrixComponentProps, useFieldConfigs } from "@renderer";
+import { FabrixComponentCommonProps, FieldConfigs } from "@renderer";
 import { ComponentRendererProps } from "@renderer2";
 import { getSubFields, SubFields } from "@renderers/fields";
 import { createElement, useContext } from "react";
 
 export const TableRenderer = (
-  props: FabrixComponentProps & {
+  props: FabrixComponentCommonProps & {
+    fieldConfigs: FieldConfigs;
     component: ComponentRendererProps<TableComponentEntry>;
   },
 ) => {
-  const { fieldConfigs } = useFieldConfigs(props.query);
-  if (fieldConfigs.length > 1 || fieldConfigs.length === 0) {
-    throw new Error("Table requires only one field at the root level");
-  }
-
-  const fieldConfig = fieldConfigs[0];
-  const fieldKeys = Object.keys(fieldConfig);
+  const fieldConfigs = props.fieldConfigs;
+  const fieldKeys = Object.keys(fieldConfigs);
   const context = useContext(FabrixContext);
   const tableComponents = fieldKeys.map((key, index) => {
-    const field = fieldConfig[key];
+    const field = fieldConfigs[key];
     if (field.type !== "view") {
       throw new Error("Table requires only view fields");
     }

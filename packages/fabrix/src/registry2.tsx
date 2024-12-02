@@ -103,7 +103,7 @@ export class ComponentRegistryV2<T extends ComponentMap> {
       throw new Error(`Component ${componentName} not found`);
     }
 
-    const hocComponent = (props: {
+    return (props: {
       query: FabrixComponentProps["query"];
       customProps?: ComponentProps<T[N]["component"]>["customProps"];
     }) => (
@@ -116,8 +116,6 @@ export class ComponentRegistryV2<T extends ComponentMap> {
         }}
       />
     );
-
-    return hocComponent;
   }
 
   getComponentDynamicWithType<T extends ComponentEntry["type"]>(name: string) {
