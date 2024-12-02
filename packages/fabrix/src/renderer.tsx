@@ -256,12 +256,12 @@ export const FabrixComponent = (
   },
 ) => {
   const fieldConfigs = useFieldConfigs(props.query);
-  const context = useContext(FabrixContext);
   const renderByField = useCallback(
     (
       field: FieldConfig,
       componentFieldsRenderer?: FabrixComponentFieldsRenderer,
     ) => {
+      const context = useContext(FabrixContext);
       const commonProps = {
         query: {
           documentResolver: () => field.document,
