@@ -113,9 +113,9 @@ export const useFieldConfigs = (query: DocumentNode | string) => {
     typeof query === "string" ? parse(query) : query,
   );
   const context = useContext(FabrixContext);
-  const fieldConfigs = useMemo(() => {
-    return rootDocument.map(({ document, fields, opType, variables }) => {
-      return {
+  const fieldConfigs = useMemo(
+    () =>
+      rootDocument.map(({ document, fields, opType, variables }) => ({
         opType,
         fields: fields
           .unwrap()
@@ -140,9 +140,9 @@ export const useFieldConfigs = (query: DocumentNode | string) => {
               },
             };
           }, {}),
-      };
-    });
-  }, [rootDocument, context]);
+      })),
+    [rootDocument, context],
+  );
 
   return {
     fieldConfigs,
