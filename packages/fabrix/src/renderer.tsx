@@ -115,8 +115,9 @@ export const useFieldConfigs = (query: DocumentNode | string) => {
   const context = useContext(FabrixContext);
   const fieldConfigs = useMemo(
     () =>
-      rootDocument.map(({ document, fields, opType, variables }) => ({
+      rootDocument.map(({ name, document, fields, opType, variables }) => ({
         opType,
+        name,
         fields: fields
           .unwrap()
           .filter((f) => !f.getParentName())
@@ -208,8 +209,11 @@ export type FabrixComponentProps = FabrixComponentCommonProps & {
   query: DocumentNode | string;
 };
 
-type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
-type FabrixComponentChildrenProps = {
+export type FabrixComponentChildrenExtraProps = {
+  key?: string;
+  className?: string;
+};
+export type FabrixComponentChildrenProps = {
   /**
    * Get the component by query name
    *

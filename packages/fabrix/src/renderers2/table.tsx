@@ -25,6 +25,7 @@ export const TableRenderer = (
       props.data,
       key,
     );
+
     const subFields = getSubFields(
       context,
       rootValue,

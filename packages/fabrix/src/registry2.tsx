@@ -1,7 +1,7 @@
 import { BaseComponentProps, Field, TableComponentHeader } from "@registry";
 import { ComponentProps, ComponentType } from "react";
 import { FabrixComponentProps } from "@renderer";
-import { FabrixComponent2 } from "@renderer2";
+import { FabrixComponent2, FabrixComponent2Props } from "@renderer2";
 
 export type CustomProps<P> = {
   customProps: P;
@@ -105,7 +105,8 @@ export class ComponentRegistryV2<T extends ComponentMap> {
 
     return (props: {
       query: FabrixComponentProps["query"];
-      customProps?: ComponentProps<T[N]["component"]>["customProps"];
+      customProps: ComponentProps<T[N]["component"]>["customProps"];
+      children?: FabrixComponent2Props["children"];
     }) => (
       <FabrixComponent2
         query={props.query}
@@ -114,7 +115,9 @@ export class ComponentRegistryV2<T extends ComponentMap> {
           entry: componentEntry,
           customProps: props.customProps,
         }}
-      />
+      >
+        {props.children}
+      </FabrixComponent2>
     );
   }
 

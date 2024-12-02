@@ -100,4 +100,45 @@ describe("ComponentRegistryV2", () => {
       },
     );
   });
+
+  test("getCustom (customTable) with getComponent", async () => {
+    const CustomTable = registry.getComponent("customTable");
+
+    await testWithUnmount(
+      <CustomTable
+        customProps={{
+          title: "Users",
+        }}
+        query={gql`
+          query getUsers {
+            users {
+              collection {
+                id
+                name
+                email
+              }
+            }
+          }
+        `}
+      >
+        {({ getComponent }) => (
+          <div className="customized-table">
+            <div>This is customized table</div>
+            {getComponent("getUsers")}
+          </div>
+        )}
+      </CustomTable>,
+      async () => {
+        expect(
+          screen.getByText("This is customized table"),
+        ).toBeInTheDocument();
+
+        const table = await screen.findByRole("table");
+        expect(table).toBeInTheDocument();
+
+        const rows = await within(table).findAllByRole("row");
+        expect(rows.length).toBe(3);
+      },
+    );
+  });
 });
