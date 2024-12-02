@@ -42,7 +42,7 @@ export type TableComponentProps<P = unknown> = BaseComponentProps &
 
 export type TableCellComponentProps<P = unknown> = FieldComponentProps<P>;
 
-type ComponentEntry<P = unknown> =
+export type ComponentEntry<P = unknown> =
   | {
       type: "field";
       component: ComponentType<FieldComponentProps<P>>;

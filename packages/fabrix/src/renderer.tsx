@@ -108,12 +108,13 @@ export type FieldConfig = ReturnType<typeof getFieldConfig> & {
 };
 type FieldConfigs = Record<string, FieldConfig>;
 
-const useFieldConfigs = (query: DocumentNode | string) => {
+export const useFieldConfigs = (query: DocumentNode | string) => {
   const rootDocument = buildRootDocument(
     typeof query === "string" ? parse(query) : query,
   );
   const context = useContext(FabrixContext);
-  const fieldConfigs = useMemo(() => {
+
+  return useMemo(() => {
     return rootDocument.map(({ document, fields, opType, variables }) =>
       fields
         .unwrap()
@@ -140,10 +141,6 @@ const useFieldConfigs = (query: DocumentNode | string) => {
         }, {}),
     );
   }, [rootDocument, context]);
-
-  return {
-    fieldConfigs,
-  };
 };
 
 type FabrixComponentCommonProps = {
@@ -258,13 +255,13 @@ export const FabrixComponent = (
     children?: (props: FabrixComponentChildrenProps) => React.ReactNode;
   },
 ) => {
-  const { fieldConfigs } = useFieldConfigs(props.query);
+  const fieldConfigs = useFieldConfigs(props.query);
+  const context = useContext(FabrixContext);
   const renderByField = useCallback(
     (
       field: FieldConfig,
       componentFieldsRenderer?: FabrixComponentFieldsRenderer,
     ) => {
-      const context = useContext(FabrixContext);
       const commonProps = {
         query: {
           documentResolver: () => field.document,
