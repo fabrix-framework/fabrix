@@ -324,7 +324,7 @@ export const FabrixComponent = (
     }
 
     return fieldConfigs.map((c) =>
-      Object.keys(c).map((queryKey, index) =>
+      Object.keys(c.fields).map((queryKey, index) =>
         getComponent(queryKey, { key: `renderer-${index}` }),
       ),
     );
