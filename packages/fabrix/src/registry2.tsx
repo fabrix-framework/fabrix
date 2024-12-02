@@ -96,7 +96,7 @@ export class ComponentRegistryV2<T extends ComponentMap> {
     },
   ) {}
 
-  getFabrixComponent<N extends keyof T>(name: N) {
+  getComponent<N extends keyof T>(name: N) {
     const componentEntry = this.props.custom?.[name];
     const componentName = name as string;
     if (!componentEntry) {

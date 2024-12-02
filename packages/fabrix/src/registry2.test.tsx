@@ -5,7 +5,7 @@ import {
   TableComponentEntry,
 } from "@registry2";
 import { describe, expect, test } from "vitest";
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { gql } from "urql";
 import { ReactNode } from "react";
 import { testWithUnmount } from "../__tests__/supports/render";
@@ -22,7 +22,7 @@ const customField2: FormFieldComponentEntry<{ age: number }> = {
   },
 } as const;
 
-const customTable: TableComponentEntry = {
+const customTable: TableComponentEntry<{ title: string }> = {
   type: "table",
   component: (props) => {
     const headers = props.headers.map((header) => (
@@ -30,26 +30,29 @@ const customTable: TableComponentEntry = {
     ));
 
     return (
-      <table>
-        <thead>
-          <tr>{headers}</tr>
-        </thead>
-        <tbody>
-          {props.values.map((item, index) => (
-            <tr key={index}>
-              {props.headers.map((header) => (
-                <td key={header.key}>{item[header.key] as ReactNode}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <>
+        <h1>{props.customProps.title}</h1>
+        <table>
+          <thead>
+            <tr>{headers}</tr>
+          </thead>
+          <tbody>
+            {props.values.map((item, index) => (
+              <tr key={index}>
+                {props.headers.map((header) => (
+                  <td key={header.key}>{item[header.key] as ReactNode}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </>
     );
   },
 };
 
 describe("ComponentRegistryV2", () => {
-  const cc = new ComponentRegistryV2({
+  const registry = new ComponentRegistryV2({
     custom: {
       customField1,
       customField2,
@@ -58,20 +61,24 @@ describe("ComponentRegistryV2", () => {
   });
 
   test("getCustom (customField1)", () => {
-    const component = cc.getFabrixComponent("customField1");
+    const component = registry.getComponent("customField1");
     expect(component).not.toBeUndefined();
   });
 
   test("getDynamicWithType (customField1)", () => {
-    const component = cc.getComponentDynamicWithType<"field">("customField1");
+    const component =
+      registry.getComponentDynamicWithType<"field">("customField1");
     expect(component).not.toBeUndefined();
   });
 
   test("getCustom (customTable)", async () => {
-    const CustomTable = cc.getFabrixComponent("customTable");
+    const CustomTable = registry.getComponent("customTable");
 
     await testWithUnmount(
       <CustomTable
+        customProps={{
+          title: "Users",
+        }}
         query={gql`
           query getUsers {
             users {
@@ -84,10 +91,12 @@ describe("ComponentRegistryV2", () => {
           }
         `}
       />,
-      () => {
-        screen.debug();
+      async () => {
+        const table = await screen.findByRole("table");
+        expect(table).toBeInTheDocument();
 
-        expect(1).toBe(1);
+        const rows = await within(table).findAllByRole("row");
+        expect(rows.length).toBe(3);
       },
     );
   });
