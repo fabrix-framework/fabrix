@@ -30,7 +30,7 @@ export const FabrixComponent2 = (
 };
 
 const TableRenderer = (props: FabrixComponentProps) => {
-  const fieldConfigs = useFieldConfigs(props.query);
+  const { fieldConfigs } = useFieldConfigs(props.query);
 
   if (fieldConfigs.length > 1 || fieldConfigs.length === 0) {
     throw new Error("Table requires only one field at the root level");
