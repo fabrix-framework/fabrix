@@ -157,7 +157,7 @@ const getTypeName = (
  *
  * This also sorts the fields by the index value.
  */
-const getSubFields = (
+export const getSubFields = (
   context: FabrixContextType,
   rootValue: Value | undefined,
   fields: ViewFields,
@@ -173,6 +173,7 @@ const getSubFields = (
         getTypeName(context, rootValue, name)[value.field.getName()] || null,
       label: value.config.label || value.field.getName(),
     }));
+export type SubFields = ReturnType<typeof getSubFields>;
 
 const renderTable = (
   context: FabrixContextType,

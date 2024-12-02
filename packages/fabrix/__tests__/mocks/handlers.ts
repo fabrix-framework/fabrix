@@ -14,8 +14,18 @@ type UsersResult {
   collection: [User!]!
 }
 
+type Role {
+  id: ID!
+  name: String!
+}
+
+type RolesResult {
+  collection: [Role!]!
+}
+
 type Query {
   users: UsersResult
+  roles: RolesResult
 }
 
 enum UserCategory {

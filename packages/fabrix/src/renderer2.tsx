@@ -1,17 +1,24 @@
 import { FabrixComponentData, useDataFetch } from "@fetcher";
 import { ComponentEntry } from "@registry2";
-import { FabrixComponentProps, useFieldConfigs } from "@renderer";
+import { FabrixComponentProps } from "@renderer";
 import { DocumentResolver, Loader } from "@renderers/shared";
+import { TableRenderer } from "@renderers2/table";
 
-export const FabrixComponent2 = (
-  props: FabrixComponentProps & {
-    componentType: Exclude<
-      ComponentEntry["type"],
-      "field" | "formField" | "tableCell"
-    >;
-  },
-) => {
-  switch (props.componentType) {
+export type ComponentRendererProps<P extends ComponentEntry = ComponentEntry> =
+  {
+    name: string;
+    entry: P;
+    customProps?: unknown;
+  };
+
+type FabrixComponent2Props = FabrixComponentProps & {
+  component: ComponentRendererProps;
+};
+
+export const FabrixComponent2 = (props: FabrixComponent2Props) => {
+  const componentEntry = props.component.entry;
+
+  switch (componentEntry.type) {
     // NOTE: Only table is implemented here as WIP
     case "table": {
       return (
@@ -20,39 +27,23 @@ export const FabrixComponent2 = (
           variables={props.variables}
           defaultData={props.data}
         >
-          {({ data }) => <TableRenderer {...props} data={data} />}
+          {({ data }) => (
+            <TableRenderer
+              {...props}
+              data={data}
+              component={{
+                name: props.component.name,
+                entry: componentEntry,
+                customProps: props.component.customProps,
+              }}
+            />
+          )}
         </DataFetcher>
       );
     }
     default:
       return null;
   }
-};
-
-const TableRenderer = (props: FabrixComponentProps) => {
-  const { fieldConfigs } = useFieldConfigs(props.query);
-
-  if (fieldConfigs.length > 1 || fieldConfigs.length === 0) {
-    throw new Error("Table requires only one field at the root level");
-  }
-  const fielConfig = fieldConfigs[0];
-  const fieldKeys = Object.keys(fielConfig);
-
-  const tableComponents = fieldKeys.map((key) => {
-    const field = fielConfig[key];
-    if (field.type !== "view") {
-      throw new Error("Table requires only view fields");
-    }
-
-    return <div>TableRender</div>;
-  });
-
-  return (
-    <>
-      <h1>query</h1>
-      <div>{tableComponents}</div>
-    </>
-  );
 };
 
 const DataFetcher = (props: {
