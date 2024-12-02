@@ -28,7 +28,7 @@ export const FabrixComponent2 = (props: FabrixComponent2Props) => {
   const componentEntry = props.component.entry;
   const { fieldConfigs } = useFieldConfigs(query);
 
-  const renderComponent = (
+  const getRenderer = (
     fieldConfigs: FieldConfigs,
     data: FabrixComponentData | undefined,
   ) => {
@@ -73,7 +73,7 @@ export const FabrixComponent2 = (props: FabrixComponent2Props) => {
           defaultData={props.data}
           opType={fieldConfig.opType}
         >
-          {({ data }) => renderComponent(fieldConfig.fields, data)}
+          {({ data }) => getRenderer(fieldConfig.fields, data)}
         </DataFetcher>
       </div>
     );
