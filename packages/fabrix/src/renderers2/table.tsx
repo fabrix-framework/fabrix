@@ -1,14 +1,14 @@
 import { FabrixContext, FabrixContextType } from "@context";
 import { FabrixComponentData } from "@fetcher";
 import { TableComponentEntry } from "@registry2";
-import { FabrixComponentProps, FieldConfig } from "@renderer";
+import { FabrixComponentProps, FieldConfigByType } from "@renderer";
 import { ComponentRendererProps, FetcherResult } from "@renderer2";
 import { getSubFields, SubFields } from "@renderers/fields";
 import { createElement, useContext } from "react";
 
 export const TableRenderer = (
   props: FabrixComponentProps & {
-    fieldConfig: FieldConfig;
+    fieldConfig: FieldConfigByType<"view">;
     component: ComponentRendererProps<TableComponentEntry>;
     fetcherResult: FetcherResult;
   },

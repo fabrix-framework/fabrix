@@ -28,6 +28,15 @@ export type FabrixComponent2Props = FabrixComponentProps & {
   children?: (props: FabrixComponentChildrenProps) => React.ReactNode;
 };
 
+function ensureFieldType<T extends FieldConfig["type"]>(
+  fieldConfig: FieldConfig,
+  type: T,
+): asserts fieldConfig is FieldConfig & { type: T } {
+  if (fieldConfig.type !== type) {
+    throw new Error(`this component only supports ${type} type`);
+  }
+}
+
 export const FabrixComponent2 = (props: FabrixComponent2Props) => {
   const { query } = props;
   const componentEntry = props.component.entry;
@@ -40,6 +49,7 @@ export const FabrixComponent2 = (props: FabrixComponent2Props) => {
     // NOTE: Only table and form are implemented here as WIP
     switch (componentEntry.type) {
       case "table": {
+        ensureFieldType(fieldConfig, "view");
         return (
           <TableRenderer
             {...props}
@@ -55,6 +65,7 @@ export const FabrixComponent2 = (props: FabrixComponent2Props) => {
         );
       }
       case "form": {
+        ensureFieldType(fieldConfig, "form");
         return (
           <FormRenderer
             {...props}

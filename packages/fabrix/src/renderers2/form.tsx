@@ -1,8 +1,8 @@
 import { FabrixContext } from "@context";
 import { FormComponentEntry } from "@registry2";
-import { FabrixComponentProps, FieldConfig } from "@renderer";
+import { FabrixComponentProps, FieldConfigByType } from "@renderer";
 import { ComponentRendererProps } from "@renderer2";
-import { FormField, renderFormField } from "@renderers/form";
+import { renderFormField } from "@renderers/form";
 import { ajvResolver } from "@renderers/form/ajvResolver";
 import { buildAjvSchema } from "@renderers/form/validation";
 import { Loader } from "@renderers/shared";
@@ -12,7 +12,7 @@ import { useMutation } from "urql";
 
 export const FormRenderer = (
   props: FabrixComponentProps & {
-    fieldConfig: FieldConfig;
+    fieldConfig: FieldConfigByType<"form">;
     component: ComponentRendererProps<FormComponentEntry>;
   },
 ) => {

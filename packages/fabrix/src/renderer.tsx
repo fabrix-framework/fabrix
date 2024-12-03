@@ -62,36 +62,32 @@ const getFieldConfig = (
   const strategy = decideStrategy(field.value.directives, opType);
   switch (strategy?.type) {
     case "view": {
-      const directive = parseDirectiveArguments(
-        strategy.directive.arguments,
-        directiveSchemaMap.fabrixView.schema,
-      );
-
       return {
         name: field.getName(),
         type: strategy.type,
         configs: {
           fields: mergeFieldConfigs(
             buildDefaultViewFieldConfigs(childFields),
-            directive.input,
+            parseDirectiveArguments(
+              strategy.directive.arguments,
+              directiveSchemaMap.fabrixView.schema,
+            ).input,
             viewFieldMerger,
           ),
         },
       };
     }
     case "form": {
-      const directive = parseDirectiveArguments(
-        strategy.directive.arguments,
-        directiveSchemaMap.fabrixForm.schema,
-      );
-
       return {
         name: field.getName(),
         type: strategy.type,
         configs: {
           fields: mergeFieldConfigs(
             buildDefaultFormFieldConfigs(context, fieldVariables),
-            directive.input,
+            parseDirectiveArguments(
+              strategy.directive.arguments,
+              directiveSchemaMap.fabrixForm.schema,
+            ).input,
             formFieldMerger,
           ),
         },
@@ -106,6 +102,12 @@ const getFieldConfig = (
 export type FieldConfig = ReturnType<typeof getFieldConfig> & {
   document: DocumentNode;
 };
+
+export type FieldConfigByType<T extends FieldConfig["type"]> = Extract<
+  FieldConfig,
+  { type: T }
+>;
+
 export type FieldConfigs = Record<string, FieldConfig>;
 
 export const useFieldConfigs = (query: DocumentNode | string) => {
