@@ -1,25 +1,24 @@
 import { createElement, useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "urql";
-import { FormFieldSchema } from "@directive/schema";
-import { FieldConfigWithMeta } from "@readers/shared";
-import { FormFieldExtra } from "@readers/form";
 import { FabrixContextType } from "../context";
 import {
   buildClassName,
   CommonFabrixComponentRendererProps,
   defaultFieldType,
+  FieldConfigByType,
   getFieldConfigByKey,
   Loader,
 } from "./shared";
 import { buildAjvSchema } from "./form/validation";
 import { ajvResolver } from "./form/ajvResolver";
 
-export type FormField = FieldConfigWithMeta<FormFieldSchema> & FormFieldExtra;
+export type FormRendererFields = FieldConfigByType<"form">["configs"]["fields"];
+export type FormRendererField = FormRendererFields[number];
 
 export const FormRenderer = (
   props: CommonFabrixComponentRendererProps<{
-    fields: Array<FormField>;
+    fields: FormRendererFields;
   }>,
 ) => {
   const { context, fieldConfigs, query, componentFieldsRenderer } = props;
@@ -95,7 +94,7 @@ export const FormRenderer = (
 
 const renderField = (props: {
   indexKey: string;
-  field: FormField;
+  field: FormRendererField;
   context: FabrixContextType;
   extraClassName?: string;
 }) => {

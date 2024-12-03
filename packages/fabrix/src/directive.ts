@@ -3,11 +3,17 @@ import { z, ZodRawShape } from "zod";
 import { buildDirectiveConfig, DirectiveConfig } from "@visitor";
 import { directiveSchemaMap } from "@directive/schema";
 
+const emptyArguments = {
+  input: [],
+};
+
 export const parseDirectiveArguments = <S extends ZodRawShape = ZodRawShape>(
-  directiveArguments: DirectiveConfig["arguments"],
+  directiveArguments: DirectiveConfig["arguments"] | null,
   schemaToParse: z.ZodObject<S>,
 ) => {
-  const parsedValue = schemaToParse.safeParse(directiveArguments);
+  const parsedValue = schemaToParse.safeParse(
+    directiveArguments ?? emptyArguments,
+  );
   if (!parsedValue.success) {
     throw new Error(parsedValue.error.message);
   }

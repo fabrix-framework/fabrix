@@ -22,22 +22,24 @@ const decideStrategy = (
   opType: OperationTypeNode,
 ) => {
   const directive = findDirective(directiveNodes);
+  const emptyDirective = {
+    arguments: null,
+  } as const;
+
   switch (opType) {
     case OperationTypeNode.QUERY: {
-      switch (directive?.name) {
-        case "fabrixView":
-          return { type: "view", directive } as const;
-        default:
-          return { type: "view:no-directive" } as const;
-      }
+      return {
+        type: "view",
+        directive:
+          directive?.name === "fabrixView" ? directive : emptyDirective,
+      } as const;
     }
     case OperationTypeNode.MUTATION: {
-      switch (directive?.name) {
-        case "fabrixForm":
-          return { type: "form", directive } as const;
-        default:
-          return { type: "form:no-directive" } as const;
-      }
+      return {
+        type: "form",
+        directive:
+          directive?.name === "fabrixForm" ? directive : emptyDirective,
+      } as const;
     }
     default: {
       return null;
@@ -77,16 +79,6 @@ const getFieldConfig = (
         },
       };
     }
-    case "view:no-directive": {
-      return {
-        name: field.getName(),
-        type: "view" as const,
-        configs: {
-          fields: buildDefaultViewFieldConfigs(childFields),
-        },
-      };
-    }
-
     case "form": {
       const directive = parseDirectiveArguments(
         strategy.directive.arguments,
@@ -105,22 +97,13 @@ const getFieldConfig = (
         },
       };
     }
-    case "form:no-directive": {
-      return {
-        name: field.getName(),
-        type: "form" as const,
-        configs: {
-          fields: buildDefaultFormFieldConfigs(context, fieldVariables),
-        },
-      };
-    }
     default: {
       return null;
     }
   }
 };
 
-type FieldConfig = ReturnType<typeof getFieldConfig> & {
+export type FieldConfig = ReturnType<typeof getFieldConfig> & {
   document: DocumentNode;
 };
 type FieldConfigs = Record<string, FieldConfig>;
