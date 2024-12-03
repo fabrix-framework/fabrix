@@ -1,13 +1,18 @@
-import { FabrixComponentData, useDataFetch } from "@fetcher";
+import {
+  FabrixComponentData,
+  useDataFetch,
+  UseDataFetchResult,
+} from "@fetcher";
 import { ComponentEntry } from "@registry2";
 import {
   FabrixComponentChildrenExtraProps,
   FabrixComponentChildrenProps,
   FabrixComponentProps,
-  FieldConfigs,
+  FieldConfig,
   useFieldConfigs,
 } from "@renderer";
 import { DocumentResolver, Loader } from "@renderers/shared";
+import { FormRenderer } from "@renderers2/form";
 import { TableRenderer } from "@renderers2/table";
 import { OperationTypeNode } from "graphql";
 
@@ -24,22 +29,37 @@ export type FabrixComponent2Props = FabrixComponentProps & {
 };
 
 export const FabrixComponent2 = (props: FabrixComponent2Props) => {
-  const { query, ...restProps } = props;
+  const { query } = props;
   const componentEntry = props.component.entry;
   const { fieldConfigs } = useFieldConfigs(query);
 
   const getRenderer = (
-    fieldConfigs: FieldConfigs,
-    data: FabrixComponentData | undefined,
+    fieldConfig: FieldConfig,
+    fetcherResult: FetcherResult,
   ) => {
+    // NOTE: Only table and form are implemented here as WIP
     switch (componentEntry.type) {
-      // NOTE: Only table is implemented here as WIP
       case "table": {
         return (
           <TableRenderer
-            {...restProps}
-            fieldConfigs={fieldConfigs}
-            data={data}
+            {...props}
+            key={`table-${fieldConfig.name}`}
+            fieldConfig={fieldConfig}
+            fetcherResult={fetcherResult}
+            component={{
+              name: props.component.name,
+              entry: componentEntry,
+              customProps: props.component.customProps,
+            }}
+          />
+        );
+      }
+      case "form": {
+        return (
+          <FormRenderer
+            {...props}
+            key={`form-${fieldConfig.name}`}
+            fieldConfig={fieldConfig}
             component={{
               name: props.component.name,
               entry: componentEntry,
@@ -73,7 +93,11 @@ export const FabrixComponent2 = (props: FabrixComponent2Props) => {
           defaultData={props.data}
           opType={fieldConfig.opType}
         >
-          {({ data }) => getRenderer(fieldConfig.fields, data)}
+          {(fetcherResult) =>
+            Object.keys(fieldConfig.fields).map((key) =>
+              getRenderer(fieldConfig.fields[key], fetcherResult),
+            )
+          }
         </DataFetcher>
       </div>
     );
@@ -94,29 +118,29 @@ export const FabrixComponent2 = (props: FabrixComponent2Props) => {
   return <div className="fabrix wrapper">{renderContents()}</div>;
 };
 
+export type FetcherResult = UseDataFetchResult;
+
 const DataFetcher = (props: {
   documentResolver: DocumentResolver;
   variables: Record<string, unknown> | undefined;
   defaultData: FabrixComponentData | undefined;
   opType: OperationTypeNode;
-  children: (props: {
-    data: FabrixComponentData | undefined;
-  }) => React.ReactNode;
+  children: (props: FetcherResult) => React.ReactNode;
 }) => {
-  const { fetching, error, data } = useDataFetch({
+  const result = useDataFetch({
     query: props.documentResolver(),
     variables: props.variables,
     defaultData: props.defaultData,
     pause: props.opType !== OperationTypeNode.QUERY,
   });
 
-  if (fetching) {
+  if (result.fetching) {
     return <Loader />;
   }
 
-  if (error) {
-    throw error;
+  if (result.error) {
+    throw result.error;
   }
 
-  return props.children({ data });
+  return props.children(result);
 };

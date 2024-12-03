@@ -1,47 +1,41 @@
 import { FabrixContext, FabrixContextType } from "@context";
 import { FabrixComponentData } from "@fetcher";
 import { TableComponentEntry } from "@registry2";
-import { FabrixComponentCommonProps, FieldConfigs } from "@renderer";
-import { ComponentRendererProps } from "@renderer2";
+import { FabrixComponentProps, FieldConfig } from "@renderer";
+import { ComponentRendererProps, FetcherResult } from "@renderer2";
 import { getSubFields, SubFields } from "@renderers/fields";
 import { createElement, useContext } from "react";
 
 export const TableRenderer = (
-  props: FabrixComponentCommonProps & {
-    fieldConfigs: FieldConfigs;
+  props: FabrixComponentProps & {
+    fieldConfig: FieldConfig;
     component: ComponentRendererProps<TableComponentEntry>;
+    fetcherResult: FetcherResult;
   },
 ) => {
-  const fieldConfigs = props.fieldConfigs;
-  const fieldKeys = Object.keys(fieldConfigs);
   const context = useContext(FabrixContext);
-  const tableComponents = fieldKeys.map((key, index) => {
-    const field = fieldConfigs[key];
-    if (field.type !== "view") {
-      throw new Error("Table requires only view fields");
-    }
+  const field = props.fieldConfig;
+  if (field.type !== "view") {
+    throw new Error("Table requires only view fields");
+  }
 
-    const { rootValue, collectionValue } = ensureCollectionValue(
-      props.data,
-      key,
-    );
+  const { rootValue, collectionValue } = ensureCollectionValue(
+    props.fetcherResult.data,
+    props.fieldConfig.name,
+  );
 
-    const subFields = getSubFields(
-      context,
-      rootValue,
-      field.configs.fields,
-      "collection",
-    );
+  const subFields = getSubFields(
+    context,
+    rootValue,
+    field.configs.fields,
+    "collection",
+  );
 
-    return createElement(props.component.entry.component, {
-      key: index,
-      headers: buildHeaders(context, subFields),
-      values: collectionValue,
-      customProps: props.component.customProps,
-    });
+  return createElement(props.component.entry.component, {
+    headers: buildHeaders(context, subFields),
+    values: collectionValue,
+    customProps: props.component.customProps,
   });
-
-  return tableComponents;
 };
 
 const ensureCollectionValue = (

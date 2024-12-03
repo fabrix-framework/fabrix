@@ -44,7 +44,7 @@ export const FormRenderer = (
             return null;
           }
 
-          return renderField({
+          return renderFormField({
             indexKey: extraProps?.key ?? `${query.rootName}-${name}`,
             extraClassName: extraProps?.className,
             field: {
@@ -60,7 +60,7 @@ export const FormRenderer = (
     return fieldConfigs.fields
       .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
       .flatMap((field, fieldIndex) =>
-        renderField({
+        renderFormField({
           indexKey: `${query.rootName}-${fieldIndex}`,
           field,
           context,
@@ -92,7 +92,7 @@ export const FormRenderer = (
   });
 };
 
-const renderField = (props: {
+export const renderFormField = (props: {
   indexKey: string;
   field: FormField;
   context: FabrixContextType;

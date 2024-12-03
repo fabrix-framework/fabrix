@@ -3,6 +3,8 @@ import { DocumentNode } from "graphql";
 import { useMemo } from "react";
 import { useClient, useQuery } from "urql";
 
+export type UseDataFetchResult = ReturnType<typeof useDataFetch>;
+
 export const useDataFetch = (props: {
   query: DocumentNode | string;
   variables?: Record<string, unknown>;
@@ -13,9 +15,10 @@ export const useDataFetch = (props: {
 
   // Stop the query from executing automatically by enabling the `pause` option.
   // when the `defaultData` prop is provided.
-  const [{ data: queryData, fetching, error }] = useQuery<FabrixComponentData>({
-    ...queryProps,
-  });
+  const [{ data: queryData, fetching, error }, runQuery] =
+    useQuery<FabrixComponentData>({
+      ...queryProps,
+    });
 
   const renderingData = useMemo(
     () => deepmerge(queryData, props.defaultData),
@@ -26,6 +29,7 @@ export const useDataFetch = (props: {
     fetching,
     error,
     data: renderingData,
+    runQuery,
   };
 };
 
