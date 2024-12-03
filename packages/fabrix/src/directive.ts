@@ -8,7 +8,7 @@ const emptyArguments = {
 };
 
 export const parseDirectiveArguments = <S extends ZodRawShape = ZodRawShape>(
-  directiveArguments: DirectiveConfig["arguments"],
+  directiveArguments: DirectiveConfig["arguments"] | null,
   schemaToParse: z.ZodObject<S>,
 ) => {
   const parsedValue = schemaToParse.safeParse(

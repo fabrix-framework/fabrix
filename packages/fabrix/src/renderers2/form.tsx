@@ -1,11 +1,11 @@
 import { FabrixContext } from "@context";
 import { FormComponentEntry } from "@registry2";
-import { FabrixComponentProps, FieldConfigByType } from "@renderer";
+import { FabrixComponentProps } from "@renderer";
 import { ComponentRendererProps } from "@renderer2";
 import { renderFormField } from "@renderers/form";
 import { ajvResolver } from "@renderers/form/ajvResolver";
 import { buildAjvSchema } from "@renderers/form/validation";
-import { Loader } from "@renderers/shared";
+import { FieldConfigByType, Loader } from "@renderers/shared";
 import { createElement, useContext } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "urql";
