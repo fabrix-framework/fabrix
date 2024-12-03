@@ -1,4 +1,4 @@
-import { FormField } from "@renderers/form";
+import { FormField, FormFields } from "@renderers/form";
 
 const convertToAjvProperty = (field: FormField) => {
   switch (field.meta?.fieldType?.type) {
@@ -37,7 +37,7 @@ const convertToAjvProperty = (field: FormField) => {
   }
 };
 
-export const buildAjvSchema = (fields: Array<FormField>) => {
+export const buildAjvSchema = (fields: FormFields) => {
   const visibleFields = fields.filter((field) => !field.config.hidden);
   const requiredFields = visibleFields.filter(
     (field) => field.meta?.isRequired,

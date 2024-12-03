@@ -1,4 +1,3 @@
-import { fallbackDefault } from "@directive/zod";
 import { Path } from "@visitor/path";
 import { z } from "zod";
 
@@ -13,7 +12,7 @@ export const baseFieldSchema = z.object({
   hidden: z
     .boolean()
     .nullish()
-    .transform(fallbackDefault(defaultValues.hidden)),
+    .transform((v) => v ?? defaultValues.hidden),
   componentType: z
     .object({
       name: z.string().nullish(),
@@ -29,7 +28,7 @@ export const formFieldSchema = baseFieldSchema.merge(
     gridCol: z
       .number()
       .nullish()
-      .transform(fallbackDefault(defaultValues.gridCol)),
+      .transform((v) => v ?? defaultValues.gridCol),
     placeholder: z.string().nullish(),
     defaultValue: z.string().nullish(),
   }),
@@ -60,7 +59,7 @@ export const viewFieldSchema = baseFieldSchema.merge(
     gridCol: z
       .number()
       .nullish()
-      .transform(fallbackDefault(defaultValues.gridCol)),
+      .transform((v) => v ?? defaultValues.gridCol),
   }),
 );
 
@@ -83,10 +82,11 @@ export const directiveSchemaMap = {
             return new Path(value.split("."));
           }),
           config: viewFieldSchema.nullish().transform(
-            fallbackDefault({
-              gridCol: defaultValues.gridCol,
-              hidden: defaultValues.hidden,
-            }),
+            (v) =>
+              v ?? {
+                gridCol: defaultValues.gridCol,
+                hidden: defaultValues.hidden,
+              },
           ),
         }),
       ),
@@ -104,10 +104,11 @@ export const directiveSchemaMap = {
             return new Path(value.split("."));
           }),
           config: formFieldSchema.nullish().transform(
-            fallbackDefault({
-              gridCol: defaultValues.gridCol,
-              hidden: defaultValues.hidden,
-            }),
+            (v) =>
+              v ?? {
+                gridCol: defaultValues.gridCol,
+                hidden: defaultValues.hidden,
+              },
           ),
           constraint: formFieldConstraintSchema,
         }),

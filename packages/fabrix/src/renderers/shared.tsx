@@ -11,6 +11,7 @@ import {
 import { DirectiveAttributes } from "@registry";
 import { FabrixContextType } from "@context";
 import { FieldConfigWithMeta } from "@readers/shared";
+import { FieldConfig } from "@renderer";
 import { FabrixComponentData } from "../fetcher";
 
 type FabrixComponentFieldsRendererExtraProps = Partial<DirectiveAttributes> & {
@@ -92,6 +93,11 @@ export const assertObjectValue: (
 };
 
 export type FieldTypes = ReturnType<typeof resolveFieldTypesFromTypename>;
+
+export type FieldConfigByType<T extends FieldConfig["type"]> = Extract<
+  FieldConfig,
+  { type: T }
+>;
 
 export const getFieldConfigByKey = <C extends Record<string, unknown>>(
   fields: Array<FieldConfigWithMeta<C>>,

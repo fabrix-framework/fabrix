@@ -1,6 +1,4 @@
 import { createElement, useCallback, useMemo } from "react";
-import { ViewFieldSchema } from "@directive/schema";
-import { FieldConfigWithMeta } from "@readers/shared";
 import { FabrixContextType } from "@context";
 import { useDataFetch, Value } from "../fetcher";
 import { RendererCommonProps } from "../renderer";
@@ -8,17 +6,18 @@ import {
   assertObjectValue,
   buildClassName,
   CommonFabrixComponentRendererProps,
+  FieldConfigByType,
   getFieldConfigByKey,
   Loader,
   resolveFieldTypesFromTypename,
 } from "./shared";
 
-type ViewField = FieldConfigWithMeta<ViewFieldSchema>;
-type Fields = Array<ViewField>;
+type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
+type ViewField = ViewFields[number];
 
 export const ViewRenderer = (
   props: CommonFabrixComponentRendererProps<{
-    fields: Fields;
+    fields: ViewFields;
   }>,
 ) => {
   const { context, fieldConfigs, query, defaultData, componentFieldsRenderer } =
@@ -161,7 +160,7 @@ const getTypeName = (
 const getSubFields = (
   context: FabrixContextType,
   rootValue: Value | undefined,
-  fields: Fields,
+  fields: ViewFields,
   name: string,
 ) =>
   // filters fields by parent key and maps the filtered values to the array of SubField
@@ -178,7 +177,7 @@ const getSubFields = (
 const renderTable = (
   context: FabrixContextType,
   rootValue: Value | undefined,
-  fields: Fields,
+  fields: ViewFields,
   tableMode: "standard" | "relay",
 ) => {
   if (!rootValue || !("collection" in rootValue)) {
