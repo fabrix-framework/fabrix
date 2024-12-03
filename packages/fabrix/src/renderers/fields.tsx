@@ -12,12 +12,12 @@ import {
   resolveFieldTypesFromTypename,
 } from "./shared";
 
-type ViewRendererFields = FieldConfigByType<"view">["configs"]["fields"];
-type ViewRendererField = ViewRendererFields[number];
+type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
+type ViewField = ViewFields[number];
 
 export const ViewRenderer = (
   props: CommonFabrixComponentRendererProps<{
-    fields: ViewRendererFields;
+    fields: ViewFields;
   }>,
 ) => {
   const { context, fieldConfigs, query, defaultData, componentFieldsRenderer } =
@@ -160,7 +160,7 @@ const getTypeName = (
 const getSubFields = (
   context: FabrixContextType,
   rootValue: Value | undefined,
-  fields: ViewRendererFields,
+  fields: ViewFields,
   name: string,
 ) =>
   // filters fields by parent key and maps the filtered values to the array of SubField
@@ -177,7 +177,7 @@ const getSubFields = (
 const renderTable = (
   context: FabrixContextType,
   rootValue: Value | undefined,
-  fields: ViewRendererFields,
+  fields: ViewFields,
   tableMode: "standard" | "relay",
 ) => {
   if (!rootValue || !("collection" in rootValue)) {
@@ -266,7 +266,7 @@ export type SubField = ReturnType<typeof getSubFields>[number];
 const renderField = (
   props: RendererCommonProps & {
     indexKey: string;
-    field: ViewRendererField;
+    field: ViewField;
     subFields: Array<SubField>;
   },
 ) => {

@@ -1,6 +1,6 @@
-import { FormRendererField, FormRendererFields } from "@renderers/form";
+import { FormField, FormFields } from "@renderers/form";
 
-const convertToAjvProperty = (field: FormRendererField) => {
+const convertToAjvProperty = (field: FormField) => {
   switch (field.meta?.fieldType?.type) {
     case "Scalar":
       switch (field.meta.fieldType.name) {
@@ -37,7 +37,7 @@ const convertToAjvProperty = (field: FormRendererField) => {
   }
 };
 
-export const buildAjvSchema = (fields: FormRendererFields) => {
+export const buildAjvSchema = (fields: FormFields) => {
   const visibleFields = fields.filter((field) => !field.config.hidden);
   const requiredFields = visibleFields.filter(
     (field) => field.meta?.isRequired,

@@ -13,12 +13,12 @@ import {
 import { buildAjvSchema } from "./form/validation";
 import { ajvResolver } from "./form/ajvResolver";
 
-export type FormRendererFields = FieldConfigByType<"form">["configs"]["fields"];
-export type FormRendererField = FormRendererFields[number];
+export type FormFields = FieldConfigByType<"form">["configs"]["fields"];
+export type FormField = FormFields[number];
 
 export const FormRenderer = (
   props: CommonFabrixComponentRendererProps<{
-    fields: FormRendererFields;
+    fields: FormFields;
   }>,
 ) => {
   const { context, fieldConfigs, query, componentFieldsRenderer } = props;
@@ -94,7 +94,7 @@ export const FormRenderer = (
 
 const renderField = (props: {
   indexKey: string;
-  field: FormRendererField;
+  field: FormField;
   context: FabrixContextType;
   extraClassName?: string;
 }) => {
