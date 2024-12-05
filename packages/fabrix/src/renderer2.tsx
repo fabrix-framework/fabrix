@@ -12,6 +12,7 @@ import {
   useFieldConfigs,
 } from "@renderer";
 import { DocumentResolver, Loader } from "@renderers/shared";
+import { FieldsRenderer } from "@renderers2/fields";
 import { FormRenderer } from "@renderers2/form";
 import { TableRenderer } from "@renderers2/table";
 import { OperationTypeNode } from "graphql";
@@ -54,6 +55,22 @@ export const FabrixComponent2 = (props: FabrixComponent2Props) => {
           <TableRenderer
             {...props}
             key={`table-${fieldConfig.name}`}
+            fieldConfig={fieldConfig}
+            fetcherResult={fetcherResult}
+            component={{
+              name: props.component.name,
+              entry: componentEntry,
+              customProps: props.component.customProps,
+            }}
+          />
+        );
+      }
+      case "fields": {
+        ensureFieldType(fieldConfig, "view");
+        return (
+          <FieldsRenderer
+            {...props}
+            key={`fields-${fieldConfig.name}`}
             fieldConfig={fieldConfig}
             fetcherResult={fetcherResult}
             component={{

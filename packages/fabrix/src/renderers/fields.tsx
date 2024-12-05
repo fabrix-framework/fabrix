@@ -264,7 +264,7 @@ const renderTable = (
 
 export type SubField = ReturnType<typeof getSubFields>[number];
 
-const renderField = (
+export const renderField = (
   props: RendererCommonProps & {
     indexKey: string;
     field: ViewField;

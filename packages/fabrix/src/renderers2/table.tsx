@@ -16,10 +16,6 @@ export const TableRenderer = (
 ) => {
   const context = useContext(FabrixContext);
   const field = props.fieldConfig;
-  if (field.type !== "view") {
-    throw new Error("Table requires only view fields");
-  }
-
   const { rootValue, collectionValue } = ensureCollectionValue(
     props.fetcherResult.data,
     props.fieldConfig.name,
@@ -33,6 +29,7 @@ export const TableRenderer = (
   );
 
   return createElement(props.component.entry.component, {
+    name: field.name,
     headers: buildHeaders(context, subFields),
     values: collectionValue,
     customProps: props.component.customProps,
@@ -90,7 +87,7 @@ const buildHeaders = (context: FabrixContextType, subFields: SubFields) =>
           return createElement(component, {
             key,
             name: key,
-            type: null,
+            type: subField.type,
             value: rowValue,
             attributes: {
               className: "",

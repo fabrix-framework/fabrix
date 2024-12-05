@@ -47,6 +47,8 @@ export const FormRenderer = (
       );
 
   return createElement(props.component.entry.component, {
+    name: props.fieldConfig.name,
+    className: "fabrix form",
     renderFields: () => (
       <FormProvider {...formContext}>{renderFields()}</FormProvider>
     ),
@@ -57,7 +59,6 @@ export const FormRenderer = (
       }),
     renderReset: (resetRenderer) =>
       resetRenderer({ reset: () => formContext.reset() }),
-    className: "fabrix form",
     customProps: props.component.customProps,
   });
 };

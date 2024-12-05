@@ -13,12 +13,19 @@ export type FieldComponentProps<P = unknown> = BaseComponentProps &
     subFields: Array<Field>;
   };
 
+export type FieldsComponentProps<P = unknown> = CustomProps<P> & {
+  name: string;
+  className?: string;
+  value: Record<string, unknown>;
+};
+
 export type FormFieldComponentProps<P = unknown> = BaseComponentProps &
   CustomProps<P> & {
     isRequired: boolean;
   };
 
 export type FormComponentProps<P = unknown> = CustomProps<P> & {
+  name: string;
   className?: string;
   renderFields: () => React.ReactNode;
   renderSubmit: (
@@ -33,7 +40,7 @@ export type FormComponentProps<P = unknown> = CustomProps<P> & {
 };
 
 export type TableComponentProps<P = unknown> = CustomProps<P> & {
-  name?: string;
+  name: string;
   className?: string;
   headers: TableComponentHeader[];
   values: Record<string, unknown>[];
@@ -44,6 +51,10 @@ export type TableCellComponentProps<P = unknown> = FieldComponentProps<P>;
 export type FieldComponentEntry<P = unknown> = {
   type: "field";
   component: ComponentType<FieldComponentProps<P>>;
+};
+export type FieldsComponentEntry<P = unknown> = {
+  type: "fields";
+  component: ComponentType<FieldsComponentProps<P>>;
 };
 export type FormFieldComponentEntry<P = unknown> = {
   type: "formField";
@@ -64,6 +75,7 @@ export type TableCellComponentEntry<P = unknown> = {
 
 export type ComponentEntry<P = unknown> =
   | FieldComponentEntry<P>
+  | FieldsComponentEntry<P>
   | FormFieldComponentEntry<P>
   | FormComponentEntry<P>
   | TableComponentEntry<P>
