@@ -208,12 +208,12 @@ type FabrixComponentChildrenProps = {
    * Get the operation result by operation name or index
    *
    * ```tsx
-   * <FabrixComponent query={appQuery}>
+   * <FabrixComponent query={getUsersQuery}>
    *   {({ getOperation }) => (
-   *     {getOperation("query1", ({ data, getComponent }) => (
+   *     {getOperation("getUsers", ({ data, getComponent }) => (
    *       <>
-   *         <h2>{data.size} users</h2>
-   *         {getComponent("getUsers")}
+   *         <h2>{data.users.size} users</h2>
+   *         {getComponent("users")}
    *       </>
    *     ))}
    *   )}
