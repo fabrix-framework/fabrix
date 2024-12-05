@@ -153,26 +153,6 @@ type FabrixComponentCommonProps = {
   variables?: Record<string, unknown>;
 
   /**
-   * The data to render the query with.
-   *
-   * If this parameter is given, the query will not be executed.
-   *
-   * The data structure is expected to be like this:
-   * ```
-   * {
-   *   getContract: {
-   *     id: "1",
-   *     name: "Contract name",
-   *     code: "C1",
-   *   }
-   * }
-   * ```
-   *
-   * The root key is the query name, and the value is the object with the field values.
-   */
-  data?: FabrixComponentData;
-
-  /**
    * The title of the query.
    */
   title?: string;
@@ -300,7 +280,7 @@ export const FabrixComponent = (
           return null;
       }
     },
-    [props.contentClassName, props.data, props.variables],
+    [props.contentClassName, props.variables],
   );
 
   const getComponentFn = useCallback(
@@ -346,7 +326,6 @@ export const FabrixComponent = (
             key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
             operation={fieldConfig}
             variables={props.variables}
-            defaultData={props.data}
             getComponentFn={getComponentFn}
             renderer={renderer}
           />
@@ -370,7 +349,6 @@ export type RendererCommonProps = {
   key: string;
   operation: FieldConfigs;
   variables: Record<string, unknown> | undefined;
-  defaultData: FabrixComponentData | undefined;
   renderer?: Parameters<FabrixGetOperationFn>[1];
   getComponentFn: (
     op: FieldConfigs,
@@ -391,7 +369,6 @@ const OperationRenderer = (props: RendererCommonProps) => {
 const QueryOperationRenderer = ({
   operation,
   variables,
-  defaultData,
   renderer,
   getComponentFn,
 }: RendererCommonProps) => {
@@ -399,7 +376,6 @@ const QueryOperationRenderer = ({
   const { fetching, error, data } = useDataFetch({
     query: operation.document,
     variables,
-    defaultData: defaultData?.[operation.name] as FabrixComponentData,
   });
 
   if (fetching || !data) {
