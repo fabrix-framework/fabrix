@@ -1,6 +1,6 @@
 import { FieldsComponentEntry } from "@registry2";
 import { FabrixComponentProps } from "@renderer";
-import { ComponentRendererProps, FetcherResult } from "@renderer2";
+import { ComponentRendererProps, FetcherResult } from "@customRenderer";
 import { FieldConfigByType } from "@renderers/shared";
 import { createElement } from "react";
 

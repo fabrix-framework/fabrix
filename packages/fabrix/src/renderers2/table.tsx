@@ -2,7 +2,7 @@ import { FabrixContext, FabrixContextType } from "@context";
 import { FabrixComponentData } from "@fetcher";
 import { TableComponentEntry } from "@registry2";
 import { FabrixComponentProps } from "@renderer";
-import { ComponentRendererProps, FetcherResult } from "@renderer2";
+import { ComponentRendererProps, FetcherResult } from "@customRenderer";
 import { getSubFields, SubFields } from "@renderers/fields";
 import { FieldConfigByType } from "@renderers/shared";
 import { createElement, useContext } from "react";

@@ -25,7 +25,7 @@ export type ComponentRendererProps<
   customProps?: unknown;
 };
 
-export type FabrixComponent2Props = FabrixComponentProps & {
+export type FabrixCustomComponentProps = FabrixComponentProps & {
   component: ComponentRendererProps;
   children?: (props: FabrixComponentChildrenProps) => React.ReactNode;
 };
@@ -39,7 +39,7 @@ function ensureFieldType<T extends FieldConfig["type"]>(
   }
 }
 
-export const FabrixComponent2 = (props: FabrixComponent2Props) => {
+export const FabrixCustomComponent = (props: FabrixCustomComponentProps) => {
   const { query } = props;
   const componentEntry = props.component.entry;
   const { fieldConfigs } = useFieldConfigs(query);

@@ -1,7 +1,7 @@
 import { FabrixContext } from "@context";
 import { FormComponentEntry } from "@registry2";
 import { FabrixComponentProps } from "@renderer";
-import { ComponentRendererProps } from "@renderer2";
+import { ComponentRendererProps } from "@customRenderer";
 import { renderFormField } from "@renderers/form";
 import { ajvResolver } from "@renderers/form/ajvResolver";
 import { buildAjvSchema } from "@renderers/form/validation";
