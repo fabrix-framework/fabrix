@@ -116,7 +116,7 @@ export class ComponentRegistryV2<
   UC extends UnitComponentMap,
 > {
   constructor(
-    readonly props: {
+    private readonly props: {
       custom?: {
         composite?: CC;
         unit: UC;
@@ -146,7 +146,7 @@ export class ComponentRegistryV2<
     });
   }
 
-  getComponent<N extends keyof CC>(name: N) {
+  getFabrixComponent<N extends keyof CC>(name: N) {
     const componentEntry = this.props.custom?.composite?.[name];
     const componentName = name as string;
     if (!componentEntry) {
@@ -171,11 +171,13 @@ export class ComponentRegistryV2<
     );
   }
 
-  getComponentDynamicWithType<T extends CompositeComponentEntry["type"]>(
-    name: string,
-  ) {
-    return this.props.custom?.composite?.[name].component as
-      | undefined
-      | ComponentTypeByName<T>;
+  getUnitComponentByName<N extends keyof UC>(name: N) {
+    return this.props.custom?.unit?.[name]?.component;
+  }
+
+  getCompositeComponentByName<N extends keyof CC>(name: N) {
+    return this.props.custom?.composite?.[name]?.component;
   }
 }
+
+export const emptyComponentRegistryV2 = new ComponentRegistryV2({});

@@ -64,18 +64,8 @@ describe("ComponentRegistryV2", () => {
     },
   });
 
-  test("getCustom (customField1)", () => {
-    const component = registry.getComponent("customTable");
-    expect(component).not.toBeUndefined();
-  });
-
-  test("getDynamicWithType (customField1)", () => {
-    const component = registry.getComponentDynamicWithType("customTable");
-    expect(component).not.toBeUndefined();
-  });
-
   test("getCustom (customTable)", async () => {
-    const CustomTable = registry.getComponent("customTable");
+    const CustomTable = registry.getFabrixComponent("customTable");
 
     await testWithUnmount(
       <CustomTable
@@ -105,7 +95,7 @@ describe("ComponentRegistryV2", () => {
   });
 
   test("getCustom (customTable) with getComponent", async () => {
-    const CustomTable = registry.getComponent("customTable");
+    const CustomTable = registry.getFabrixComponent("customTable");
 
     await testWithUnmount(
       <CustomTable
