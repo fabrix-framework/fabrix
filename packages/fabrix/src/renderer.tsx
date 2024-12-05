@@ -221,6 +221,23 @@ type FabrixComponentChildrenProps = {
    * ```
    */
   getOperation: FabrixGetOperationFn;
+  /**
+   * Get the component by root field name
+   *
+   * ```tsx
+   * <FabrixComponent query={getUsersQuery}>
+   *   {({ getComponent }) => (
+   *     {getComponent("getUsers", "users")}
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  getComponent: (
+    operationIndexOrName: number | string,
+    rootFieldName: string,
+    extraProps?: FabrixComponentChildrenExtraProps,
+    fieldsRenderer?: FabrixComponentFieldsRenderer,
+  ) => React.ReactNode;
 };
 
 /**
@@ -336,7 +353,18 @@ export const FabrixComponent = (
 
   const renderContents = () => {
     if (props.children) {
-      return props.children({ getOperation });
+      return props.children({
+        getOperation,
+        getComponent: (
+          operationIndexOrName,
+          rootFieldName,
+          extraProps,
+          fieldsRenderer,
+        ) =>
+          getOperation(operationIndexOrName, ({ getComponent }) =>
+            getComponent(rootFieldName, extraProps, fieldsRenderer),
+          ),
+      });
     }
 
     return fieldConfigs.map((_, i) => getOperation(i));
