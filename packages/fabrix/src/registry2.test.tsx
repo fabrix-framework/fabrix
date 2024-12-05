@@ -54,20 +54,23 @@ const customTable: TableComponentEntry<{ title: string }> = {
 describe("ComponentRegistryV2", () => {
   const registry = new ComponentRegistryV2({
     custom: {
-      customField1,
-      customField2,
-      customTable,
+      composite: {
+        customTable,
+      },
+      unit: {
+        customField1,
+        customField2,
+      },
     },
   });
 
   test("getCustom (customField1)", () => {
-    const component = registry.getComponent("customField1");
+    const component = registry.getComponent("customTable");
     expect(component).not.toBeUndefined();
   });
 
   test("getDynamicWithType (customField1)", () => {
-    const component =
-      registry.getComponentDynamicWithType<"field">("customField1");
+    const component = registry.getComponentDynamicWithType("customTable");
     expect(component).not.toBeUndefined();
   });
 

@@ -3,7 +3,7 @@ import {
   useDataFetch,
   UseDataFetchResult,
 } from "@fetcher";
-import { ComponentEntry } from "@registry2";
+import { CompositeComponentEntry } from "@registry2";
 import {
   FabrixComponentChildrenExtraProps,
   FabrixComponentChildrenProps,
@@ -17,12 +17,13 @@ import { FormRenderer } from "@renderers2/form";
 import { TableRenderer } from "@renderers2/table";
 import { OperationTypeNode } from "graphql";
 
-export type ComponentRendererProps<P extends ComponentEntry = ComponentEntry> =
-  {
-    name: string;
-    entry: P;
-    customProps?: unknown;
-  };
+export type ComponentRendererProps<
+  P extends CompositeComponentEntry = CompositeComponentEntry,
+> = {
+  name: string;
+  entry: P;
+  customProps?: unknown;
+};
 
 export type FabrixComponent2Props = FabrixComponentProps & {
   component: ComponentRendererProps;
