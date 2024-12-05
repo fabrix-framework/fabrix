@@ -147,7 +147,7 @@ type ComponentTypeByName<T extends ComponentEntries["type"]> = ComponentType<
  */
 type KeyOf<T> = T extends Record<infer K, unknown> ? Extract<K, string> : never;
 
-export class ComponentRegistryV2<
+export class ComponentRegistry<
   CC extends CompositeComponentMap = CompositeComponentMap,
   UC extends UnitComponentMap = UnitComponentMap,
 > {
@@ -163,8 +163,8 @@ export class ComponentRegistryV2<
     },
   ) {}
 
-  merge(registry: ComponentRegistryV2<CC, UC>) {
-    return new ComponentRegistryV2({
+  merge(registry: ComponentRegistry<CC, UC>) {
+    return new ComponentRegistry({
       custom: {
         composite: {
           ...this.props.custom?.composite,
@@ -224,4 +224,4 @@ export class ComponentRegistryV2<
   }
 }
 
-export const emptyComponentRegistryV2 = new ComponentRegistryV2({});
+export const emptyComponentRegistryV2 = new ComponentRegistry({});

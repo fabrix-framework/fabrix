@@ -4,14 +4,14 @@ import {
   waitForElementToBeRemoved,
   screen,
 } from "@testing-library/react";
-import { ComponentRegistryV2 } from "@registry";
+import { ComponentRegistry } from "@registry";
 import { testingComponents } from "./components";
 
 export const testWithUnmount = async (
   ui: React.ReactNode,
   test: () => Promise<void> | void,
   options?: {
-    components: ComponentRegistryV2;
+    components: ComponentRegistry;
   },
 ) => {
   const components = options?.components

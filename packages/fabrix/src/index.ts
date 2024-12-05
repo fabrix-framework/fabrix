@@ -11,5 +11,5 @@ export {
   type TableCellComponentProps,
   type FormComponentProps,
   type FormFieldComponentProps,
-  ComponentRegistryV2 as ComponentRegistry,
+  ComponentRegistry,
 } from "./registry";

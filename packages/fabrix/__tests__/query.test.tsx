@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { FabrixComponent } from "@renderer";
-import { ComponentRegistryV2 } from "@registry";
+import { ComponentRegistry } from "@registry";
 import { users } from "./mocks/data";
 import { testWithUnmount } from "./supports/render";
 
@@ -61,7 +61,7 @@ describe("query", () => {
   });
 
   it("should render the table with virtual columns", async () => {
-    const components = new ComponentRegistryV2({
+    const components = new ComponentRegistry({
       custom: {
         unit: {
           actionCell: {

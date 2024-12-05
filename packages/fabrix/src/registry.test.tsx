@@ -1,4 +1,4 @@
-import { ComponentRegistryV2, TableComponentEntry } from "@registry";
+import { ComponentRegistry, TableComponentEntry } from "@registry";
 import { describe, expect, test } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { gql } from "urql";
@@ -35,7 +35,7 @@ const customTable: TableComponentEntry<{ title: string }> = {
 };
 
 describe("ComponentRegistryV2", () => {
-  const registry = new ComponentRegistryV2({
+  const registry = new ComponentRegistry({
     custom: {
       composite: {
         customTable,

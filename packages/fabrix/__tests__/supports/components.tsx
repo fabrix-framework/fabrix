@@ -1,5 +1,5 @@
 import {
-  ComponentRegistryV2,
+  ComponentRegistry,
   FieldComponentProps,
   FormComponentProps,
   FormFieldComponentProps,
@@ -78,7 +78,7 @@ const formFieldView = (props: FormFieldComponentProps) => {
   );
 };
 
-export const testingComponents = new ComponentRegistryV2({
+export const testingComponents = new ComponentRegistry({
   default: {
     field: fieldView,
     form: formView,
