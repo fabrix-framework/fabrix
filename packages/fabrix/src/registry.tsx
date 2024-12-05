@@ -224,4 +224,4 @@ export class ComponentRegistry<
   }
 }
 
-export const emptyComponentRegistryV2 = new ComponentRegistry({});
+export const emptyComponentRegistry = new ComponentRegistry({});

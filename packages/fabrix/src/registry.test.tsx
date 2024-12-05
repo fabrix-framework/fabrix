@@ -34,7 +34,7 @@ const customTable: TableComponentEntry<{ title: string }> = {
   },
 };
 
-describe("ComponentRegistryV2", () => {
+describe("ComponentRegistry", () => {
   const registry = new ComponentRegistry({
     custom: {
       composite: {

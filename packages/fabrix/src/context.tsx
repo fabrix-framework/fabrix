@@ -10,7 +10,7 @@ import {
   OperationTypeNode,
 } from "graphql";
 import { createContext, useCallback, useContext } from "react";
-import { ComponentRegistry, emptyComponentRegistryV2 } from "@registry";
+import { ComponentRegistry, emptyComponentRegistry } from "@registry";
 
 type SchemaSet = {
   serverSchema: GraphQLSchema;
@@ -35,7 +35,7 @@ export const FabrixContext = createContext<FabrixContextType>({
   schemaLoader: {
     status: "loading",
   },
-  componentRegistry: emptyComponentRegistryV2,
+  componentRegistry: emptyComponentRegistry,
 });
 
 /**
