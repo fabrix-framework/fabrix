@@ -127,6 +127,25 @@ export class ComponentRegistryV2<
     },
   ) {}
 
+  merge(registry: ComponentRegistryV2<CC, UC>) {
+    return new ComponentRegistryV2({
+      custom: {
+        composite: {
+          ...this.props.custom?.composite,
+          ...registry.props.custom?.composite,
+        },
+        unit: {
+          ...this.props.custom?.unit,
+          ...registry.props.custom?.unit,
+        },
+      },
+      default: {
+        ...this.props.default,
+        ...registry.props.default,
+      },
+    });
+  }
+
   getComponent<N extends keyof CC>(name: N) {
     const componentEntry = this.props.custom?.composite?.[name];
     const componentName = name as string;
