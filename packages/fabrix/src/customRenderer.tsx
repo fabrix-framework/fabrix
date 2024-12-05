@@ -3,7 +3,7 @@ import {
   useDataFetch,
   UseDataFetchResult,
 } from "@fetcher";
-import { CompositeComponentEntry } from "@registry2";
+import { CompositeComponentEntry } from "@registry";
 import {
   FabrixComponentChildrenExtraProps,
   FabrixComponentChildrenProps,

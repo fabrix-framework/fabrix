@@ -1,6 +1,6 @@
 import { FabrixContext, FabrixContextType } from "@context";
 import { FabrixComponentData } from "@fetcher";
-import { TableComponentEntry } from "@registry2";
+import { TableComponentEntry } from "@registry";
 import { FabrixComponentProps } from "@renderer";
 import { ComponentRendererProps, FetcherResult } from "@customRenderer";
 import { getSubFields, SubFields } from "@renderers/fields";

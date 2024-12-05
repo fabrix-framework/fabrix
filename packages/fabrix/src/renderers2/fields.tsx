@@ -1,4 +1,4 @@
-import { FieldsComponentEntry } from "@registry2";
+import { FieldsComponentEntry } from "@registry";
 import { FabrixComponentProps } from "@renderer";
 import { ComponentRendererProps, FetcherResult } from "@customRenderer";
 import { FieldConfigByType } from "@renderers/shared";

@@ -4,7 +4,7 @@ import {
   waitForElementToBeRemoved,
   screen,
 } from "@testing-library/react";
-import { ComponentRegistryV2 } from "@registry2";
+import { ComponentRegistryV2 } from "@registry";
 import { testingComponents } from "./components";
 
 export const testWithUnmount = async (

@@ -1,4 +1,4 @@
-import { ComponentRegistryV2, TableComponentEntry } from "@registry2";
+import { ComponentRegistryV2, TableComponentEntry } from "@registry";
 import { describe, expect, test } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { gql } from "urql";

@@ -1,5 +1,5 @@
 import { FabrixContext } from "@context";
-import { FormComponentEntry } from "@registry2";
+import { FormComponentEntry } from "@registry";
 import { FabrixComponentProps } from "@renderer";
 import { ComponentRendererProps } from "@customRenderer";
 import { renderFormField } from "@renderers/form";

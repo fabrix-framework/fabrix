@@ -1,10 +1,10 @@
 import {
+  ComponentRegistryV2,
   FieldComponentProps,
   FormComponentProps,
   FormFieldComponentProps,
   TableComponentProps,
 } from "@registry";
-import { ComponentRegistryV2 } from "@registry2";
 import { ReactNode } from "react";
 import { useController } from "react-hook-form";
 

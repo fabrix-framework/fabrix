@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { FabrixComponent } from "@renderer";
-import { ComponentRegistry } from "@registry";
+import { ComponentRegistryV2 } from "@registry";
 import { users } from "./mocks/data";
 import { testWithUnmount } from "./supports/render";
-import { ComponentRegistryV2, TableCellComponentProps } from "@registry2";
 
 describe("query", () => {
   it("should render the table with collection", async () => {

@@ -8,9 +8,8 @@ export { type SubField } from "@renderers/fields";
 export {
   type FieldComponentProps,
   type TableComponentProps,
-  type TableComponentHeader,
   type TableCellComponentProps,
   type FormComponentProps,
   type FormFieldComponentProps,
-  ComponentRegistry,
+  ComponentRegistryV2 as ComponentRegistry,
 } from "./registry";
