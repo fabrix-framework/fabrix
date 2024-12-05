@@ -1,79 +1,52 @@
-import { createElement, useCallback, useMemo } from "react";
-import { FabrixContextType } from "@context";
-import { useDataFetch, Value } from "../fetcher";
-import { RendererCommonProps } from "../renderer";
+import { createElement, useCallback, useContext, useMemo } from "react";
+import { FabrixContext, FabrixContextType } from "@context";
+import { Value } from "../fetcher";
 import {
   assertObjectValue,
   buildClassName,
   CommonFabrixComponentRendererProps,
   FieldConfigByType,
   getFieldConfigByKey,
-  Loader,
   resolveFieldTypesFromTypename,
 } from "./shared";
 
-type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
+export type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
 type ViewField = ViewFields[number];
 
-export const ViewRenderer = (
-  props: CommonFabrixComponentRendererProps<{
-    fields: ViewFields;
-  }>,
-) => {
-  const { context, fieldConfigs, query, defaultData, componentFieldsRenderer } =
-    props;
-  const { rootName, documentResolver, variables } = query;
-  const {
-    fetching,
-    error,
-    data: renderingData,
-  } = useDataFetch({
-    query: documentResolver(),
-    variables,
-    defaultData,
-  });
-
-  const commonRenderFieldProps = useMemo(() => {
-    return {
-      context,
-      renderingData,
-      rootName,
-      query,
-    };
-  }, [context, rootName, renderingData, query]);
-
-  const rootValue = renderingData?.[query.rootName];
-
+export const ViewRenderer = ({
+  context,
+  rootField,
+  componentFieldsRenderer,
+  className,
+}: CommonFabrixComponentRendererProps<ViewFields>) => {
   // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
   const tableType = useMemo(() => {
-    if (fieldConfigs.fields.some((f) => f.field.getName() === "collection")) {
+    if (rootField.fields.some((f) => f.field.getName() === "collection")) {
       return "standard" as const;
-    } else if (fieldConfigs.fields.some((f) => f.field.getName() === "edges")) {
+    } else if (rootField.fields.some((f) => f.field.getName() === "edges")) {
       return "relay" as const;
     }
 
     return null;
   }, []);
 
-  const rootFieldType = resolveFieldTypesFromTypename(context, rootValue);
   const renderFields = useCallback(() => {
     if (componentFieldsRenderer) {
       return componentFieldsRenderer({
         getField: (name, extraProps) => {
-          const field = getFieldConfigByKey(fieldConfigs.fields, name);
+          const field = getFieldConfigByKey(rootField.fields, name);
           if (!field) {
             return null;
           }
 
           return renderField({
-            ...commonRenderFieldProps,
+            rootField,
             extraClassName: extraProps?.className,
-            indexKey: extraProps?.key ?? `${query.rootName}-${name}`,
-            fieldTypes: rootFieldType,
+            indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
             subFields: getSubFields(
               context,
-              rootValue,
-              fieldConfigs.fields,
+              rootField.data,
+              rootField.fields,
               name,
             ),
             field: {
@@ -85,7 +58,7 @@ export const ViewRenderer = (
       });
     }
 
-    const fieldsComponent = fieldConfigs.fields
+    const fieldsComponent = rootField.fields
       .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
       .flatMap((field, fieldIndex) => {
         const name = field.field.getName();
@@ -95,13 +68,12 @@ export const ViewRenderer = (
         }
 
         return renderField({
-          ...commonRenderFieldProps,
-          indexKey: `${query.rootName}-${fieldIndex}`,
-          fieldTypes: rootFieldType,
+          rootField,
+          indexKey: `${rootField.name}-${fieldIndex}`,
           subFields: getSubFields(
             context,
-            rootValue,
-            fieldConfigs.fields,
+            rootField.data,
+            rootField.fields,
             name,
           ),
           field,
@@ -109,29 +81,14 @@ export const ViewRenderer = (
       });
 
     return (
-      <div className={`fabrix fields col-row ${props.className ?? ""}`}>
+      <div className={`fabrix fields col-row ${className ?? ""}`}>
         {fieldsComponent}
       </div>
     );
-  }, [
-    commonRenderFieldProps,
-    componentFieldsRenderer,
-    fieldConfigs,
-    query.rootName,
-    rootFieldType,
-    getSubFields,
-  ]);
-
-  if (fetching) {
-    return <Loader />;
-  }
-
-  if (error) {
-    throw error;
-  }
+  }, [componentFieldsRenderer, rootField, getSubFields]);
 
   return tableType !== null
-    ? renderTable(context, rootValue, fieldConfigs.fields, tableType)
+    ? renderTable(context, rootField.data, rootField.fields, tableType)
     : renderFields();
 };
 
@@ -263,30 +220,29 @@ const renderTable = (
 
 export type SubField = ReturnType<typeof getSubFields>[number];
 
-const renderField = (
-  props: RendererCommonProps & {
-    indexKey: string;
-    field: ViewField;
-    subFields: Array<SubField>;
-  },
-) => {
-  const {
-    context,
-    field,
-    subFields,
-    fieldTypes,
-    renderingData,
-    extraClassName,
-  } = props;
+type RenderFieldProps = {
+  rootField: CommonFabrixComponentRendererProps<ViewFields>["rootField"];
+  indexKey: string;
+  field: ViewField;
+  subFields: Array<SubField>;
+  extraClassName?: string;
+};
+const renderField = ({
+  rootField,
+  field,
+  subFields,
+  indexKey,
+  extraClassName,
+}: RenderFieldProps) => {
+  const context = useContext(FabrixContext);
   if (field.config.hidden) {
     return;
   }
 
   const fieldName = field.field.getName();
-  const values = renderingData?.[props.query.rootName];
-  const fieldType = fieldTypes?.[fieldName];
+  const fieldType = rootField.type?.[fieldName];
 
-  assertObjectValue(values);
+  assertObjectValue(rootField.data);
 
   const component = field.config.componentType?.name
     ? context.componentRegistry.getCustom(
@@ -307,10 +263,10 @@ const renderField = (
 
   const className = buildClassName(field.config, extraClassName);
   return createElement(component, {
-    key: props.indexKey,
+    key: indexKey,
     name: field.field.asKey(),
     path: field.field.value,
-    value: values?.[fieldName] ?? "-",
+    value: rootField.data?.[fieldName] ?? "-",
     type: fieldType,
     subFields: subFields.map((subField) => ({
       key: subField.value.field.getName(),

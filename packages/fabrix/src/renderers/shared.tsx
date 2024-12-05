@@ -12,7 +12,7 @@ import { DirectiveAttributes } from "@registry";
 import { FabrixContextType } from "@context";
 import { FieldConfigWithMeta } from "@readers/shared";
 import { FieldConfig } from "@renderer";
-import { FabrixComponentData } from "../fetcher";
+import { Value } from "@fetcher";
 
 type FabrixComponentFieldsRendererExtraProps = Partial<DirectiveAttributes> & {
   key?: string;
@@ -51,13 +51,17 @@ export type RendererQuery = {
   variables: Record<string, unknown> | undefined;
   documentResolver: DocumentResolver;
 };
-export type CommonFabrixComponentRendererProps<T = Record<string, unknown>> = {
-  query: RendererQuery;
-  fieldConfigs: T;
-  className?: string;
-  defaultData: FabrixComponentData | undefined;
+export type CommonFabrixComponentRendererProps<F> = {
   context: FabrixContextType;
+  rootField: {
+    name: string;
+    fields: F;
+    data: Value;
+    type: Record<string, FieldType>;
+    document: DocumentNode;
+  };
   componentFieldsRenderer?: FabrixComponentFieldsRenderer;
+  className?: string;
 };
 
 export const buildClassName = <
@@ -115,7 +119,7 @@ export type ObjectLikeValue =
 export const resolveFieldTypesFromTypename = (
   context: FabrixContextType,
   values: ObjectLikeValue,
-) => {
+): Record<string, FieldType> => {
   if (!values) {
     return {};
   }
