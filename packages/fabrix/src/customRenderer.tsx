@@ -12,9 +12,9 @@ import {
   useFieldConfigs,
 } from "@renderer";
 import { DocumentResolver, Loader } from "@renderers/shared";
-import { FieldsRenderer } from "@renderers2/fields";
-import { FormRenderer } from "@renderers2/form";
-import { TableRenderer } from "@renderers2/table";
+import { FieldsRenderer } from "@customRenderer/fields";
+import { FormRenderer } from "@customRenderer/form";
+import { TableRenderer } from "@customRenderer/table";
 import { OperationTypeNode } from "graphql";
 
 export type ComponentRendererProps<
