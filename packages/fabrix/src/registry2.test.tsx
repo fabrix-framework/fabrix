@@ -1,26 +1,9 @@
-import {
-  ComponentRegistryV2,
-  FieldComponentEntry,
-  FormFieldComponentEntry,
-  TableComponentEntry,
-} from "@registry2";
+import { ComponentRegistryV2, TableComponentEntry } from "@registry2";
 import { describe, expect, test } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { gql } from "urql";
 import { ReactNode } from "react";
 import { testWithUnmount } from "../__tests__/supports/render";
-
-const customField1: FieldComponentEntry<{ name: string }> = {
-  type: "field",
-  component: (props) => <div>{props.customProps.name}</div>,
-};
-
-const customField2: FormFieldComponentEntry<{ age: number }> = {
-  type: "formField",
-  component: (props) => {
-    return <div>{props.customProps.age}</div>;
-  },
-} as const;
 
 const customTable: TableComponentEntry<{ title: string }> = {
   type: "table",
@@ -56,10 +39,6 @@ describe("ComponentRegistryV2", () => {
     custom: {
       composite: {
         customTable,
-      },
-      unit: {
-        customField1,
-        customField2,
       },
     },
   });

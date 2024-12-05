@@ -131,7 +131,13 @@ export const ViewRenderer = (
   }
 
   return tableType !== null
-    ? renderTable(context, rootValue, fieldConfigs.fields, tableType)
+    ? renderTable(
+        query.rootName,
+        context,
+        rootValue,
+        fieldConfigs.fields,
+        tableType,
+      )
     : renderFields();
 };
 
@@ -176,6 +182,7 @@ export const getSubFields = (
 export type SubFields = ReturnType<typeof getSubFields>;
 
 const renderTable = (
+  name: string,
   context: FabrixContextType,
   rootValue: Value | undefined,
   fields: ViewFields,
@@ -197,23 +204,19 @@ const renderTable = (
         return [];
       }
 
-      // TODO: fallback to default table cell component
       const component = subField.value.config.componentType?.name
-        ? context.componentRegistry.getCustom(
+        ? context.componentRegistry.getUnitComponentByName<"tableCell">(
             subField.value.config.componentType.name,
-            "tableCell",
           )
-        : null;
+        : context.componentRegistry.getDefaultComponentByType("tableCell");
 
-      const userProps = subField.value.config.componentType?.props?.reduce(
-        (acc, prop) => {
+      const userProps =
+        subField.value.config.componentType?.props?.reduce((acc, prop) => {
           return {
             ...acc,
             [prop.name]: prop.value,
           };
-        },
-        {},
-      );
+        }, {}) ?? {};
 
       const key = subField.value.field.getName();
       const cellRenderer = component
@@ -221,8 +224,14 @@ const renderTable = (
             return createElement(component, {
               key,
               name: key,
-              type: null,
+              path: subField.value.field.value,
+              type: subField.type,
               value: rowValue,
+              subFields: subFields.map((subField) => ({
+                key: subField.value.field.getName(),
+                label: subField.label,
+                type: subField.type,
+              })),
               attributes: {
                 className: "",
                 label: subField.label,
@@ -240,14 +249,17 @@ const renderTable = (
       };
     });
 
-    const tableComponent = context.componentRegistry.components.default?.table;
+    const tableComponent =
+      context.componentRegistry.getDefaultComponentByType("table");
     if (!tableComponent) {
       return;
     }
 
     return createElement(tableComponent, {
+      name,
       headers,
       values,
+      customProps: {},
     });
   };
 
@@ -290,11 +302,10 @@ export const renderField = (
   assertObjectValue(values);
 
   const component = field.config.componentType?.name
-    ? context.componentRegistry.getCustom(
+    ? context.componentRegistry.getUnitComponentByName<"field">(
         field.config.componentType.name,
-        "field",
       )
-    : context.componentRegistry.components.default?.field;
+    : context.componentRegistry.getDefaultComponentByType("field");
   if (!component) {
     return;
   }

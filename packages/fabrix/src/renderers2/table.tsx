@@ -63,13 +63,11 @@ const buildHeaders = (context: FabrixContextType, subFields: SubFields) =>
       return [];
     }
 
-    // TODO: fallback to default table cell component
     const component = subField.value.config.componentType?.name
-      ? context.componentRegistry.getCustom(
+      ? context.componentRegistry.getUnitComponentByName<"tableCell">(
           subField.value.config.componentType.name,
-          "tableCell",
         )
-      : null;
+      : context.componentRegistry.getDefaultComponentByType("tableCell");
 
     const userProps = subField.value.config.componentType?.props?.reduce(
       (acc, prop) => {
@@ -87,8 +85,14 @@ const buildHeaders = (context: FabrixContextType, subFields: SubFields) =>
           return createElement(component, {
             key,
             name: key,
+            path: subField.value.field.value,
             type: subField.type,
             value: rowValue,
+            subFields: subFields.map((subField) => ({
+              key: subField.value.field.getName(),
+              label: subField.label,
+              type: subField.type,
+            })),
             attributes: {
               className: "",
               label: subField.label,

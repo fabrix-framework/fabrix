@@ -6,8 +6,8 @@ export type DirectiveAttributes = Pick<ViewFieldSchema, "label"> & {
   className: string;
 };
 
-type UserProps = Record<string, string | undefined>;
-type CustomRendererProps<P extends UserProps> = {
+export type UserProps = Record<string, string | undefined>;
+export type CustomRendererProps<P extends UserProps> = {
   userProps?: P;
 };
 
@@ -84,9 +84,7 @@ export type FormComponentProps<P extends UserProps = UserProps> =
     ) => React.ReactNode;
   };
 
-type ComponentFunc<P> = (
-  props: React.PropsWithChildren<P>,
-) => React.ReactNode;
+type ComponentFunc<P> = (props: React.PropsWithChildren<P>) => React.ReactNode;
 
 type CustomComponent =
   | {

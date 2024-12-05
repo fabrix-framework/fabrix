@@ -1,4 +1,10 @@
-import { BaseComponentProps, Field, TableComponentHeader } from "@registry";
+import {
+  BaseComponentProps,
+  CustomRendererProps,
+  Field,
+  TableComponentHeader,
+  UserProps,
+} from "@registry";
 import { ComponentProps, ComponentType } from "react";
 import { FabrixComponentProps } from "@renderer";
 import {
@@ -10,11 +16,13 @@ export type CustomProps<P> = {
   customProps: P;
 };
 
-export type FieldComponentProps<P = unknown> = BaseComponentProps &
-  CustomProps<P> & {
-    path: string[];
-    subFields: Array<Field>;
-  };
+type FieldLikeComponentProps = BaseComponentProps & {
+  path: string[];
+  subFields: Array<Field>;
+};
+
+export type FieldComponentProps<UP extends UserProps = UserProps> =
+  FieldLikeComponentProps & CustomRendererProps<UP>;
 
 export type FieldsComponentProps<P = unknown> = CustomProps<P> & {
   name: string;
@@ -22,10 +30,11 @@ export type FieldsComponentProps<P = unknown> = CustomProps<P> & {
   value: Record<string, unknown>;
 };
 
-export type FormFieldComponentProps<P = unknown> = BaseComponentProps &
-  CustomProps<P> & {
-    isRequired: boolean;
-  };
+export type FormFieldComponentProps<UP extends UserProps = UserProps> =
+  BaseComponentProps &
+    CustomRendererProps<UP> & {
+      isRequired: boolean;
+    };
 
 export type FormComponentProps<P = unknown> = CustomProps<P> & {
   name: string;
@@ -49,19 +58,20 @@ export type TableComponentProps<P = unknown> = CustomProps<P> & {
   values: Record<string, unknown>[];
 };
 
-export type TableCellComponentProps<P = unknown> = FieldComponentProps<P>;
+export type TableCellComponentProps<UP extends UserProps = UserProps> =
+  FieldLikeComponentProps & CustomRendererProps<UP>;
 
-export type FieldComponentEntry<P = unknown> = {
+export type FieldComponentEntry = {
   type: "field";
-  component: ComponentType<FieldComponentProps<P>>;
+  component: ComponentType<FieldComponentProps>;
 };
 export type FieldsComponentEntry<P = unknown> = {
   type: "fields";
   component: ComponentType<FieldsComponentProps<P>>;
 };
-export type FormFieldComponentEntry<P = unknown> = {
+export type FormFieldComponentEntry = {
   type: "formField";
-  component: ComponentType<FormFieldComponentProps<P>>;
+  component: ComponentType<FormFieldComponentProps>;
 };
 export type FormComponentEntry<P = unknown> = {
   type: "form";
@@ -71,9 +81,9 @@ export type TableComponentEntry<P = unknown> = {
   type: "table";
   component: ComponentType<TableComponentProps<P>>;
 };
-export type TableCellComponentEntry<P = unknown> = {
+export type TableCellComponentEntry = {
   type: "tableCell";
-  component: ComponentType<TableCellComponentProps<P>>;
+  component: ComponentType<TableCellComponentProps>;
 };
 
 export type CompositeComponentEntry<P = unknown> =
@@ -86,43 +96,48 @@ export type CompositeComponentMap = Record<
   CompositeComponentEntry<any>
 >;
 
-export type UnitComponentEntry<P = unknown> =
-  | FieldComponentEntry<P>
-  | FormFieldComponentEntry<P>
-  | TableCellComponentEntry<P>;
-export type UnitComponentMap = Record<
-  string,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  UnitComponentEntry<any>
+export type UnitComponentEntry =
+  | FieldComponentEntry
+  | FormFieldComponentEntry
+  | TableCellComponentEntry;
+export type UnitComponentMap = Record<string, UnitComponentEntry>;
+
+type ComponentEntries = CompositeComponentEntry | UnitComponentEntry;
+
+type ComponentTypeByName<T extends ComponentEntries["type"]> = ComponentType<
+  T extends "field"
+    ? FieldComponentProps
+    : T extends "formField"
+      ? FormFieldComponentProps
+      : T extends "form"
+        ? FormComponentProps
+        : T extends "table"
+          ? TableComponentProps
+          : T extends "tableCell"
+            ? TableCellComponentProps
+            : never
 >;
 
-type ComponentTypeByName<T extends CompositeComponentEntry["type"]> =
-  ComponentType<
-    T extends "field"
-      ? FieldComponentProps
-      : T extends "formField"
-        ? FormFieldComponentProps
-        : T extends "form"
-          ? FormComponentProps
-          : T extends "table"
-            ? TableComponentProps
-            : T extends "tableCell"
-              ? TableCellComponentProps
-              : never
-  >;
+/**
+ * Extracts the keys of a record type that are strings.
+ *
+ * Without this, TypeScript infers the record keys as `string | number | symbol`,
+ * but we want to ensure that the keys are strings.
+ */
+type KeyOf<T> = T extends Record<infer K, unknown> ? Extract<K, string> : never;
 
 export class ComponentRegistryV2<
-  CC extends CompositeComponentMap,
-  UC extends UnitComponentMap,
+  CC extends CompositeComponentMap = CompositeComponentMap,
+  UC extends UnitComponentMap = UnitComponentMap,
 > {
   constructor(
     private readonly props: {
       custom?: {
         composite?: CC;
-        unit: UC;
+        unit?: UC;
       };
       default?: {
-        [K in CompositeComponentEntry["type"]]?: ComponentTypeByName<K>;
+        [K in ComponentEntries["type"]]?: ComponentTypeByName<K>;
       };
     },
   ) {}
@@ -146,11 +161,10 @@ export class ComponentRegistryV2<
     });
   }
 
-  getFabrixComponent<N extends keyof CC>(name: N) {
+  getFabrixComponent<N extends KeyOf<CC>>(name: N) {
     const componentEntry = this.props.custom?.composite?.[name];
-    const componentName = name as string;
     if (!componentEntry) {
-      throw new Error(`Component ${componentName} not found`);
+      throw new Error(`Component ${name} not found`);
     }
 
     return (props: {
@@ -161,7 +175,7 @@ export class ComponentRegistryV2<
       <FabrixCustomComponent
         query={props.query}
         component={{
-          name: componentName,
+          name,
           entry: componentEntry,
           customProps: props.customProps,
         }}
@@ -171,12 +185,21 @@ export class ComponentRegistryV2<
     );
   }
 
-  getUnitComponentByName<N extends keyof UC>(name: N) {
-    return this.props.custom?.unit?.[name]?.component;
+  getUnitComponentByName<T extends UnitComponentEntry["type"]>(
+    name: KeyOf<UC>,
+  ) {
+    return this.props.custom?.unit?.[name]?.component as ComponentTypeByName<T>;
   }
 
-  getCompositeComponentByName<N extends keyof CC>(name: N) {
-    return this.props.custom?.composite?.[name]?.component;
+  getCompositeComponentByName<T extends ComponentEntries["type"]>(
+    name: KeyOf<CC>,
+  ) {
+    return this.props.custom?.composite?.[name]
+      ?.component as ComponentTypeByName<T>;
+  }
+
+  getDefaultComponentByType<T extends ComponentEntries["type"]>(type: T) {
+    return this.props.default?.[type] as ComponentTypeByName<T>;
   }
 }
 

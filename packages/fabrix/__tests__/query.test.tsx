@@ -4,6 +4,7 @@ import { FabrixComponent } from "@renderer";
 import { ComponentRegistry } from "@registry";
 import { users } from "./mocks/data";
 import { testWithUnmount } from "./supports/render";
+import { ComponentRegistryV2, TableCellComponentProps } from "@registry2";
 
 describe("query", () => {
   it("should render the table with collection", async () => {
@@ -61,16 +62,17 @@ describe("query", () => {
   });
 
   it("should render the table with virtual columns", async () => {
-    const components = new ComponentRegistry({
-      custom: [
-        {
-          name: "ActionCell",
-          type: "tableCell",
-          component: (props) => (
-            <button role="button">{props.userProps?.["label"]}</button>
-          ),
-        } as const,
-      ],
+    const components = new ComponentRegistryV2({
+      custom: {
+        unit: {
+          actionCell: {
+            type: "tableCell",
+            component: (props) => (
+              <button role="button">{props.userProps?.["label"]}</button>
+            ),
+          } as const,
+        },
+      },
     });
 
     await testWithUnmount(
@@ -90,7 +92,7 @@ describe("query", () => {
                   label: "操作",
                   index: -1
                   componentType: {
-                    name: "ActionCell",
+                    name: "actionCell",
                     props: [
                       { name: "label", value: "Delete" },
                       { name: "color", value: "red" },

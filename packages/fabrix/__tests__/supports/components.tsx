@@ -1,10 +1,10 @@
 import {
   FieldComponentProps,
-  ComponentRegistry,
   FormComponentProps,
   FormFieldComponentProps,
   TableComponentProps,
 } from "@registry";
+import { ComponentRegistryV2 } from "@registry2";
 import { ReactNode } from "react";
 import { useController } from "react-hook-form";
 
@@ -78,7 +78,7 @@ const formFieldView = (props: FormFieldComponentProps) => {
   );
 };
 
-export const testingComponents = new ComponentRegistry({
+export const testingComponents = new ComponentRegistryV2({
   default: {
     field: fieldView,
     form: formView,
