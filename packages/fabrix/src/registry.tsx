@@ -214,13 +214,13 @@ type MergeCustomComponentMap<
   F extends { composite: CompositeComponentMap | undefined }
     ? F[Key] extends CompositeComponentMap
       ? F[Key]
-      : never
-    : never,
+      : undefined
+    : undefined,
   S extends { composite: CompositeComponentMap | undefined }
     ? S[Key] extends CompositeComponentMap
       ? S[Key]
-      : never
-    : never
+      : undefined
+    : undefined
 >;
 
 /**
@@ -243,22 +243,10 @@ export class ComponentRegistry<
           ...this.props.custom?.composite,
           ...registry.props.custom?.composite,
         } as MergeCustomComponentMap<P["custom"], MP["custom"], "composite">,
-        /* 
-        as Merge<
-          NonNullable<P["custom"]>["composite"],
-          NonNullable<MP["custom"]>["composite"]
-        >,
-        */
         unit: {
           ...this.props.custom?.unit,
           ...registry.props.custom?.unit,
         } as MergeCustomComponentMap<P["custom"], MP["custom"], "unit">,
-        /* 
-        as Merge<
-          NonNullable<P["custom"]>["unit"],
-          NonNullable<MP["custom"]>["unit"]
-        >,
-        */
       },
       default: {
         ...this.props.default,
