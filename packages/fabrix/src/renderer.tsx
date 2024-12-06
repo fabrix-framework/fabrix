@@ -1,5 +1,5 @@
 import { DirectiveNode, DocumentNode, OperationTypeNode, parse } from "graphql";
-import { useCallback, useContext, useMemo } from "react";
+import { ReactNode, useCallback, useContext, useMemo } from "react";
 import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
 import { FormRenderer } from "@renderers/form";
@@ -194,14 +194,16 @@ type FabrixGetComponentFn = (
   name: string,
   extraProps?: FabrixComponentChildrenExtraProps,
   fieldsRenderer?: FabrixComponentFieldsRenderer,
-) => React.ReactNode;
-type FabrixGetOperationFn = (
+) => ReactNode;
+type FabrixGetOperationFn = <
+  T extends Record<string, unknown> = Record<string, unknown>,
+>(
   indexOrName: number | string,
   renderer?: (props: {
-    data: FabrixComponentData;
+    data: T;
     getComponent: FabrixGetComponentFn;
-  }) => React.ReactNode,
-) => React.ReactNode;
+  }) => ReactNode,
+) => ReactNode;
 
 type FabrixComponentChildrenProps = {
   /**
@@ -237,7 +239,7 @@ type FabrixComponentChildrenProps = {
     rootFieldName: string,
     extraProps?: FabrixComponentChildrenExtraProps,
     fieldsRenderer?: FabrixComponentFieldsRenderer,
-  ) => React.ReactNode;
+  ) => ReactNode;
 };
 
 /**
@@ -264,7 +266,7 @@ type FabrixComponentChildrenProps = {
  */
 export const FabrixComponent = (
   props: FabrixComponentProps & {
-    children?: (props: FabrixComponentChildrenProps) => React.ReactNode;
+    children?: (props: FabrixComponentChildrenProps) => ReactNode;
   },
 ) => {
   const { fieldConfigs } = useFieldConfigs(props.query);
@@ -344,7 +346,7 @@ export const FabrixComponent = (
             operation={fieldConfig}
             variables={props.variables}
             getComponentFn={getComponentFn}
-            renderer={renderer}
+            renderer={renderer as Parameters<FabrixGetOperationFn>[1]}
           />
         );
       },
