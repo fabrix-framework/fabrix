@@ -172,57 +172,6 @@ const renderTable = (
       fields,
       tableMode == "standard" ? "collection" : "edges.node",
     );
-    const headers = subFields.flatMap((subField) => {
-      if (subField.value.config.hidden) {
-        return [];
-      }
-
-      const component =
-        context.componentRegistry.getCustomComponentByNameWithFallback(
-          subField.value.config.componentType?.name,
-          "tableCell",
-        );
-
-      const userProps = subField.value.config.componentType?.props?.reduce(
-        (acc, prop) => {
-          return {
-            ...acc,
-            [prop.name]: prop.value,
-          };
-        },
-        {},
-      );
-
-      const key = subField.value.field.getName();
-      const cellRenderer = component
-        ? (rowValue: Record<string, unknown>) => {
-            return createElement(component, {
-              key,
-              name: key,
-              path: subField.value.field.value,
-              type: null,
-              value: rowValue,
-              subFields: subFields.map((subField) => ({
-                key: subField.value.field.getName(),
-                label: subField.label,
-                type: subField.type,
-              })),
-              attributes: {
-                className: "",
-                label: subField.label,
-              },
-              userProps,
-            });
-          }
-        : null;
-
-      return {
-        label: subField.label,
-        key: subField.value.field.getName(),
-        type: subField.type,
-        render: cellRenderer,
-      };
-    });
 
     const tableComponent =
       context.componentRegistry.getDefaultComponentByType("table");
@@ -232,7 +181,7 @@ const renderTable = (
 
     return createElement(tableComponent, {
       name,
-      headers,
+      headers: buildHeaders(context, subFields),
       values,
       customProps: {},
     });
@@ -240,6 +189,62 @@ const renderTable = (
 
   return <div className={"fabrix table"}>{renderTableContent()}</div>;
 };
+
+export const buildHeaders = (
+  context: FabrixContextType,
+  subFields: SubFields,
+) =>
+  subFields.flatMap((subField) => {
+    if (subField.value.config.hidden) {
+      return [];
+    }
+
+    const component =
+      context.componentRegistry.getCustomComponentByNameWithFallback(
+        subField.value.config.componentType?.name,
+        "tableCell",
+      );
+
+    const userProps = subField.value.config.componentType?.props?.reduce(
+      (acc, prop) => {
+        return {
+          ...acc,
+          [prop.name]: prop.value,
+        };
+      },
+      {},
+    );
+
+    const key = subField.value.field.getName();
+    const cellRenderer = component
+      ? (rowValue: Record<string, unknown>) => {
+          return createElement(component, {
+            key,
+            name: key,
+            path: subField.value.field.value,
+            type: subField.type,
+            value: rowValue,
+            subFields: subFields.map((subField) => ({
+              key: subField.value.field.getName(),
+              label: subField.label,
+              type: subField.type,
+            })),
+            attributes: {
+              className: "",
+              label: subField.label,
+            },
+            userProps,
+          });
+        }
+      : null;
+
+    return {
+      label: subField.label,
+      key: subField.value.field.getName(),
+      type: subField.type,
+      render: cellRenderer,
+    };
+  });
 
 export type SubField = ReturnType<typeof getSubFields>[number];
 export type SubFields = Array<SubField>;
