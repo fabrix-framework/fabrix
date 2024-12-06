@@ -2,10 +2,7 @@ import { ComponentType } from "react";
 import { FabrixComponentProps } from "@renderer";
 import { ViewFieldSchema } from "@directive/schema";
 import { FieldType } from "@renderers/shared";
-import {
-  FabrixCustomComponent,
-  FabrixCustomComponentProps,
-} from "@customRenderer";
+import { FabrixCustomComponent } from "@customRenderer";
 import {
   ComponentTypeByName,
   KeyOf,
@@ -223,7 +220,6 @@ export class ComponentRegistry<
     return (props: {
       query: FabrixComponentProps["query"];
       customProps: CP["component"] extends ComponentType<infer P> ? P : never;
-      children?: FabrixCustomComponentProps["children"];
     }) => (
       <FabrixCustomComponent
         query={props.query}
@@ -232,9 +228,7 @@ export class ComponentRegistry<
           entry: componentEntry,
           customProps: props.customProps,
         }}
-      >
-        {props.children}
-      </FabrixCustomComponent>
+      />
     );
   }
 

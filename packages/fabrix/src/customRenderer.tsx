@@ -1,7 +1,6 @@
 import { FabrixComponentData } from "@fetcher";
 import { CompositeComponentEntries } from "@registry";
 import {
-  FabrixComponentChildrenProps,
   FabrixComponentProps,
   FieldConfig,
   FieldConfigs,
@@ -21,7 +20,6 @@ export type ComponentRendererProps<
 
 export type FabrixCustomComponentProps = FabrixComponentProps & {
   component: ComponentRendererProps;
-  children?: (props: FabrixComponentChildrenProps) => React.ReactNode;
 };
 
 export const FabrixCustomComponent = (props: FabrixCustomComponentProps) => {
