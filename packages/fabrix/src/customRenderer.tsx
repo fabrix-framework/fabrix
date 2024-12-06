@@ -1,8 +1,8 @@
-import { CompositeComponentEntry } from "@registry";
+import { CompositeComponentEntries } from "@registry";
 import { FabrixComponentChildrenProps, FabrixComponentProps } from "@renderer";
 
 export type ComponentRendererProps<
-  P extends CompositeComponentEntry = CompositeComponentEntry,
+  P extends CompositeComponentEntries = CompositeComponentEntries,
 > = {
   name: string;
   entry: P;

@@ -38,6 +38,9 @@ type FieldLikeComponentProps = BaseComponentProps & {
   subFields: Array<Field>;
 };
 
+/**
+ * The component props that field renderer should implement.
+ */
 export type FieldComponentProps<UP extends UserProps = UserProps> =
   FieldLikeComponentProps & CustomRendererProps<UP>;
 
@@ -47,12 +50,18 @@ export type FieldsComponentProps<P = unknown> = CustomProps<P> & {
   value: Record<string, unknown>;
 };
 
+/**
+ * The component props that form field renderer should implement.
+ */
 export type FormFieldComponentProps<UP extends UserProps = UserProps> =
   BaseComponentProps &
     CustomRendererProps<UP> & {
       isRequired: boolean;
     };
 
+/**
+ * The component props that form renderer should implement.
+ */
 export type FormComponentProps<P = unknown> = CustomProps<P> & {
   name: string;
   className?: string;
@@ -72,6 +81,9 @@ export type TableComponentHeader = Field & {
   render: ((rowValue: Record<string, unknown>) => React.ReactElement) | null;
 };
 
+/**
+ * The component props that table renderer should implement.
+ */
 export type TableComponentProps<P = unknown> = CustomProps<P> & {
   name: string;
   className?: string;
@@ -79,6 +91,9 @@ export type TableComponentProps<P = unknown> = CustomProps<P> & {
   values: Record<string, unknown>[];
 };
 
+/**
+ * The component props that table cell renderer should implement.
+ */
 export type TableCellComponentProps<UP extends UserProps = UserProps> =
   FieldLikeComponentProps & CustomRendererProps<UP>;
 
@@ -107,23 +122,29 @@ export type TableCellComponentEntry = {
   component: ComponentType<TableCellComponentProps>;
 };
 
-export type CompositeComponentEntry<P = unknown> =
+/**
+ * Entries for composite components.
+ */
+export type CompositeComponentEntries<P = unknown> =
   | FieldsComponentEntry<P>
   | FormComponentEntry<P>
   | TableComponentEntry<P>;
 export type CompositeComponentMap = Record<
   string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  CompositeComponentEntry<any>
+  CompositeComponentEntries<any>
 >;
 
-export type UnitComponentEntry =
+/**
+ * Entries for unit components.
+ */
+export type UnitComponentEntries =
   | FieldComponentEntry
   | FormFieldComponentEntry
   | TableCellComponentEntry;
-export type UnitComponentMap = Record<string, UnitComponentEntry>;
+export type UnitComponentMap = Record<string, UnitComponentEntries>;
 
-type ComponentEntries = CompositeComponentEntry | UnitComponentEntry;
+type ComponentEntries = CompositeComponentEntries | UnitComponentEntries;
 
 type ComponentTypeByName<T extends ComponentEntries["type"]> = ComponentType<
   T extends "field"
@@ -147,6 +168,9 @@ type ComponentTypeByName<T extends ComponentEntries["type"]> = ComponentType<
  */
 type KeyOf<T> = T extends Record<infer K, unknown> ? Extract<K, string> : never;
 
+/**
+ * Component registry is a class that holds the custom components and default components.
+ */
 export class ComponentRegistry<
   CC extends CompositeComponentMap = CompositeComponentMap,
   UC extends UnitComponentMap = UnitComponentMap,
@@ -182,6 +206,12 @@ export class ComponentRegistry<
     });
   }
 
+  /**
+   * Get the custom component integrated with `FabrixComponent`.
+   *
+   * `getFabrixComponent` only accepts the name of the component as the parameter.
+   * The reason is that only composite components are supposed to accept GraphQL query to build its presentation.
+   */
   getFabrixComponent<N extends KeyOf<CC>>(name: N) {
     const componentEntry = this.props.custom?.composite?.[name];
     if (!componentEntry) {
@@ -206,12 +236,22 @@ export class ComponentRegistry<
     );
   }
 
-  getUnitComponentByName<T extends UnitComponentEntry["type"]>(
+  /**
+   * Get the unit component by name.
+   *
+   * Specify type T that matches type type name of an unit component to get the correct type of the component.
+   */
+  getUnitComponentByName<T extends UnitComponentEntries["type"]>(
     name: KeyOf<UC>,
   ) {
     return this.props.custom?.unit?.[name]?.component as ComponentTypeByName<T>;
   }
 
+  /**
+   * Get the composite component by name.
+   *
+   * Specify type T that matches type type name of an composite component to get the correct type of the component.
+   */
   getCompositeComponentByName<T extends ComponentEntries["type"]>(
     name: KeyOf<CC>,
   ) {
@@ -219,6 +259,9 @@ export class ComponentRegistry<
       ?.component as ComponentTypeByName<T>;
   }
 
+  /**
+   * Get the default component by type.
+   */
   getDefaultComponentByType<T extends ComponentEntries["type"]>(type: T) {
     return this.props.default?.[type] as ComponentTypeByName<T>;
   }
