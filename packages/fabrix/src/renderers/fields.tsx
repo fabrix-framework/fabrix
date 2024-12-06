@@ -1,6 +1,6 @@
 import { createElement, useCallback, useContext, useMemo } from "react";
 import { FabrixContext, FabrixContextType } from "@context";
-import { Value } from "../fetcher";
+import { FabrixComponentData, Value } from "../fetcher";
 import {
   assertObjectValue,
   buildClassName,
@@ -9,6 +9,7 @@ import {
   getFieldConfigByKey,
   resolveFieldTypesFromTypename,
 } from "./shared";
+import { get } from "http";
 
 export type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
 type ViewField = ViewFields[number];
@@ -20,15 +21,7 @@ export const ViewRenderer = ({
   className,
 }: CommonFabrixComponentRendererProps<ViewFields>) => {
   // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
-  const tableType = useMemo(() => {
-    if (rootField.fields.some((f) => f.field.getName() === "collection")) {
-      return "standard" as const;
-    } else if (rootField.fields.some((f) => f.field.getName() === "edges")) {
-      return "relay" as const;
-    }
-
-    return null;
-  }, []);
+  const tableType = useMemo(() => getTableType(rootField.fields), [rootField]);
 
   const renderFields = useCallback(() => {
     if (componentFieldsRenderer) {
@@ -131,23 +124,55 @@ const getSubFields = (
       label: value.config.label || value.field.getName(),
     }));
 
+const tableModes = {
+  standard: "collection",
+  relay: "edges",
+} as const;
+type TableMode = keyof typeof tableModes;
+const getTableType = (fields: ViewFields) => {
+  const modeKeyFields = Object.values(tableModes) as string[];
+  const keyField = fields.find((f) =>
+    modeKeyFields.includes(f.field.getName()),
+  );
+  if (!keyField) {
+    return null;
+  }
+  return keyField.field.getName() == "collection" ? "standard" : "relay";
+};
+const getTableValues = (
+  rootValue: Value,
+  mode: TableMode,
+): Record<string, unknown>[] => {
+  const value = rootValue as Record<string, unknown>;
+  switch (mode) {
+    case "standard":
+      return value.collection as Record<string, unknown>[];
+    case "relay":
+      return (value.edges as { node: Record<string, unknown> }[]).map(
+        ({ node }) => node,
+      );
+  }
+};
+
 const renderTable = (
   context: FabrixContextType,
   rootValue: Value | undefined,
   fields: ViewFields,
-  tableMode: "standard" | "relay",
+  tableMode: TableMode,
 ) => {
-  if (!rootValue || !("collection" in rootValue)) {
+  if (!rootValue) {
     return;
   }
 
-  const values = rootValue.collection;
-  if (!Array.isArray(values)) {
-    return;
-  }
+  const values = getTableValues(rootValue, tableMode);
 
-  const renderStandardTable = () => {
-    const subFields = getSubFields(context, rootValue, fields, "collection");
+  const renderTableContent = () => {
+    const subFields = getSubFields(
+      context,
+      rootValue,
+      fields,
+      tableMode == "standard" ? "collection" : "edges.node",
+    );
     const headers = subFields.flatMap((subField) => {
       if (subField.value.config.hidden) {
         return [];
@@ -207,15 +232,7 @@ const renderTable = (
     });
   };
 
-  const renderRelayTable = () => {
-    return <div>WARN: Relay style table renderer is not supported for now</div>;
-  };
-
-  return (
-    <div className={"fabrix table"}>
-      {tableMode === "standard" ? renderStandardTable() : renderRelayTable()}
-    </div>
-  );
+  return <div className={"fabrix table"}>{renderTableContent()}</div>;
 };
 
 export type SubField = ReturnType<typeof getSubFields>[number];
