@@ -10,7 +10,7 @@ import {
   ComponentTypeByName,
   KeyOf,
   MergeCustomComponentMap,
-} from "@registry/typeutils";
+} from "@registry/utiltypes";
 
 export type DirectiveAttributes = Pick<ViewFieldSchema, "label"> & {
   className: string;
