@@ -1,9 +1,9 @@
-import { FabrixContext, FabrixContextType } from "@context";
+import { FabrixContext } from "@context";
 import { FabrixComponentData } from "@fetcher";
 import { TableComponentEntry } from "@registry";
 import { FabrixComponentProps } from "@renderer";
 import { ComponentRendererProps } from "@customRenderer";
-import { getSubFields, getTableType, SubFields } from "@renderers/fields";
+import { buildHeaders, getSubFields, getTableType } from "@renderers/fields";
 import { FieldConfigByType } from "@renderers/shared";
 import { createElement, useContext } from "react";
 
@@ -57,56 +57,3 @@ const ensureCollectionValue = (
     rootValue,
   };
 };
-
-const buildHeaders = (context: FabrixContextType, subFields: SubFields) =>
-  subFields.flatMap((subField) => {
-    if (subField.value.config.hidden) {
-      return [];
-    }
-
-    const component =
-      context.componentRegistry.getCustomComponentByNameWithFallback(
-        subField.value.config.componentType?.name,
-        "tableCell",
-      );
-
-    const userProps = subField.value.config.componentType?.props?.reduce(
-      (acc, prop) => {
-        return {
-          ...acc,
-          [prop.name]: prop.value,
-        };
-      },
-      {},
-    );
-
-    const key = subField.value.field.getName();
-    const cellRenderer = component
-      ? (rowValue: Record<string, unknown>) => {
-          return createElement(component, {
-            key,
-            name: key,
-            path: subField.value.field.value,
-            type: subField.type,
-            value: rowValue,
-            subFields: subFields.map((subField) => ({
-              key: subField.value.field.getName(),
-              label: subField.label,
-              type: subField.type,
-            })),
-            attributes: {
-              className: "",
-              label: subField.label,
-            },
-            userProps,
-          });
-        }
-      : null;
-
-    return {
-      label: subField.label,
-      key: subField.value.field.getName(),
-      type: subField.type,
-      render: cellRenderer,
-    };
-  });
