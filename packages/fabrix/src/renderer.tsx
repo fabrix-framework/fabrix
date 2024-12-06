@@ -329,50 +329,79 @@ export const FabrixComponent = (
     [fieldConfigs, renderByField, props.containerClassName],
   );
 
-  const getOperation: FabrixComponentChildrenProps["getOperation"] =
+  const getOperationInternal: FabrixComponentChildrenProps["getOperation"] =
     useCallback(
       (indexOrName, renderer) => {
-        const fieldConfig =
-          typeof indexOrName === "number"
-            ? fieldConfigs[indexOrName]
-            : fieldConfigs.find(({ name }) => name == indexOrName);
-        if (!fieldConfig) {
-          throw new Error(`No operation found for indexOrName:${indexOrName}`);
-        }
-
-        return (
-          <OperationRenderer
-            key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
-            operation={fieldConfig}
-            variables={props.variables}
-            getComponentFn={getComponentFn}
-            renderer={renderer as Parameters<FabrixGetOperationFn>[1]}
-          />
+        return getOperation(
+          {
+            indexOrName,
+            renderer: renderer as Parameters<FabrixGetOperationFn>[1],
+            variables: props.variables,
+            fieldConfigs,
+          },
+          getComponentFn,
         );
       },
-      [fieldConfigs, getComponentFn],
+      [fieldConfigs, getComponentFn, props.variables],
     );
 
   const renderContents = () => {
     if (props.children) {
       return props.children({
-        getOperation,
+        getOperation: getOperationInternal,
         getComponent: (
           operationIndexOrName,
           rootFieldName,
           extraProps,
           fieldsRenderer,
         ) =>
-          getOperation(operationIndexOrName, ({ getComponent }) =>
+          getOperationInternal(operationIndexOrName, ({ getComponent }) =>
             getComponent(rootFieldName, extraProps, fieldsRenderer),
           ),
       });
     }
 
-    return fieldConfigs.map((_, i) => getOperation(i));
+    return fieldConfigs.map((_, i) => getOperationInternal(i));
   };
 
   return <div className="fabrix wrapper">{renderContents()}</div>;
+};
+
+type GetComponentFn = (
+  op: FieldConfigs,
+  data: FabrixComponentData,
+  context: FabrixContextType,
+) => FabrixGetComponentFn;
+
+type GetOperationProps = {
+  indexOrName: string | number;
+  renderer: Parameters<FabrixGetOperationFn>[1];
+  variables: Record<string, unknown> | undefined;
+  fieldConfigs: FieldConfigs[];
+};
+
+export const getOperation = (
+  props: GetOperationProps,
+  getComponentFn: GetComponentFn,
+) => {
+  const { indexOrName, renderer, variables, fieldConfigs } = props;
+  const fieldConfig =
+    typeof indexOrName === "number"
+      ? fieldConfigs[indexOrName]
+      : fieldConfigs.find(({ name }) => name == indexOrName);
+  if (!fieldConfig) {
+    throw new Error(`No operation found for indexOrName: ${indexOrName}`);
+  }
+
+  return (
+    <OperationRenderer
+      key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
+      operation={fieldConfig}
+      variables={variables}
+      getComponentFn={getComponentFn}
+      renderer={renderer}
+    />
+  );
 };
 
 export type RendererCommonProps = {
@@ -380,11 +409,7 @@ export type RendererCommonProps = {
   operation: FieldConfigs;
   variables: Record<string, unknown> | undefined;
   renderer?: Parameters<FabrixGetOperationFn>[1];
-  getComponentFn: (
-    op: FieldConfigs,
-    data: FabrixComponentData,
-    context: FabrixContextType,
-  ) => FabrixGetComponentFn;
+  getComponentFn: GetComponentFn;
   extraClassName?: string;
 };
 
