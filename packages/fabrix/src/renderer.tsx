@@ -109,7 +109,7 @@ type FieldConfigs = {
   fields: FieldConfig[];
 };
 
-const useFieldConfigs = (query: DocumentNode | string) => {
+export const useFieldConfigs = (query: DocumentNode | string) => {
   const rootDocument = buildRootDocument(
     typeof query === "string" ? parse(query) : query,
   );
