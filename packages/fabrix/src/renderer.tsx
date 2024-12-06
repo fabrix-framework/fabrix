@@ -168,7 +168,7 @@ type FabrixComponentCommonProps = {
   contentClassName?: string;
 };
 
-type FabrixComponentProps = FabrixComponentCommonProps & {
+export type FabrixComponentProps = FabrixComponentCommonProps & {
   /**
    * The query to render.
    *
@@ -205,7 +205,7 @@ type FabrixGetOperationFn = <
   }) => ReactNode,
 ) => ReactNode;
 
-type FabrixComponentChildrenProps = {
+export type FabrixComponentChildrenProps = {
   /**
    * Get the operation result by operation name or index
    *
