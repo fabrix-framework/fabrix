@@ -2,6 +2,7 @@ import {
   ComponentEntries,
   ComponentRegistryCustomProps,
   FieldComponentProps,
+  FieldsComponentProps,
   FormComponentProps,
   FormFieldComponentProps,
   TableCellComponentProps,
@@ -66,13 +67,15 @@ export type ComponentTypeByName<T extends ComponentEntries["type"]> =
   ComponentType<
     T extends "field"
       ? FieldComponentProps
-      : T extends "formField"
-        ? FormFieldComponentProps
-        : T extends "form"
-          ? FormComponentProps
-          : T extends "table"
-            ? TableComponentProps
+      : T extends "fields"
+        ? FieldsComponentProps
+        : T extends "formField"
+          ? FormFieldComponentProps
+          : T extends "form"
+            ? FormComponentProps
             : T extends "tableCell"
               ? TableCellComponentProps
-              : never
+              : T extends "table"
+                ? TableComponentProps
+                : never
   >;

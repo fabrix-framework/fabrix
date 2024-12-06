@@ -177,12 +177,11 @@ const renderTable = (
         return [];
       }
 
-      // TODO: fallback to default table cell component
-      const component = subField.value.config.componentType?.name
-        ? context.componentRegistry.getUnitComponentByName<"tableCell">(
-            subField.value.config.componentType.name,
-          )
-        : context.componentRegistry.getDefaultComponentByType("tableCell");
+      const component =
+        context.componentRegistry.getCustomComponentByNameWithFallback(
+          subField.value.config.componentType?.name,
+          "tableCell",
+        );
 
       const userProps = subField.value.config.componentType?.props?.reduce(
         (acc, prop) => {
@@ -268,11 +267,11 @@ const renderField = ({
 
   assertObjectValue(rootField.data);
 
-  const component = field.config.componentType?.name
-    ? context.componentRegistry.getUnitComponentByName<"field">(
-        field.config.componentType.name,
-      )
-    : context.componentRegistry.getDefaultComponentByType("field");
+  const component =
+    context.componentRegistry.getCustomComponentByNameWithFallback(
+      field.config.componentType?.name,
+      "field",
+    );
   if (!component) {
     return;
   }

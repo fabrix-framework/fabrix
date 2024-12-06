@@ -239,24 +239,25 @@ export class ComponentRegistry<
   }
 
   /**
-   * Get the unit component by name.
+   * Get the component by name.
    *
-   * Specify type T that matches type type name of an unit component to get the correct type of the component.
+   * If the component is not found, it will return the default component.
    */
-  getUnitComponentByName<T extends UnitComponentEntries["type"]>(name: string) {
-    return this.props.custom?.unit?.[name]?.component as ComponentTypeByName<T>;
-  }
-
-  /**
-   * Get the composite component by name.
-   *
-   * Specify type T that matches type type name of an composite component to get the correct type of the component.
-   */
-  getCompositeComponentByName<T extends ComponentEntries["type"]>(
-    name: string,
+  getCustomComponentByNameWithFallback<T extends ComponentEntries["type"]>(
+    name: string | null | undefined,
+    type: T,
   ) {
-    return this.props.custom?.composite?.[name]
-      ?.component as ComponentTypeByName<T>;
+    const components: Record<string, ComponentEntries> = {
+      ...this.props.custom?.composite,
+      ...this.props.custom?.unit,
+    };
+
+    const component = components[name ?? ""];
+    if (!component) {
+      return this.getDefaultComponentByType(type);
+    }
+
+    return component as unknown as ComponentTypeByName<T>;
   }
 
   /**
