@@ -104,11 +104,11 @@ const renderField = (props: {
     return;
   }
 
-  const component = fieldConfig.componentType?.name
-    ? context.componentRegistry.getUnitComponentByName<"formField">(
-        fieldConfig.componentType.name,
-      )
-    : context.componentRegistry.getDefaultComponentByType("formField");
+  const component =
+    context.componentRegistry.getCustomComponentByNameWithFallback(
+      fieldConfig.componentType?.name,
+      "formField",
+    );
   if (!component) {
     return;
   }
