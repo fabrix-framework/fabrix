@@ -12,7 +12,6 @@ import {
 } from "./shared";
 import { buildAjvSchema } from "./form/validation";
 import { ajvResolver } from "./form/ajvResolver";
-import { printIntrospectionSchema } from "graphql";
 
 export type FormFields = FieldConfigByType<"form">["configs"]["fields"];
 export type FormField = FormFields[number];
