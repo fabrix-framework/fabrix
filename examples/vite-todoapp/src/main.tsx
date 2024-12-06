@@ -17,6 +17,12 @@ const TodoAppComponents = new ComponentRegistry({
     unit: {
       IDActionCell,
     },
+    composite: {
+      mytable: {
+        type: "table",
+        component: () => <div>mytable</div>,
+      },
+    },
   },
 });
 
