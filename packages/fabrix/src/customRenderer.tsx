@@ -1,5 +1,9 @@
-import { CompositeComponentEntry } from "@registry2";
-import { FabrixComponentChildrenProps, FabrixComponentProps } from "@renderer";
+import { CompositeComponentEntry } from "@registry";
+import {
+  FabrixComponentChildrenProps,
+  FabrixComponentProps,
+  useFieldConfigs,
+} from "@renderer";
 
 export type ComponentRendererProps<
   P extends CompositeComponentEntry = CompositeComponentEntry,
@@ -15,5 +19,9 @@ export type FabrixCustomComponentProps = FabrixComponentProps & {
 };
 
 export const FabrixCustomComponent = (props: FabrixCustomComponentProps) => {
+  const { query } = props;
+  const componentEntry = props.component.entry;
+  const { fieldConfigs } = useFieldConfigs(query);
+
   return <div>Custom renderer</div>;
 };

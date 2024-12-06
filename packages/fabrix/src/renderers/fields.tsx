@@ -80,7 +80,7 @@ export const ViewRenderer = ({
   }, [componentFieldsRenderer, rootField, getSubFields]);
 
   return tableType !== null
-    ? renderTable(context, rootField.data, rootField.fields, tableType)
+    ? renderTable(context, rootField, tableType)
     : renderFields();
 };
 
@@ -179,11 +179,10 @@ const renderTable = (
 
       // TODO: fallback to default table cell component
       const component = subField.value.config.componentType?.name
-        ? context.componentRegistry.getCustom(
+        ? context.componentRegistry.getUnitComponentByName<"tableCell">(
             subField.value.config.componentType.name,
-            "tableCell",
           )
-        : null;
+        : context.componentRegistry.getDefaultComponentByType("tableCell");
 
       const userProps = subField.value.config.componentType?.props?.reduce(
         (acc, prop) => {
@@ -201,8 +200,14 @@ const renderTable = (
             return createElement(component, {
               key,
               name: key,
+              path: subField.value.field.value,
               type: null,
               value: rowValue,
+              subFields: subFields.map((subField) => ({
+                key: subField.value.field.getName(),
+                label: subField.label,
+                type: subField.type,
+              })),
               attributes: {
                 className: "",
                 label: subField.label,
@@ -220,14 +225,17 @@ const renderTable = (
       };
     });
 
-    const tableComponent = context.componentRegistry.components.default?.table;
+    const tableComponent =
+      context.componentRegistry.getDefaultComponentByType("table");
     if (!tableComponent) {
       return;
     }
 
     return createElement(tableComponent, {
+      name,
       headers,
       values,
+      customProps: {},
     });
   };
 
@@ -261,11 +269,10 @@ const renderField = ({
   assertObjectValue(rootField.data);
 
   const component = field.config.componentType?.name
-    ? context.componentRegistry.getCustom(
+    ? context.componentRegistry.getUnitComponentByName<"field">(
         field.config.componentType.name,
-        "field",
       )
-    : context.componentRegistry.components.default?.field;
+    : context.componentRegistry.getDefaultComponentByType("field");
   if (!component) {
     return;
   }
