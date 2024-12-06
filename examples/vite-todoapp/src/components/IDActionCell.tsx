@@ -7,7 +7,6 @@ import {
 import { useCallback, useState } from "react";
 
 export const IDActionCell = {
-  name: "IDActionCell",
   type: "tableCell",
   component: (props: TableCellComponentProps) => {
     const client = useFabrixClient();
@@ -20,6 +19,13 @@ export const IDActionCell = {
       throw new Error("Mutation is required");
     }
 
+    const getMutatingID = () => {
+      if (!props.value || typeof props.value !== "object") {
+        return null;
+      }
+      return "id" in props.value ? props.value.id : null;
+    };
+
     const mutate = useCallback(async () => {
       const op = context.getMutation(mutation);
       if (!op) {
@@ -30,7 +36,7 @@ export const IDActionCell = {
       try {
         await client.mutation(op, {
           input: {
-            id: props.value.id,
+            id: getMutatingID(),
           },
         });
       } catch (e) {
