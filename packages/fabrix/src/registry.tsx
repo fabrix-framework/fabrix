@@ -6,7 +6,6 @@ import {
   FabrixCustomComponent,
   FabrixCustomComponentProps,
 } from "@customRenderer";
-import { U } from "vitest/dist/chunks/environment.CzISCQ7o";
 
 export type DirectiveAttributes = Pick<ViewFieldSchema, "label"> & {
   className: string;
