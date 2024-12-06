@@ -102,7 +102,7 @@ const getFieldConfig = (
 export type FieldConfig = ReturnType<typeof getFieldConfig> & {
   document: DocumentNode;
 };
-type FieldConfigs = {
+export type FieldConfigs = {
   name: string;
   document: DocumentNode;
   type: OperationTypeNode;
@@ -315,8 +315,9 @@ export const FabrixComponent = (
       ) => {
         const field = fieldConfig.fields.find((f) => f.name === name);
         if (!field) {
-          throw new Error(`No root field found for name:${name}`);
+          throw new Error(`No root field found for name: ${name}`);
         }
+
         return (
           <div
             key={extraProps?.key}
@@ -329,7 +330,7 @@ export const FabrixComponent = (
     [fieldConfigs, renderByField, props.containerClassName],
   );
 
-  const getOperationInternal: FabrixComponentChildrenProps["getOperation"] =
+  const getAppliedOperation: FabrixComponentChildrenProps["getOperation"] =
     useCallback(
       (indexOrName, renderer) => {
         return getOperation(
@@ -348,20 +349,20 @@ export const FabrixComponent = (
   const renderContents = () => {
     if (props.children) {
       return props.children({
-        getOperation: getOperationInternal,
+        getOperation: getAppliedOperation,
         getComponent: (
           operationIndexOrName,
           rootFieldName,
           extraProps,
           fieldsRenderer,
         ) =>
-          getOperationInternal(operationIndexOrName, ({ getComponent }) =>
+          getAppliedOperation(operationIndexOrName, ({ getComponent }) =>
             getComponent(rootFieldName, extraProps, fieldsRenderer),
           ),
       });
     }
 
-    return fieldConfigs.map((_, i) => getOperationInternal(i));
+    return fieldConfigs.map((_, i) => getAppliedOperation(i));
   };
 
   return <div className="fabrix wrapper">{renderContents()}</div>;
