@@ -198,6 +198,31 @@ export type ComponentRegistryProps<
   };
 };
 
+type CustomComponentCategories = keyof NonNullable<
+  ComponentRegistryProps<CompositeComponentMap, UnitComponentMap>["custom"]
+>;
+
+type MergeCustomComponentMap<
+  F extends
+    | ComponentRegistryProps<CompositeComponentMap, UnitComponentMap>["custom"]
+    | undefined,
+  S extends
+    | ComponentRegistryProps<CompositeComponentMap, UnitComponentMap>["custom"]
+    | undefined,
+  Key extends CustomComponentCategories,
+> = Merge<
+  F extends { composite: CompositeComponentMap | undefined }
+    ? F[Key] extends CompositeComponentMap
+      ? F[Key]
+      : never
+    : never,
+  S extends { composite: CompositeComponentMap | undefined }
+    ? S[Key] extends CompositeComponentMap
+      ? S[Key]
+      : never
+    : never
+>;
+
 /**
  * Component registry is a class that holds the custom components and default components.
  */
@@ -217,17 +242,23 @@ export class ComponentRegistry<
         composite: {
           ...this.props.custom?.composite,
           ...registry.props.custom?.composite,
-        } as Merge<
+        } as MergeCustomComponentMap<P["custom"], MP["custom"], "composite">,
+        /* 
+        as Merge<
           NonNullable<P["custom"]>["composite"],
           NonNullable<MP["custom"]>["composite"]
         >,
+        */
         unit: {
           ...this.props.custom?.unit,
           ...registry.props.custom?.unit,
-        } as Merge<
+        } as MergeCustomComponentMap<P["custom"], MP["custom"], "unit">,
+        /* 
+        as Merge<
           NonNullable<P["custom"]>["unit"],
           NonNullable<MP["custom"]>["unit"]
         >,
+        */
       },
       default: {
         ...this.props.default,
