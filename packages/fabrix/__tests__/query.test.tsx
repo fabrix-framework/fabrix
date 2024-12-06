@@ -50,6 +50,33 @@ describe("query", () => {
     },
   );
 
+  it("should render the table with edges", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          query getUsers {
+            userEdges {
+              edges {
+                node {
+                  id
+                  name
+                  email
+                }
+              }
+            }
+          }
+        `}
+      />,
+      async () => {
+        const table = await screen.findByRole("table");
+        expect(table).toBeInTheDocument();
+
+        const rows = await within(table).findAllByRole("row");
+        expect(rows.length).toBe(users.length + 1);
+      },
+    );
+  });
+
   it("should render the table with customized labels", async () => {
     await testWithUnmount(
       <FabrixComponent
