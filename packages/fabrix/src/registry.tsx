@@ -38,7 +38,7 @@ export type CustomProps<P> = {
   customProps: P;
 };
 
-type FieldLikeComponentProps = BaseComponentProps & {
+type FieldLikeComponentProps<V = unknown> = BaseComponentProps<V> & {
   path: string[];
   subFields: Array<Field>;
 };
@@ -100,7 +100,7 @@ export type TableComponentProps<P = unknown> = CustomProps<P> & {
  * The component props that table cell renderer should implement.
  */
 export type TableCellComponentProps<UP extends UserProps = UserProps> =
-  FieldLikeComponentProps & CustomRendererProps<UP>;
+  FieldLikeComponentProps<Record<string, unknown>> & CustomRendererProps<UP>;
 
 export type FieldComponentEntry = {
   type: "field";
