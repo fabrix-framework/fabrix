@@ -6,6 +6,11 @@ import {
   FabrixCustomComponent,
   FabrixCustomComponentProps,
 } from "@customRenderer";
+import {
+  ComponentTypeByName,
+  KeyOf,
+  MergeCustomComponentMap,
+} from "@registry/typeutils";
 
 export type DirectiveAttributes = Pick<ViewFieldSchema, "label"> & {
   className: string;
@@ -144,84 +149,25 @@ export type UnitComponentEntries =
   | TableCellComponentEntry;
 export type UnitComponentMap = Record<string, UnitComponentEntries>;
 
-type ComponentEntries = CompositeComponentEntries | UnitComponentEntries;
+export type ComponentEntries = CompositeComponentEntries | UnitComponentEntries;
 
-type ComponentTypeByName<T extends ComponentEntries["type"]> = ComponentType<
-  T extends "field"
-    ? FieldComponentProps
-    : T extends "formField"
-      ? FormFieldComponentProps
-      : T extends "form"
-        ? FormComponentProps
-        : T extends "table"
-          ? TableComponentProps
-          : T extends "tableCell"
-            ? TableCellComponentProps
-            : never
->;
-
-/**
- * Extracts the keys of a record type that are strings.
- *
- * Without this, TypeScript infers the record keys as `string | number | symbol`,
- * but we want to ensure that the keys are strings.
- */
-type KeyOf<T> = T extends Record<infer K, unknown> ? Extract<K, string> : never;
-
-type Merge<
-  F extends Record<string, unknown> | undefined,
-  S extends Record<string, unknown> | undefined,
-> = F extends undefined
-  ? S extends undefined
-    ? Record<string, never>
-    : S
-  : S extends undefined
-    ? F
-    : {
-        [K in keyof F | keyof S]: K extends keyof S
-          ? S[K]
-          : K extends keyof F
-            ? F[K]
-            : never;
-      };
+export type ComponentRegistryCustomProps<
+  CC extends CompositeComponentMap = CompositeComponentMap,
+  UC extends UnitComponentMap = UnitComponentMap,
+> = {
+  composite?: CC;
+  unit?: UC;
+};
 
 export type ComponentRegistryProps<
   CC extends CompositeComponentMap,
   UC extends UnitComponentMap,
 > = {
-  custom?: {
-    composite?: CC;
-    unit?: UC;
-  };
+  custom?: ComponentRegistryCustomProps<CC, UC>;
   default?: {
     [K in ComponentEntries["type"]]?: ComponentTypeByName<K>;
   };
 };
-
-type CustomComponentCategories = keyof NonNullable<
-  ComponentRegistryProps<CompositeComponentMap, UnitComponentMap>["custom"]
->;
-
-type MergeCustomComponentMap<
-  F extends
-    | ComponentRegistryProps<CompositeComponentMap, UnitComponentMap>["custom"]
-    | undefined,
-  S extends
-    | ComponentRegistryProps<CompositeComponentMap, UnitComponentMap>["custom"]
-    | undefined,
-  Key extends CustomComponentCategories,
-> = Merge<
-  F extends { composite: CompositeComponentMap | undefined }
-    ? F[Key] extends CompositeComponentMap
-      ? F[Key]
-      : undefined
-    : undefined,
-  S extends { composite: CompositeComponentMap | undefined }
-    ? S[Key] extends CompositeComponentMap
-      ? S[Key]
-      : undefined
-    : undefined
->;
 
 /**
  * Component registry is a class that holds the custom components and default components.
