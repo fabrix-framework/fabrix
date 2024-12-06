@@ -106,7 +106,7 @@ const getTypeName = (
  *
  * This also sorts the fields by the index value.
  */
-const getSubFields = (
+export const getSubFields = (
   context: FabrixContextType,
   rootValue: Value | undefined,
   fields: ViewFields,
@@ -128,7 +128,7 @@ const tableModes = {
   relay: "edges",
 } as const;
 type TableMode = keyof typeof tableModes;
-const getTableType = (fields: ViewFields) => {
+export const getTableType = (fields: ViewFields) => {
   const modeKeyFields = Object.values(tableModes) as string[];
   const keyField = fields.find((f) =>
     modeKeyFields.includes(f.field.getName()),
@@ -242,12 +242,13 @@ const renderTable = (
 };
 
 export type SubField = ReturnType<typeof getSubFields>[number];
+export type SubFields = Array<SubField>;
 
 type RenderFieldProps = {
   rootField: CommonFabrixComponentRendererProps<ViewFields>["rootField"];
   indexKey: string;
   field: ViewField;
-  subFields: Array<SubField>;
+  subFields: SubFields;
   extraClassName?: string;
 };
 const renderField = ({
