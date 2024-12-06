@@ -1,4 +1,4 @@
-import { ComponentProps, ComponentType } from "react";
+import { ComponentType } from "react";
 import { FabrixComponentProps } from "@renderer";
 import { ViewFieldSchema } from "@directive/schema";
 import { FieldType } from "@renderers/shared";
@@ -6,6 +6,7 @@ import {
   FabrixCustomComponent,
   FabrixCustomComponentProps,
 } from "@customRenderer";
+import { U } from "vitest/dist/chunks/environment.CzISCQ7o";
 
 export type DirectiveAttributes = Pick<ViewFieldSchema, "label"> & {
   className: string;
@@ -168,36 +169,66 @@ type ComponentTypeByName<T extends ComponentEntries["type"]> = ComponentType<
  */
 type KeyOf<T> = T extends Record<infer K, unknown> ? Extract<K, string> : never;
 
+type Merge<
+  F extends Record<string, unknown> | undefined,
+  S extends Record<string, unknown> | undefined,
+> = F extends undefined
+  ? S extends undefined
+    ? Record<string, never>
+    : S
+  : S extends undefined
+    ? F
+    : {
+        [K in keyof F | keyof S]: K extends keyof S
+          ? S[K]
+          : K extends keyof F
+            ? F[K]
+            : never;
+      };
+
+export type ComponentRegistryProps<
+  CC extends CompositeComponentMap,
+  UC extends UnitComponentMap,
+> = {
+  custom?: {
+    composite?: CC;
+    unit?: UC;
+  };
+  default?: {
+    [K in ComponentEntries["type"]]?: ComponentTypeByName<K>;
+  };
+};
+
 /**
  * Component registry is a class that holds the custom components and default components.
  */
 export class ComponentRegistry<
-  CC extends CompositeComponentMap = CompositeComponentMap,
-  UC extends UnitComponentMap = UnitComponentMap,
+  P extends ComponentRegistryProps<
+    CompositeComponentMap,
+    UnitComponentMap
+  > = ComponentRegistryProps<CompositeComponentMap, UnitComponentMap>,
 > {
-  constructor(
-    private readonly props: {
-      custom?: {
-        composite?: CC;
-        unit?: UC;
-      };
-      default?: {
-        [K in ComponentEntries["type"]]?: ComponentTypeByName<K>;
-      };
-    },
-  ) {}
+  constructor(private readonly props: P) {}
 
-  merge(registry: ComponentRegistry<CC, UC>) {
+  merge<
+    MP extends ComponentRegistryProps<CompositeComponentMap, UnitComponentMap>,
+  >(registry: ComponentRegistry<MP>) {
     return new ComponentRegistry({
       custom: {
         composite: {
           ...this.props.custom?.composite,
           ...registry.props.custom?.composite,
-        },
+        } as Merge<
+          NonNullable<P["custom"]>["composite"],
+          NonNullable<MP["custom"]>["composite"]
+        >,
         unit: {
           ...this.props.custom?.unit,
           ...registry.props.custom?.unit,
-        },
+        } as Merge<
+          NonNullable<P["custom"]>["unit"],
+          NonNullable<MP["custom"]>["unit"]
+        >,
       },
       default: {
         ...this.props.default,
@@ -212,7 +243,14 @@ export class ComponentRegistry<
    * `getFabrixComponent` only accepts the name of the component as the parameter.
    * The reason is that only composite components are supposed to accept GraphQL query to build its presentation.
    */
-  getFabrixComponent<N extends KeyOf<CC>>(name: N) {
+  getFabrixComponent<
+    K extends P["custom"] extends { composite: CompositeComponentMap }
+      ? KeyOf<P["custom"]["composite"]>
+      : never,
+    CP extends P["custom"] extends { composite: CompositeComponentMap }
+      ? P["custom"]["composite"][K]
+      : never,
+  >(name: K) {
     const componentEntry = this.props.custom?.composite?.[name];
     if (!componentEntry) {
       throw new Error(`Component ${name} not found`);
@@ -220,7 +258,7 @@ export class ComponentRegistry<
 
     return (props: {
       query: FabrixComponentProps["query"];
-      customProps: ComponentProps<CC[N]["component"]>["customProps"];
+      customProps: CP["component"] extends ComponentType<infer P> ? P : never;
       children?: FabrixCustomComponentProps["children"];
     }) => (
       <FabrixCustomComponent
@@ -241,9 +279,7 @@ export class ComponentRegistry<
    *
    * Specify type T that matches type type name of an unit component to get the correct type of the component.
    */
-  getUnitComponentByName<T extends UnitComponentEntries["type"]>(
-    name: KeyOf<UC>,
-  ) {
+  getUnitComponentByName<T extends UnitComponentEntries["type"]>(name: string) {
     return this.props.custom?.unit?.[name]?.component as ComponentTypeByName<T>;
   }
 
@@ -253,7 +289,7 @@ export class ComponentRegistry<
    * Specify type T that matches type type name of an composite component to get the correct type of the component.
    */
   getCompositeComponentByName<T extends ComponentEntries["type"]>(
-    name: KeyOf<CC>,
+    name: string,
   ) {
     return this.props.custom?.composite?.[name]
       ?.component as ComponentTypeByName<T>;
