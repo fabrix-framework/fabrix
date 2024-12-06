@@ -16,21 +16,19 @@ import { ajvResolver } from "./form/ajvResolver";
 export type FormFields = FieldConfigByType<"form">["configs"]["fields"];
 export type FormField = FormFields[number];
 
-export const FormRenderer = (
-  props: CommonFabrixComponentRendererProps<{
-    fields: FormFields;
-  }>,
-) => {
-  const { context, fieldConfigs, query, componentFieldsRenderer } = props;
+export const FormRenderer = ({
+  context,
+  rootField,
+  componentFieldsRenderer,
+  className,
+}: CommonFabrixComponentRendererProps<FormFields>) => {
   const formContext = useForm({
-    resolver: ajvResolver(buildAjvSchema(fieldConfigs.fields)),
+    resolver: ajvResolver(buildAjvSchema(rootField.fields)),
   });
-  const [mutationResult, runMutation] = useMutation(query.documentResolver());
+  const [mutationResult, runMutation] = useMutation(rootField.document);
   const runSubmit = formContext.handleSubmit(async (input) => {
     // TODO: sending values should be specifiable by the user through something like `path`
-    await runMutation({
-      input,
-    });
+    await runMutation({ input });
 
     formContext.reset();
   });
@@ -39,13 +37,13 @@ export const FormRenderer = (
     if (componentFieldsRenderer) {
       return componentFieldsRenderer({
         getField: (name, extraProps) => {
-          const field = getFieldConfigByKey(fieldConfigs.fields, name);
+          const field = getFieldConfigByKey(rootField.fields, name);
           if (!field) {
             return null;
           }
 
           return renderField({
-            indexKey: extraProps?.key ?? `${query.rootName}-${name}`,
+            indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
             extraClassName: extraProps?.className,
             field: {
               ...field,
@@ -57,16 +55,16 @@ export const FormRenderer = (
       });
     }
 
-    return fieldConfigs.fields
+    return rootField.fields
       .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
       .flatMap((field, fieldIndex) =>
         renderField({
-          indexKey: `${query.rootName}-${fieldIndex}`,
+          indexKey: `${rootField.name}-${fieldIndex}`,
           field,
           context,
         }),
       );
-  }, [context, fieldConfigs, query.rootName, componentFieldsRenderer]);
+  }, [context, rootField.name, componentFieldsRenderer]);
 
   if (context.schemaLoader.status === "loading") {
     return <Loader />;
@@ -88,7 +86,7 @@ export const FormRenderer = (
       }),
     renderReset: (resetRenderer) =>
       resetRenderer({ reset: () => formContext.reset() }),
-    className: `fabrix form col-row ${props.className ?? ""}`,
+    className: `fabrix form col-row ${className ?? ""}`,
   });
 };
 

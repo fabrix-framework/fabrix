@@ -5,11 +5,27 @@ import { ComponentRegistry } from "@registry";
 import { users } from "./mocks/data";
 import { testWithUnmount } from "./supports/render";
 
+type FabrixComponentChildrenProps = Parameters<
+  typeof FabrixComponent
+>[0]["children"];
+
 describe("query", () => {
-  it("should render the table with collection", async () => {
-    await testWithUnmount(
-      <FabrixComponent
-        query={`
+  const childrenPropPattern = [
+    ["no children", undefined],
+    ["getOperation", ({ getOperation }) => getOperation("getUsers")],
+    [
+      "getOperation/getComponent",
+      ({ getOperation }) =>
+        getOperation("getUsers", ({ getComponent }) => getComponent("users")),
+    ],
+    ["getComponent", ({ getComponent }) => getComponent("getUsers", "users")],
+  ] satisfies [string, FabrixComponentChildrenProps][];
+  it.each(childrenPropPattern)(
+    "should render the table with collection | %s",
+    async (_, children) => {
+      await testWithUnmount(
+        <FabrixComponent
+          query={`
           query getUsers {
             users {
               collection {
@@ -20,16 +36,19 @@ describe("query", () => {
             }
           }
         `}
-      />,
-      async () => {
-        const table = await screen.findByRole("table");
-        expect(table).toBeInTheDocument();
+        >
+          {children}
+        </FabrixComponent>,
+        async () => {
+          const table = await screen.findByRole("table");
+          expect(table).toBeInTheDocument();
 
-        const rows = await within(table).findAllByRole("row");
-        expect(rows.length).toBe(users.length + 1);
-      },
-    );
-  });
+          const rows = await within(table).findAllByRole("row");
+          expect(rows.length).toBe(users.length + 1);
+        },
+      );
+    },
+  );
 
   it("should render the table with customized labels", async () => {
     await testWithUnmount(
@@ -120,6 +139,23 @@ describe("query", () => {
         expect(headers[0]).toHaveTextContent("操作");
       },
       { components },
+    );
+  });
+
+  it("should render the table with collection", async () => {
+    await testWithUnmount(
+      <FabrixComponent query={`query getUsers { users { size } }`}>
+        {({ getOperation }) =>
+          getOperation<{ users: { size: number } }>("getUsers", ({ data }) => (
+            <div role="result-size">{data.users.size}</div>
+          ))
+        }
+      </FabrixComponent>,
+      async () => {
+        const result = await screen.findByRole("result-size");
+        expect(result).toBeInTheDocument();
+        expect(result).toHaveTextContent(users.length.toString());
+      },
     );
   });
 });

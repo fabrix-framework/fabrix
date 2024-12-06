@@ -12,6 +12,7 @@ type User {
 
 type UsersResult {
   collection: [User!]!
+  size: Int!
 }
 
 type Query {
@@ -39,6 +40,7 @@ type Mutation {
 const resolvers = {
   users: () => ({
     collection: users,
+    size: users.length,
   }),
 };
 
