@@ -108,15 +108,16 @@ describe("query", () => {
 
   it("should render the table with virtual columns", async () => {
     const components = new ComponentRegistry({
-      custom: [
-        {
-          name: "ActionCell",
-          type: "tableCell",
-          component: (props) => (
-            <button role="button">{props.userProps?.["label"]}</button>
-          ),
-        } as const,
-      ],
+      custom: {
+        unit: {
+          actionCell: {
+            type: "tableCell",
+            component: (props) => (
+              <button role="button">{props.userProps?.["label"]}</button>
+            ),
+          } as const,
+        },
+      },
     });
 
     await testWithUnmount(

@@ -80,7 +80,7 @@ export const ViewRenderer = ({
   }, [componentFieldsRenderer, rootField, getSubFields]);
 
   return tableType !== null
-    ? renderTable(context, rootField.data, rootField.fields, tableType)
+    ? renderTable(context, rootField, tableType)
     : renderFields();
 };
 
@@ -106,7 +106,7 @@ const getTypeName = (
  *
  * This also sorts the fields by the index value.
  */
-const getSubFields = (
+export const getSubFields = (
   context: FabrixContextType,
   rootValue: Value | undefined,
   fields: ViewFields,
@@ -128,7 +128,7 @@ const tableModes = {
   relay: "edges",
 } as const;
 type TableMode = keyof typeof tableModes;
-const getTableType = (fields: ViewFields) => {
+export const getTableType = (fields: ViewFields) => {
   const modeKeyFields = Object.values(tableModes) as string[];
   const keyField = fields.find((f) =>
     modeKeyFields.includes(f.field.getName()),
@@ -138,6 +138,7 @@ const getTableType = (fields: ViewFields) => {
   }
   return keyField.field.getName() == "collection" ? "standard" : "relay";
 };
+
 const getTableValues = (
   rootValue: Value,
   mode: TableMode,
@@ -153,18 +154,23 @@ const getTableValues = (
   }
 };
 
+type RootField = {
+  name: string;
+  data: Value | undefined;
+  fields: ViewFields;
+};
 const renderTable = (
   context: FabrixContextType,
-  rootValue: Value | undefined,
-  fields: ViewFields,
+  rootField: RootField,
   tableMode: TableMode,
 ) => {
+  const { name, data, fields } = rootField;
+  const rootValue = data;
   if (!rootValue) {
     return;
   }
 
   const values = getTableValues(rootValue, tableMode);
-
   const renderTableContent = () => {
     const subFields = getSubFields(
       context,
@@ -172,75 +178,88 @@ const renderTable = (
       fields,
       tableMode == "standard" ? "collection" : "edges.node",
     );
-    const headers = subFields.flatMap((subField) => {
-      if (subField.value.config.hidden) {
-        return [];
-      }
 
-      // TODO: fallback to default table cell component
-      const component = subField.value.config.componentType?.name
-        ? context.componentRegistry.getCustom(
-            subField.value.config.componentType.name,
-            "tableCell",
-          )
-        : null;
-
-      const userProps = subField.value.config.componentType?.props?.reduce(
-        (acc, prop) => {
-          return {
-            ...acc,
-            [prop.name]: prop.value,
-          };
-        },
-        {},
-      );
-
-      const key = subField.value.field.getName();
-      const cellRenderer = component
-        ? (rowValue: Record<string, unknown>) => {
-            return createElement(component, {
-              key,
-              name: key,
-              type: null,
-              value: rowValue,
-              attributes: {
-                className: "",
-                label: subField.label,
-              },
-              userProps,
-            });
-          }
-        : null;
-
-      return {
-        label: subField.label,
-        key: subField.value.field.getName(),
-        type: subField.type,
-        render: cellRenderer,
-      };
-    });
-
-    const tableComponent = context.componentRegistry.components.default?.table;
+    const tableComponent =
+      context.componentRegistry.getDefaultComponentByType("table");
     if (!tableComponent) {
       return;
     }
 
     return createElement(tableComponent, {
-      headers,
+      name,
+      headers: buildHeaders(context, subFields),
       values,
+      customProps: {},
     });
   };
 
   return <div className={"fabrix table"}>{renderTableContent()}</div>;
 };
 
+export const buildHeaders = (
+  context: FabrixContextType,
+  subFields: SubFields,
+) =>
+  subFields.flatMap((subField) => {
+    if (subField.value.config.hidden) {
+      return [];
+    }
+
+    const component =
+      context.componentRegistry.getCustomComponentByNameWithFallback(
+        subField.value.config.componentType?.name,
+        "tableCell",
+      );
+
+    const userProps = subField.value.config.componentType?.props?.reduce(
+      (acc, prop) => {
+        return {
+          ...acc,
+          [prop.name]: prop.value,
+        };
+      },
+      {},
+    );
+
+    const key = subField.value.field.getName();
+    const cellRenderer = component
+      ? (rowValue: Record<string, unknown>) => {
+          return createElement(component, {
+            key,
+            name: key,
+            path: subField.value.field.value,
+            type: subField.type,
+            value: rowValue,
+            subFields: subFields.map((subField) => ({
+              key: subField.value.field.getName(),
+              label: subField.label,
+              type: subField.type,
+            })),
+            attributes: {
+              className: "",
+              label: subField.label,
+            },
+            userProps,
+          });
+        }
+      : null;
+
+    return {
+      label: subField.label,
+      key: subField.value.field.getName(),
+      type: subField.type,
+      render: cellRenderer,
+    };
+  });
+
 export type SubField = ReturnType<typeof getSubFields>[number];
+export type SubFields = Array<SubField>;
 
 type RenderFieldProps = {
   rootField: CommonFabrixComponentRendererProps<ViewFields>["rootField"];
   indexKey: string;
   field: ViewField;
-  subFields: Array<SubField>;
+  subFields: SubFields;
   extraClassName?: string;
 };
 const renderField = ({
@@ -260,12 +279,11 @@ const renderField = ({
 
   assertObjectValue(rootField.data);
 
-  const component = field.config.componentType?.name
-    ? context.componentRegistry.getCustom(
-        field.config.componentType.name,
-        "field",
-      )
-    : context.componentRegistry.components.default?.field;
+  const component =
+    context.componentRegistry.getCustomComponentByNameWithFallback(
+      field.config.componentType?.name,
+      "field",
+    );
   if (!component) {
     return;
   }
