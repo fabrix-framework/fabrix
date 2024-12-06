@@ -7,7 +7,7 @@ import {
   getOperation,
   useFieldConfigs,
 } from "@renderer";
-import { FieldsRenderer } from "@renderers/custom/fields";
+import { TableRenderer } from "@renderers/custom/table";
 import { useCallback } from "react";
 
 export type ComponentRendererProps<
@@ -32,12 +32,12 @@ export const FabrixCustomComponent = (props: FabrixCustomComponentProps) => {
     data: FabrixComponentData,
   ) => {
     switch (componentEntry.type) {
-      case "fields": {
+      case "table": {
         ensureFieldType(fieldConfig, "view");
         return (
-          <FieldsRenderer
+          <TableRenderer
             {...props}
-            key={`fields-${fieldConfig.name}`}
+            key={`table-${fieldConfig.name}`}
             fieldConfig={fieldConfig}
             data={data}
             component={{
@@ -49,7 +49,7 @@ export const FabrixCustomComponent = (props: FabrixCustomComponentProps) => {
         );
       }
       default: {
-        return null;
+        throw new Error(`Unsupported component type: ${componentEntry.type}`);
       }
     }
   };
