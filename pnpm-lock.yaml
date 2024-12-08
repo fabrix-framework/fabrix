@@ -332,8 +332,8 @@ importers:
   shared/eslint:
     dependencies:
       '@eslint/compat':
-        specifier: ^1.1.1
-        version: 1.2.0(eslint@9.12.0)
+        specifier: ^1.2.4
+        version: 1.2.4(eslint@9.12.0)
       eslint:
         specifier: ^9
         version: 9.12.0
@@ -1106,8 +1106,8 @@ packages:
     resolution: {integrity: sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
-  '@eslint/compat@1.2.0':
-    resolution: {integrity: sha512-CkPWddN7J9JPrQedEr2X7AjK9y1jaMJtxZ4A/+jTMFA2+n5BWhcKHW/EbJyARqg2zzQfgtWUtVmG3hrG6+nGpg==}
+  '@eslint/compat@1.2.4':
+    resolution: {integrity: sha512-S8ZdQj/N69YAtuqFt7653jwcvuUj131+6qGLUyDqfDg1OIoBQ66OCuXC473YQfO2AaxITTutiRQiDwoo7ZLYyg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^9.10.0
@@ -4622,7 +4622,7 @@ snapshots:
 
   '@eslint-community/regexpp@4.12.1': {}
 
-  '@eslint/compat@1.2.0(eslint@9.12.0)':
+  '@eslint/compat@1.2.4(eslint@9.12.0)':
     optionalDependencies:
       eslint: 9.12.0
 
