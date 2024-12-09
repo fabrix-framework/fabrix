@@ -116,6 +116,8 @@ describe("getFabrixComponent", () => {
         `}
       />,
       async () => {
+        expect(await screen.findByText("Custom Table")).toBeInTheDocument();
+
         const table = await screen.findByRole("table");
         expect(table).toBeInTheDocument();
 
