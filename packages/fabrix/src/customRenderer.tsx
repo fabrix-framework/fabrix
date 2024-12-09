@@ -1,20 +1,22 @@
-import { FabrixComponentData } from "@fetcher";
+import { Value } from "@fetcher";
 import { CompositeComponentEntries } from "@registry";
 import {
+  FabrixComponentChildrenProps,
   FabrixComponentProps,
+  FabrixGetOperationFn,
   FieldConfig,
-  FieldConfigs,
+  getComponentFn,
   getOperation,
   useFieldConfigs,
 } from "@renderer";
 import { CustomComponentTableRenderer } from "@renderers/custom/table";
-import { useCallback } from "react";
+import { ReactNode, useCallback } from "react";
 
 export type ComponentRendererProps<
-  P extends CompositeComponentEntries = CompositeComponentEntries,
+  C extends CompositeComponentEntries = CompositeComponentEntries,
 > = {
   name: string;
-  entry: P;
+  entry: C;
   customProps?: unknown;
 };
 
@@ -22,67 +24,76 @@ export type FabrixCustomComponentProps = FabrixComponentProps & {
   component: ComponentRendererProps;
 };
 
-export const FabrixCustomComponent = (props: FabrixCustomComponentProps) => {
+export const FabrixCustomComponent = (
+  props: FabrixCustomComponentProps & {
+    children?: (props: FabrixComponentChildrenProps) => ReactNode;
+  },
+) => {
   const { query } = props;
-  const componentEntry = props.component.entry;
   const { fieldConfigs } = useFieldConfigs(query);
+  const getComponent = getComponentFn(
+    props,
+    (fieldConfig: FieldConfig, data: Value) => {
+      const componentEntry = props.component.entry;
 
-  const renderComponent = (
-    fieldConfig: FieldConfig,
-    data: FabrixComponentData,
-  ) => {
-    switch (componentEntry.type) {
-      case "table": {
-        ensureFieldType(fieldConfig, "view");
-        return (
-          <CustomComponentTableRenderer
-            {...props}
-            key={`table-${fieldConfig.name}`}
-            fieldConfig={fieldConfig}
-            data={data}
-            component={{
-              name: props.component.name,
-              entry: componentEntry,
-              customProps: props.component.customProps,
-            }}
-          />
-        );
+      switch (componentEntry.type) {
+        case "table": {
+          ensureFieldType(fieldConfig, "view");
+          return (
+            <CustomComponentTableRenderer
+              {...props}
+              key={`table-${fieldConfig.name}`}
+              fieldConfig={fieldConfig}
+              data={data}
+              component={{
+                name: props.component.name,
+                entry: componentEntry,
+                customProps: props.component.customProps,
+              }}
+            />
+          );
+        }
+        default: {
+          throw new Error(`Unsupported component type: ${componentEntry.type}`);
+        }
       }
-      default: {
-        throw new Error(`Unsupported component type: ${componentEntry.type}`);
-      }
-    }
-  };
-
-  const getAppliedOperation = useCallback(
-    (index: number) => {
-      return getOperation(
-        {
-          // NOTE: FabrixCustomComponent does not support children renderer (renederer: undefined)
-          //
-          indexOrName: index,
-          fieldConfigs,
-          variables: undefined,
-          renderer: undefined,
-        },
-        (fieldConfig: FieldConfigs, data: FabrixComponentData) => {
-          // Implemenation for `getComponent` function caller
-          return (name: string) => {
-            const field = fieldConfig.fields.find((f) => f.name === name);
-            if (!field) {
-              throw new Error(`No root field found for name: ${name}`);
-            }
-
-            return renderComponent(field, data);
-          };
-        },
-      );
     },
-    [fieldConfigs],
   );
 
-  const renderContents = () =>
-    fieldConfigs.map((_, i) => getAppliedOperation(i));
+  const getAppliedOperation: FabrixComponentChildrenProps["getOperation"] =
+    useCallback(
+      (indexOrName, renderer) => {
+        return getOperation(
+          {
+            indexOrName,
+            renderer: renderer as Parameters<FabrixGetOperationFn>[1],
+            variables: props.variables,
+            fieldConfigs,
+          },
+          getComponent,
+        );
+      },
+      [fieldConfigs, props.variables],
+    );
+
+  const renderContents = () => {
+    if (props.children) {
+      return props.children({
+        getOperation: getAppliedOperation,
+        getComponent: (
+          operationIndexOrName,
+          rootFieldName,
+          extraProps,
+          fieldsRenderer,
+        ) =>
+          getAppliedOperation(operationIndexOrName, ({ getComponent }) =>
+            getComponent(rootFieldName, extraProps, fieldsRenderer),
+          ),
+      });
+    }
+
+    return fieldConfigs.map((_, i) => getAppliedOperation(i));
+  };
 
   return <div className="fabrix wrapper">{renderContents()}</div>;
 };
