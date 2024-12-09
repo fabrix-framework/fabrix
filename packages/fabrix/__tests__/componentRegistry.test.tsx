@@ -1,9 +1,9 @@
 import { ComponentRegistry, TableComponentEntry } from "@registry";
 import { it, describe, expect, test } from "vitest";
 import { screen, within } from "@testing-library/react";
-import { testWithUnmount } from "./supports/render";
 import { ReactNode } from "react";
 import { gql } from "urql";
+import { testWithUnmount } from "./supports/render";
 
 const components = new ComponentRegistry({
   custom: {
