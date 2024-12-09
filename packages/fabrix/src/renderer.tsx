@@ -390,13 +390,6 @@ export const getComponentFn =
     );
   };
 
-type GetOperationProps = {
-  indexOrName: string | number;
-  renderer: Parameters<FabrixGetOperationFn>[1];
-  variables: Record<string, unknown> | undefined;
-  fieldConfigs: FieldConfigs[];
-};
-
 type GetComponentFn = (
   op: FieldConfigs,
   data: FabrixComponentData,
