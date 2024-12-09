@@ -356,7 +356,7 @@ export const getComponentRendererFn = (
   };
 };
 
-export type RendererFn = (
+type RendererFn = (
   field: FieldConfig,
   data: Value,
   context: FabrixContextType,
