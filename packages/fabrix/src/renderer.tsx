@@ -312,41 +312,25 @@ export const getComponentRendererFn = (
   getComponent: ReturnType<typeof getComponentFn>,
 ) => {
   const { fieldConfigs } = useFieldConfigs(props.query);
-  const getOperation = useCallback(
-    (props: GetOperationProps, getComponentFn: GetComponentFn) => {
-      const { indexOrName, renderer, variables, fieldConfigs } = props;
-      const fieldConfig =
-        typeof indexOrName === "number"
-          ? fieldConfigs[indexOrName]
-          : fieldConfigs.find(({ name }) => name == indexOrName);
-      if (!fieldConfig) {
-        throw new Error(`No operation found for indexOrName: ${indexOrName}`);
-      }
-
-      return (
-        <OperationRenderer
-          key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
-          operation={fieldConfig}
-          variables={variables}
-          getComponentFn={getComponentFn}
-          renderer={renderer}
-        />
-      );
-    },
-    [],
-  );
-
-  const getAppliedOperation: FabrixComponentChildrenProps["getOperation"] =
+  const getOperation: FabrixComponentChildrenProps["getOperation"] =
     useCallback(
       (indexOrName, renderer) => {
-        return getOperation(
-          {
-            indexOrName,
-            renderer: renderer as Parameters<FabrixGetOperationFn>[1],
-            variables: props.variables,
-            fieldConfigs,
-          },
-          getComponent,
+        const fieldConfig =
+          typeof indexOrName === "number"
+            ? fieldConfigs[indexOrName]
+            : fieldConfigs.find(({ name }) => name == indexOrName);
+        if (!fieldConfig) {
+          throw new Error(`No operation found for indexOrName: ${indexOrName}`);
+        }
+
+        return (
+          <OperationRenderer
+            key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
+            operation={fieldConfig}
+            variables={props.variables}
+            getComponentFn={getComponent}
+            renderer={renderer as Parameters<FabrixGetOperationFn>[1]}
+          />
         );
       },
       [fieldConfigs, props.variables],
@@ -355,20 +339,20 @@ export const getComponentRendererFn = (
   return () => {
     if (props.children) {
       return props.children({
-        getOperation: getAppliedOperation,
+        getOperation,
         getComponent: (
           operationIndexOrName,
           rootFieldName,
           extraProps,
           fieldsRenderer,
         ) =>
-          getAppliedOperation(operationIndexOrName, ({ getComponent }) =>
+          getOperation(operationIndexOrName, ({ getComponent }) =>
             getComponent(rootFieldName, extraProps, fieldsRenderer),
           ),
       });
     }
 
-    return fieldConfigs.map((_, i) => getAppliedOperation(i));
+    return fieldConfigs.map((_, i) => getOperation(i));
   };
 };
 
