@@ -22,7 +22,8 @@ export type KeyOf<T> =
 /**
  * Merge two objects.
  *
- * If the key exists in both objects, the value from the second object will be used.  */
+ * If the key exists in both objects, the value from the second object will be used.
+ */
 export type Merge<
   F extends Record<string, unknown> | undefined,
   S extends Record<string, unknown> | undefined,
