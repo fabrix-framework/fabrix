@@ -7,7 +7,7 @@ import {
   getOperation,
   useFieldConfigs,
 } from "@renderer";
-import { TableRenderer } from "@renderers/custom/table";
+import { CustomComponentTableRenderer } from "@renderers/custom/table";
 import { useCallback } from "react";
 
 export type ComponentRendererProps<
@@ -35,7 +35,7 @@ export const FabrixCustomComponent = (props: FabrixCustomComponentProps) => {
       case "table": {
         ensureFieldType(fieldConfig, "view");
         return (
-          <TableRenderer
+          <CustomComponentTableRenderer
             {...props}
             key={`table-${fieldConfig.name}`}
             fieldConfig={fieldConfig}

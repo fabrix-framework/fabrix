@@ -1,6 +1,6 @@
 import { createElement, useCallback, useContext, useMemo } from "react";
 import { FabrixContext, FabrixContextType } from "@context";
-import { Value } from "../fetcher";
+import { Value } from "@fetcher";
 import {
   assertObjectValue,
   buildClassName,
@@ -9,6 +9,7 @@ import {
   getFieldConfigByKey,
   resolveFieldTypesFromTypename,
 } from "./shared";
+import { getTableMode, renderTable } from "./table";
 
 export type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
 type ViewField = ViewFields[number];
@@ -20,7 +21,7 @@ export const ViewRenderer = ({
   className,
 }: CommonFabrixComponentRendererProps<ViewFields>) => {
   // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
-  const tableType = useMemo(() => getTableType(rootField.fields), [rootField]);
+  const tableType = useMemo(() => getTableMode(rootField.fields), [rootField]);
 
   const renderFields = useCallback(() => {
     if (componentFieldsRenderer) {
