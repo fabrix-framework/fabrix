@@ -219,11 +219,7 @@ export class ComponentRegistry<
 
     return (props: {
       query: FabrixComponentProps["query"];
-      customProps: CP["component"] extends ComponentType<
-        infer C extends { customProps: infer P }
-      >
-        ? P
-        : never;
+      customProps: CP extends CompositeComponentEntries<infer P> ? P : never;
     }) => (
       <FabrixCustomComponent
         query={props.query}
