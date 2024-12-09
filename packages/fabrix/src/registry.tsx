@@ -1,4 +1,4 @@
-import { ComponentType } from "react";
+import { ComponentType, ReactNode } from "react";
 import { FabrixComponentProps } from "@renderer";
 import { ViewFieldSchema } from "@directive/schema";
 import { FieldType } from "@renderers/shared";
@@ -237,18 +237,21 @@ export class ComponentRegistry<
       throw new Error(`Component ${name} not found`);
     }
 
-    return (props: {
-      query: FabrixComponentProps["query"];
-      customProps: CP extends CompositeComponentEntries<infer P> ? P : never;
-    }) => (
+    return (
+      props: FabrixComponentProps & {
+        customProps: CP extends CompositeComponentEntries<infer P> ? P : never;
+      },
+    ) => (
       <FabrixCustomComponent
-        query={props.query}
+        {...props}
         component={{
           name,
           entry: componentEntry,
           customProps: props.customProps,
         }}
-      />
+      >
+        {props.children}
+      </FabrixCustomComponent>
     );
   }
 

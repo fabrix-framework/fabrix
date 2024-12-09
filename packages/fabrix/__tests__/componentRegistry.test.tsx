@@ -124,6 +124,42 @@ describe("getFabrixComponent", () => {
       },
     );
   });
+
+  test("getCustom (customTable) with children", async () => {
+    const CustomTable = registry.getFabrixComponent("customTable");
+
+    await testWithUnmount(
+      <CustomTable
+        customProps={{
+          title: "Custom Table",
+        }}
+        query={gql`
+          query getUsers {
+            users {
+              collection {
+                id
+                name
+                email
+              }
+            }
+          }
+        `}
+      >
+        {({ getComponent }) => {
+          return (
+            <div data-testid="component-wrapper">
+              {getComponent("getUsers", "users")}
+            </div>
+          );
+        }}
+      </CustomTable>,
+      async () => {
+        const wrapper = await screen.findByTestId("component-wrapper");
+        const table = await within(wrapper).findByRole("table");
+        expect(table).toBeInTheDocument();
+      },
+    );
+  });
 });
 
 describe("getDefaultComponentByType", () => {
