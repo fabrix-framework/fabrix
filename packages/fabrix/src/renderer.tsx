@@ -312,6 +312,30 @@ export const getComponentRendererFn = (
   getComponent: ReturnType<typeof getComponentFn>,
 ) => {
   const { fieldConfigs } = useFieldConfigs(props.query);
+  const getOperation = useCallback(
+    (props: GetOperationProps, getComponentFn: GetComponentFn) => {
+      const { indexOrName, renderer, variables, fieldConfigs } = props;
+      const fieldConfig =
+        typeof indexOrName === "number"
+          ? fieldConfigs[indexOrName]
+          : fieldConfigs.find(({ name }) => name == indexOrName);
+      if (!fieldConfig) {
+        throw new Error(`No operation found for indexOrName: ${indexOrName}`);
+      }
+
+      return (
+        <OperationRenderer
+          key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
+          operation={fieldConfig}
+          variables={variables}
+          getComponentFn={getComponentFn}
+          renderer={renderer}
+        />
+      );
+    },
+    [],
+  );
+
   const getAppliedOperation: FabrixComponentChildrenProps["getOperation"] =
     useCallback(
       (indexOrName, renderer) => {
@@ -395,31 +419,7 @@ type GetComponentFn = (
   context: FabrixContextType,
 ) => FabrixGetComponentFn;
 
-export const getOperation = (
-  props: GetOperationProps,
-  getComponentFn: GetComponentFn,
-) => {
-  const { indexOrName, renderer, variables, fieldConfigs } = props;
-  const fieldConfig =
-    typeof indexOrName === "number"
-      ? fieldConfigs[indexOrName]
-      : fieldConfigs.find(({ name }) => name == indexOrName);
-  if (!fieldConfig) {
-    throw new Error(`No operation found for indexOrName: ${indexOrName}`);
-  }
-
-  return (
-    <OperationRenderer
-      key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
-      operation={fieldConfig}
-      variables={variables}
-      getComponentFn={getComponentFn}
-      renderer={renderer}
-    />
-  );
-};
-
-export type RendererCommonProps = {
+type RendererCommonProps = {
   key: string;
   operation: FieldConfigs;
   variables: Record<string, unknown> | undefined;
