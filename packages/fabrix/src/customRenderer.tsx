@@ -58,7 +58,8 @@ export const FabrixCustomComponent = (props: FabrixCustomComponentProps) => {
     (index: number) => {
       return getOperation(
         {
-          // NOTE: FabrixCustomComponent does not support custom renderer
+          // NOTE: FabrixCustomComponent does not support children renderer (renederer: undefined)
+          //
           indexOrName: index,
           variables: {},
           fieldConfigs,
