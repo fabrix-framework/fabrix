@@ -168,6 +168,18 @@ export type ComponentRegistryProps<
 
 /**
  * Component registry is a class that holds the custom components and default components.
+ *
+ * ## Categories of components
+ *
+ * Component registry expects users to provide two categories of components: *custom* and *default*.
+ * * *Custom components* are the components that users can define and use in their GraphQL query, or get the component through `getFabrixComponent` method.
+ * * *Default components* are used when no component is specified or as fallback for the case when the custom component specified is not found.
+ *
+ * ## Custom components
+ *
+ * Custom components are divided into two categories: *composite* and *unit*.
+ * * *Composite components* are the components that can have subfields. They are used to render the fields in the query.
+ * * *Unit components* are the atomic components. Composite components can use unit components to render the fields, but unit components cannot have subfields.
  */
 export class ComponentRegistry<
   P extends ComponentRegistryProps<
@@ -177,6 +189,9 @@ export class ComponentRegistry<
 > {
   constructor(private readonly props: P) {}
 
+  /**
+   * Merge the component registry with another component registry.
+   */
   merge<
     MP extends ComponentRegistryProps<CompositeComponentMap, UnitComponentMap>,
   >(registry: ComponentRegistry<MP>) {
@@ -201,8 +216,13 @@ export class ComponentRegistry<
   /**
    * Get the custom component integrated with `FabrixComponent`.
    *
-   * `getFabrixComponent` only accepts the name of the component as the parameter.
-   * The reason is that only composite components are supposed to accept GraphQL query to build its presentation.
+   * This method creates a React component that wraps `FabrixComponent` with the custom component.
+   *
+   * The component takes a following props:
+   * * `query`: The GraphQL query string.
+   * * `customProps`: The custom props that the custom component requires.
+   *
+   * @param name The name of the custom composite component.
    */
   getFabrixComponent<
     K extends P["custom"] extends { composite: CompositeComponentMap }
@@ -236,6 +256,9 @@ export class ComponentRegistry<
    * Get the component by name.
    *
    * If the component is not found, it will return the default component.
+   *
+   * @param name The name of the component.
+   * @param type The type of the component.
    */
   getCustomComponentByNameWithFallback<T extends ComponentEntries["type"]>(
     name: string | null | undefined,
