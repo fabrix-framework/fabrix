@@ -61,8 +61,8 @@ export const FabrixCustomComponent = (props: FabrixCustomComponentProps) => {
           // NOTE: FabrixCustomComponent does not support children renderer (renederer: undefined)
           //
           indexOrName: index,
-          variables: {},
           fieldConfigs,
+          variables: undefined,
           renderer: undefined,
         },
         (fieldConfig: FieldConfigs, data: FabrixComponentData) => {

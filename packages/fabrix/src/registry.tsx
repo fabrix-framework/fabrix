@@ -219,7 +219,11 @@ export class ComponentRegistry<
 
     return (props: {
       query: FabrixComponentProps["query"];
-      customProps: CP["component"] extends ComponentType<infer P> ? P : never;
+      customProps: CP["component"] extends ComponentType<
+        infer C extends { customProps: infer P }
+      >
+        ? P
+        : never;
     }) => (
       <FabrixCustomComponent
         query={props.query}
@@ -241,17 +245,17 @@ export class ComponentRegistry<
     name: string | null | undefined,
     type: T,
   ) {
-    const components: Record<string, ComponentEntries> = {
+    const customComponents: Record<string, ComponentEntries> = {
       ...this.props.custom?.composite,
       ...this.props.custom?.unit,
     };
 
-    const component = components[name ?? ""];
-    if (!component) {
+    const cc = customComponents[name ?? ""];
+    if (!cc) {
       return this.getDefaultComponentByType(type);
     }
 
-    return component as unknown as ComponentTypeByName<T>;
+    return cc.component as unknown as ComponentTypeByName<T>;
   }
 
   /**
