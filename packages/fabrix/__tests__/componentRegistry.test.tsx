@@ -40,7 +40,7 @@ describe("merge", () => {
   const mergedComponents = components.merge(extraComponents);
 
   it("should override custom components by merging two registries", async () => {
-    const Component = mergedComponents.getCustomComponentByNameWithFallback(
+    const Component = mergedComponents.getCustomComponent(
       "myCustomTable",
       "table",
     );
@@ -182,10 +182,7 @@ describe("getDefaultComponentByType", () => {
 
 describe("getCustomComponentByNameWithFallback", () => {
   test("should render the component by name", async () => {
-    const Component = components.getCustomComponentByNameWithFallback(
-      "myCustomTable",
-      "table",
-    );
+    const Component = components.getCustomComponent("myCustomTable", "table");
 
     await testWithUnmount(
       <Component {...emptyComponentProps} name="" />,
@@ -199,7 +196,7 @@ describe("getCustomComponentByNameWithFallback", () => {
   });
 
   test("should render the fallback component", async () => {
-    const Component = components.getCustomComponentByNameWithFallback(
+    const Component = components.getCustomComponent(
       "unregistered-table",
       "table",
     );

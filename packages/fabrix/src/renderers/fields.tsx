@@ -157,11 +157,10 @@ const renderField = ({
 
   assertObjectValue(rootField.data);
 
-  const component =
-    context.componentRegistry.getCustomComponentByNameWithFallback(
-      field.config.componentType?.name,
-      "field",
-    );
+  const component = context.componentRegistry.getCustomComponent(
+    field.config.componentType?.name,
+    "field",
+  );
   if (!component) {
     return;
   }

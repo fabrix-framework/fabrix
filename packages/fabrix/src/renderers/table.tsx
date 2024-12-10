@@ -96,11 +96,10 @@ export const buildHeaders = (
       return [];
     }
 
-    const component =
-      context.componentRegistry.getCustomComponentByNameWithFallback(
-        subField.value.config.componentType?.name,
-        "tableCell",
-      );
+    const component = context.componentRegistry.getCustomComponent(
+      subField.value.config.componentType?.name,
+      "tableCell",
+    );
 
     const userProps = subField.value.config.componentType?.props?.reduce(
       (acc, prop) => {

@@ -263,7 +263,7 @@ export class ComponentRegistry<
    * @param name The name of the component.
    * @param type The type of the component.
    */
-  getCustomComponentByNameWithFallback<T extends ComponentEntries["type"]>(
+  getCustomComponent<T extends ComponentEntries["type"]>(
     name: string | null | undefined,
     type: T,
   ) {
