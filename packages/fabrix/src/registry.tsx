@@ -263,10 +263,12 @@ export class ComponentRegistry<
    * @param name The name of the component.
    * @param type The type of the component.
    */
-  getCustomComponent<T extends ComponentEntries["type"]>(
-    name: string | null | undefined,
-    type: T,
-  ) {
+  getCustomComponent<
+    T extends ComponentEntries["type"],
+    N extends P["custom"] extends { composite: CompositeComponentMap }
+      ? KeyOf<Extract<P["custom"]["composite"], { [key: string]: { type: T } }>>
+      : string | null | undefined,
+  >(name: N, type: T) {
     const customComponents: Record<string, ComponentEntries> = {
       ...this.props.custom?.composite,
       ...this.props.custom?.unit,

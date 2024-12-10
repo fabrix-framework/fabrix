@@ -197,6 +197,7 @@ describe("getCustomComponentByNameWithFallback", () => {
 
   test("should render the fallback component", async () => {
     const Component = components.getCustomComponent(
+      // @ts-expect-error TS2345
       "unregistered-table",
       "table",
     );
