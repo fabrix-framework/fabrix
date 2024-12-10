@@ -80,7 +80,7 @@ export type FormComponentProps<P = unknown> = CustomProps<P> & {
 };
 
 export type TableComponentHeader = Field & {
-  render: ((rowValue: Record<string, unknown>) => React.ReactElement) | null;
+  render: ((rowValue: Record<string, unknown>) => React.ReactNode) | null;
 };
 
 /**
