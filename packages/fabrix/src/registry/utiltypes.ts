@@ -66,17 +66,12 @@ export type MergeCustomComponentMap<
  */
 export type ComponentTypeByName<T extends ComponentEntries["type"]> =
   ComponentType<
-    T extends "field"
-      ? FieldComponentProps
-      : T extends "fields"
-        ? FieldsComponentProps
-        : T extends "formField"
-          ? FormFieldComponentProps
-          : T extends "form"
-            ? FormComponentProps
-            : T extends "tableCell"
-              ? TableCellComponentProps
-              : T extends "table"
-                ? TableComponentProps
-                : never
+    {
+      field: FieldComponentProps;
+      fields: FieldsComponentProps;
+      formField: FormFieldComponentProps;
+      form: FormComponentProps;
+      tableCell: TableCellComponentProps;
+      table: TableComponentProps;
+    }[T]
   >;
