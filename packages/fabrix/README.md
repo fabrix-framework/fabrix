@@ -190,12 +190,14 @@ import MyCustomForm from "./components/MyCustomForm";
 
 const yourCustomRegistry = new ComponentRegistry({
   default: defaultComponents,
-  custom: [
-    {
-      type: "field",
-      component: MyCustomField,
-    },
-  ],
+  custom: {
+    unit: {
+      myCustomField: {
+        type: "field",
+        component: MyCustomField,
+      },
+    }
+  },
 });
 
 export const Providers = (props: React.PropsWithChildren) =>
@@ -215,8 +217,8 @@ The directives allow you to define how each field in a query or mutation should 
 ```graphql
 query getCharacter($id: ID!) {
   getCharacter(id: $id) @fabrixView(input: [
-    { field: "name", config: { label: "Name", componentType: { name: "MyCustomField" } } }
-    { field: "email", config: { label: "Email", componentType: { name: "MyCustomField" } } }
+    { field: "name", config: { label: "Name", componentType: { name: "myCustomField" } } }
+    { field: "email", config: { label: "Email", componentType: { name: "myCustomField" } } }
   ]) {
     name
     email

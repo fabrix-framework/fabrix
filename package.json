@@ -6,7 +6,8 @@
   },
   "scripts": {
     "dev": "turbo dev",
-    "build": "turbo build"
+    "build": "turbo build",
+    "type-check": "turbo type-check"
   },
   "packageManager": "pnpm@9.9.0",
   "devDependencies": {

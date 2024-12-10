@@ -7,7 +7,6 @@ import {
 import { useCallback, useState } from "react";
 
 export const IDActionCell = {
-  name: "IDActionCell",
   type: "tableCell",
   component: (props: TableCellComponentProps) => {
     const client = useFabrixClient();

@@ -1,5 +1,4 @@
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
 import {
   ComponentRegistry,
   FabrixProvider,
@@ -11,9 +10,14 @@ import { IDActionCell } from "./components/IDActionCell.tsx";
 import App from "./App.tsx";
 import "./index.css";
 import "./columns.css";
+import { createRoot } from "react-dom/client";
 
 const TodoAppComponents = new ComponentRegistry({
-  custom: [IDActionCell],
+  custom: {
+    unit: {
+      IDActionCell,
+    },
+  },
 });
 
 createRoot(document.getElementById("root")!).render(
