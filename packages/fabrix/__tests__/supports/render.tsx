@@ -11,7 +11,15 @@ export const testWithUnmount = async (
   ui: React.ReactNode,
   test: () => Promise<void> | void,
   options?: {
-    components: ComponentRegistry;
+    /**
+     * Custom components to be used in the test.
+     */
+    components?: ComponentRegistry;
+
+    /**
+     * If true, the loader will not be waited for removal.
+     */
+    noLoader?: boolean;
   },
 ) => {
   const components = options?.components
@@ -29,7 +37,9 @@ export const testWithUnmount = async (
     ),
   });
 
-  await waitForElementToBeRemoved(() => screen.queryAllByRole("status"));
+  if (!options?.noLoader) {
+    await waitForElementToBeRemoved(() => screen.queryAllByRole("status"));
+  }
 
   try {
     await test();

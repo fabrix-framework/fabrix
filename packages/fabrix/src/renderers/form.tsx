@@ -70,12 +70,13 @@ export const FormRenderer = ({
     return <Loader />;
   }
 
-  const component = context.componentRegistry.components.default?.form;
+  const component = context.componentRegistry.getDefaultComponentByType("form");
   if (!component) {
     return;
   }
 
   return createElement(component, {
+    name: rootField.name,
     renderFields: () => {
       return <FormProvider {...formContext}>{renderFields()}</FormProvider>;
     },
@@ -87,6 +88,7 @@ export const FormRenderer = ({
     renderReset: (resetRenderer) =>
       resetRenderer({ reset: () => formContext.reset() }),
     className: `fabrix form col-row ${className ?? ""}`,
+    customProps: {},
   });
 };
 
@@ -102,12 +104,10 @@ const renderField = (props: {
     return;
   }
 
-  const component = fieldConfig.componentType?.name
-    ? context.componentRegistry.getCustom(
-        fieldConfig.componentType.name,
-        "formField",
-      )
-    : context.componentRegistry.components.default?.formField;
+  const component = context.componentRegistry.getCustomComponent(
+    fieldConfig.componentType?.name,
+    "formField",
+  );
   if (!component) {
     return;
   }

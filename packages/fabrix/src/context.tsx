@@ -10,7 +10,7 @@ import {
   OperationTypeNode,
 } from "graphql";
 import { createContext, useCallback, useContext } from "react";
-import { ComponentRegistry, emptyComponentRegistry } from "./registry";
+import { ComponentRegistry, emptyComponentRegistry } from "@registry";
 
 type SchemaSet = {
   serverSchema: GraphQLSchema;

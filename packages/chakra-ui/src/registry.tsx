@@ -13,11 +13,12 @@ export const defaultComponents = {
 
 export const ChakraUIRegistry = new ComponentRegistry({
   default: defaultComponents,
-  custom: [
-    {
-      type: "field",
-      name: "ImagePreview",
-      component: ImagePreview,
+  custom: {
+    unit: {
+      imagePreview: {
+        type: "field",
+        component: ImagePreview,
+      },
     },
-  ],
+  },
 });

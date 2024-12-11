@@ -102,14 +102,14 @@ const getFieldConfig = (
 export type FieldConfig = ReturnType<typeof getFieldConfig> & {
   document: DocumentNode;
 };
-type FieldConfigs = {
+export type FieldConfigs = {
   name: string;
   document: DocumentNode;
   type: OperationTypeNode;
   fields: FieldConfig[];
 };
 
-const useFieldConfigs = (query: DocumentNode | string) => {
+export const useFieldConfigs = (query: DocumentNode | string) => {
   const rootDocument = buildRootDocument(
     typeof query === "string" ? parse(query) : query,
   );
@@ -168,7 +168,7 @@ type FabrixComponentCommonProps = {
   contentClassName?: string;
 };
 
-type FabrixComponentProps = FabrixComponentCommonProps & {
+export type FabrixComponentProps = FabrixComponentCommonProps & {
   /**
    * The query to render.
    *
@@ -183,6 +183,8 @@ type FabrixComponentProps = FabrixComponentCommonProps & {
    * ```
    */
   query: DocumentNode | string;
+
+  children?: (props: FabrixComponentChildrenProps) => ReactNode;
 };
 
 type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
@@ -195,7 +197,8 @@ type FabrixGetComponentFn = (
   extraProps?: FabrixComponentChildrenExtraProps,
   fieldsRenderer?: FabrixComponentFieldsRenderer,
 ) => ReactNode;
-type FabrixGetOperationFn = <
+
+export type FabrixGetOperationFn = <
   T extends Record<string, unknown> = Record<string, unknown>,
 >(
   indexOrName: number | string,
@@ -205,7 +208,7 @@ type FabrixGetOperationFn = <
   }) => ReactNode,
 ) => ReactNode;
 
-type FabrixComponentChildrenProps = {
+export type FabrixComponentChildrenProps = {
   /**
    * Get the operation result by operation name or index
    *
@@ -223,6 +226,7 @@ type FabrixComponentChildrenProps = {
    * ```
    */
   getOperation: FabrixGetOperationFn;
+
   /**
    * Get the component by root field name
    *
@@ -264,71 +268,50 @@ type FabrixComponentChildrenProps = {
  * </FabrixComponent>
  * ```
  */
-export const FabrixComponent = (
-  props: FabrixComponentProps & {
-    children?: (props: FabrixComponentChildrenProps) => ReactNode;
-  },
-) => {
-  const { fieldConfigs } = useFieldConfigs(props.query);
-  const renderByField = useCallback(
-    (
-      field: FieldConfig,
-      data: Value,
-      context: FabrixContextType,
-      componentFieldsRenderer?: FabrixComponentFieldsRenderer,
-    ) => {
-      const commonProps = {
-        context,
-        rootField: {
-          name: field.name,
-          fields: field.configs.fields,
-          data,
-          type: resolveFieldTypesFromTypename(context, data),
-          document: field.document,
-          className: props.contentClassName,
-          componentFieldsRenderer,
-        },
-      };
-      switch (field.type) {
-        case "view":
-          return <ViewRenderer {...commonProps} />;
-        case "form": {
-          return <FormRenderer {...commonProps} />;
-        }
-        default:
-          return null;
-      }
-    },
-    [props.contentClassName, props.variables],
-  );
-
-  const getComponentFn = useCallback(
-    (
-      fieldConfig: FieldConfigs,
-      data: FabrixComponentData,
-      context: FabrixContextType,
-    ) =>
+export const FabrixComponent = (props: FabrixComponentProps) => {
+  const renderComponent = getComponentRendererFn(
+    props,
+    getComponentFn(
+      props,
       (
-        name: string,
-        extraProps?: FabrixComponentChildrenExtraProps,
+        field: FieldConfig,
+        data: Value,
+        context: FabrixContextType,
         componentFieldsRenderer?: FabrixComponentFieldsRenderer,
       ) => {
-        const field = fieldConfig.fields.find((f) => f.name === name);
-        if (!field) {
-          throw new Error(`No root field found for name:${name}`);
+        const commonProps = {
+          context,
+          rootField: {
+            name: field.name,
+            fields: field.configs.fields,
+            data,
+            type: resolveFieldTypesFromTypename(context, data),
+            document: field.document,
+            className: props.contentClassName,
+            componentFieldsRenderer,
+          },
+        };
+        switch (field.type) {
+          case "view":
+            return <ViewRenderer {...commonProps} />;
+          case "form": {
+            return <FormRenderer {...commonProps} />;
+          }
+          default:
+            return null;
         }
-        return (
-          <div
-            key={extraProps?.key}
-            className={`fabrix renderer container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
-          >
-            {renderByField(field, data[name], context, componentFieldsRenderer)}
-          </div>
-        );
       },
-    [fieldConfigs, renderByField, props.containerClassName],
+    ),
   );
 
+  return <div className="fabrix wrapper">{renderComponent()}</div>;
+};
+
+export const getComponentRendererFn = (
+  props: FabrixComponentProps,
+  getComponent: ReturnType<typeof getComponentFn>,
+) => {
+  const { fieldConfigs } = useFieldConfigs(props.query);
   const getOperation: FabrixComponentChildrenProps["getOperation"] =
     useCallback(
       (indexOrName, renderer) => {
@@ -337,7 +320,7 @@ export const FabrixComponent = (
             ? fieldConfigs[indexOrName]
             : fieldConfigs.find(({ name }) => name == indexOrName);
         if (!fieldConfig) {
-          throw new Error(`No operation found for indexOrName:${indexOrName}`);
+          throw new Error(`No operation found for indexOrName: ${indexOrName}`);
         }
 
         return (
@@ -345,15 +328,15 @@ export const FabrixComponent = (
             key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
             operation={fieldConfig}
             variables={props.variables}
-            getComponentFn={getComponentFn}
+            getComponentFn={getComponent}
             renderer={renderer as Parameters<FabrixGetOperationFn>[1]}
           />
         );
       },
-      [fieldConfigs, getComponentFn],
+      [fieldConfigs, props.variables],
     );
 
-  const renderContents = () => {
+  return () => {
     if (props.children) {
       return props.children({
         getOperation,
@@ -371,20 +354,54 @@ export const FabrixComponent = (
 
     return fieldConfigs.map((_, i) => getOperation(i));
   };
-
-  return <div className="fabrix wrapper">{renderContents()}</div>;
 };
 
-export type RendererCommonProps = {
+type RendererFn = (
+  field: FieldConfig,
+  data: Value,
+  context: FabrixContextType,
+  componentFieldsRenderer?: FabrixComponentFieldsRenderer,
+) => ReactNode;
+
+export const getComponentFn =
+  (props: FabrixComponentProps, rendererFn: RendererFn) =>
+  (
+    fieldConfig: FieldConfigs,
+    data: FabrixComponentData,
+    context: FabrixContextType,
+  ) =>
+  (
+    name: string,
+    extraProps?: FabrixComponentChildrenExtraProps,
+    componentFieldsRenderer?: FabrixComponentFieldsRenderer,
+  ) => {
+    const field = fieldConfig.fields.find((f) => f.name === name);
+    if (!field) {
+      throw new Error(`No root field found for name: ${name}`);
+    }
+
+    return (
+      <div
+        key={extraProps?.key}
+        className={`fabrix renderer container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
+      >
+        {rendererFn(field, data[name], context, componentFieldsRenderer)}
+      </div>
+    );
+  };
+
+type GetComponentFn = (
+  op: FieldConfigs,
+  data: FabrixComponentData,
+  context: FabrixContextType,
+) => FabrixGetComponentFn;
+
+type RendererCommonProps = {
   key: string;
   operation: FieldConfigs;
   variables: Record<string, unknown> | undefined;
   renderer?: Parameters<FabrixGetOperationFn>[1];
-  getComponentFn: (
-    op: FieldConfigs,
-    data: FabrixComponentData,
-    context: FabrixContextType,
-  ) => FabrixGetComponentFn;
+  getComponentFn: GetComponentFn;
   extraClassName?: string;
 };
 
