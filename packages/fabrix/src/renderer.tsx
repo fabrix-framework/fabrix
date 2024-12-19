@@ -1,14 +1,10 @@
 import { DirectiveNode, DocumentNode, OperationTypeNode, parse } from "graphql";
 import { ReactNode, useCallback, useContext, useMemo } from "react";
 import { findDirective, parseDirectiveArguments } from "@directive";
-import { ViewRenderer } from "@renderers/fields";
-import { FormRenderer } from "@renderers/form";
+import { DefaultViewRenderer } from "@renderers/fields";
+import { DefaultFormRenderer } from "@renderers/form";
 import { FabrixContext, FabrixContextType } from "@context";
-import {
-  FabrixComponentFieldsRenderer,
-  Loader,
-  resolveFieldTypesFromTypename,
-} from "@renderers/shared";
+import { FabrixComponentFieldsRenderer, Loader } from "@renderers/shared";
 import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
@@ -276,16 +272,13 @@ export const FabrixComponent = (props: FabrixComponentProps) => {
       (
         field: FieldConfig,
         data: Value,
-        context: FabrixContextType,
         componentFieldsRenderer?: FabrixComponentFieldsRenderer,
       ) => {
         const commonProps = {
-          context,
           rootField: {
             name: field.name,
             fields: field.configs.fields,
             data,
-            type: resolveFieldTypesFromTypename(context, data),
             document: field.document,
             className: props.contentClassName,
             componentFieldsRenderer,
@@ -293,9 +286,9 @@ export const FabrixComponent = (props: FabrixComponentProps) => {
         };
         switch (field.type) {
           case "view":
-            return <ViewRenderer {...commonProps} />;
+            return <DefaultViewRenderer {...commonProps} />;
           case "form": {
-            return <FormRenderer {...commonProps} />;
+            return <DefaultFormRenderer {...commonProps} />;
           }
           default:
             return null;
@@ -359,17 +352,12 @@ export const getComponentRendererFn = (
 type RendererFn = (
   field: FieldConfig,
   data: Value,
-  context: FabrixContextType,
   componentFieldsRenderer?: FabrixComponentFieldsRenderer,
 ) => ReactNode;
 
 export const getComponentFn =
   (props: FabrixComponentProps, rendererFn: RendererFn) =>
-  (
-    fieldConfig: FieldConfigs,
-    data: FabrixComponentData,
-    context: FabrixContextType,
-  ) =>
+  (fieldConfig: FieldConfigs, data: FabrixComponentData) =>
   (
     name: string,
     extraProps?: FabrixComponentChildrenExtraProps,
@@ -385,7 +373,7 @@ export const getComponentFn =
         key={extraProps?.key}
         className={`fabrix renderer container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
       >
-        {rendererFn(field, data[name], context, componentFieldsRenderer)}
+        {rendererFn(field, data[name], componentFieldsRenderer)}
       </div>
     );
   };
