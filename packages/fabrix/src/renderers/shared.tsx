@@ -52,12 +52,10 @@ export type RendererQuery = {
   documentResolver: DocumentResolver;
 };
 export type CommonFabrixComponentRendererProps<F> = {
-  context: FabrixContextType;
   rootField: {
     name: string;
     fields: F;
     data: Value;
-    type: Record<string, FieldType>;
     document: DocumentNode;
   };
   componentFieldsRenderer?: FabrixComponentFieldsRenderer;

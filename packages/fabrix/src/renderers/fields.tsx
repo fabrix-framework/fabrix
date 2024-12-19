@@ -14,15 +14,14 @@ import { getTableMode, renderTable } from "./table";
 export type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
 type ViewField = ViewFields[number];
 
-export const ViewRenderer = ({
-  context,
+export const DefaultViewRenderer = ({
   rootField,
   componentFieldsRenderer,
   className,
 }: CommonFabrixComponentRendererProps<ViewFields>) => {
   // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
   const tableType = useMemo(() => getTableMode(rootField.fields), [rootField]);
-
+  const context = useContext(FabrixContext);
   const renderFields = useCallback(() => {
     if (componentFieldsRenderer) {
       return componentFieldsRenderer({
@@ -152,8 +151,9 @@ const renderField = ({
     return;
   }
 
+  const type = resolveFieldTypesFromTypename(context, rootField.data);
   const fieldName = field.field.getName();
-  const fieldType = rootField.type?.[fieldName];
+  const fieldType = type?.[fieldName];
 
   assertObjectValue(rootField.data);
 
