@@ -4,11 +4,7 @@ import { findDirective, parseDirectiveArguments } from "@directive";
 import { DefaultViewRenderer } from "@renderers/fields";
 import { DefaultFormRenderer } from "@renderers/form";
 import { FabrixContext, FabrixContextType } from "@context";
-import {
-  FabrixComponentFieldsRenderer,
-  Loader,
-  resolveFieldTypesFromTypename,
-} from "@renderers/shared";
+import { FabrixComponentFieldsRenderer, Loader } from "@renderers/shared";
 import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
