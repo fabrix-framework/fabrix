@@ -17,10 +17,17 @@ type PageInfo {
   endCursor: String
 }
 
+type UserAddress {
+  city: String
+  street: String
+  zip: String!
+}
+
 type User implements Node {
   id: ID!
   name: String!
   email: String!
+  address: UserAddress!
 }
 
 type UsersResult {

@@ -111,7 +111,7 @@ export const buildHeaders = (
       {},
     );
 
-    const key = subField.value.field.getName();
+    const key = subField.value.field.asKey();
     const cellRenderer = component
       ? (rowValue: Record<string, unknown>) => {
           return createElement(component, {
@@ -121,7 +121,7 @@ export const buildHeaders = (
             type: subField.type,
             value: rowValue,
             subFields: subFields.map((subField) => ({
-              key: subField.value.field.getName(),
+              key: subField.value.field.asKey(),
               label: subField.label,
               type: subField.type,
             })),
@@ -135,8 +135,8 @@ export const buildHeaders = (
       : null;
 
     return {
+      key,
       label: subField.label,
-      key: subField.value.field.getName(),
       type: subField.type,
       render: cellRenderer,
     };

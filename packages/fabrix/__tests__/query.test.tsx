@@ -89,6 +89,9 @@ describe("query", () => {
                 id
                 name
                 email
+                address {
+                  zip 
+                }
               }
             }
           }

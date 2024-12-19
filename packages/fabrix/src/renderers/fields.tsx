@@ -115,12 +115,12 @@ export const getSubFields = (
 ) =>
   // filters fields by parent key and maps the filtered values to the array of SubField
   fields
-    .filter((f) => f.field.getParent()?.asKey() === name)
+    .filter((f) => f.field.getParent()?.asKey().startsWith(name))
     .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
     .map((value) => ({
       value,
       type:
-        getTypeName(context, rootValue, name)[value.field.getName()] || null,
+        getTypeName(context, rootValue, name)[value.field.getName()] ?? null,
       label: value.config.label || value.field.getName(),
     }));
 
