@@ -96,11 +96,6 @@ export const getFieldConfigByKey = <C extends Record<string, unknown>>(
   name: string,
 ) => fields.find((f) => f.field.asKey() == name);
 
-export type ObjectLikeValue =
-  | Record<string, unknown>
-  | Array<NonNullable<ObjectLikeValue>>
-  | undefined;
-
 export const Loader = () => {
   return (
     <div aria-busy="true" role="status">

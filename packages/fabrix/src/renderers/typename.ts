@@ -35,12 +35,12 @@ import { Path } from "@visitor/path";
  * ```
  */
 export const buildTypenameExtractor = (props: {
-  targetValue: ObjectLikeValue2;
+  targetValue: ObjectLikeValue;
   schemaSet: SchemaSet;
 }) => {
   const { targetValue, schemaSet } = props;
   const typenamesByPath: Record<string, string> = {};
-  const traverse = (value: ObjectLikeValue2, path: string) => {
+  const traverse = (value: ObjectLikeValue, path: string) => {
     if (Array.isArray(value)) {
       value.forEach((item) => {
         traverse(item as typeof value, path);
@@ -146,10 +146,10 @@ export const buildTypenameExtractor = (props: {
 
 export type TypenameExtractor = ReturnType<typeof buildTypenameExtractor>;
 
-export type ObjectLikeValue2 =
+type ObjectLikeValue =
   | Record<string, unknown>
-  | Record<string, Array<NonNullable<ObjectLikeValue2>>>
-  | Array<NonNullable<ObjectLikeValue2>>
+  | Record<string, Array<NonNullable<ObjectLikeValue>>>
+  | Array<NonNullable<ObjectLikeValue>>
   | undefined;
 
 type ScalarType = {
