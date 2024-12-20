@@ -3,6 +3,8 @@ import { Value } from "@fetcher";
 import { TableComponentEntry } from "@registry";
 import { useContext, createElement } from "react";
 import { RootField, SubFields, ViewFields, getSubFields } from "./fields";
+import { Loader } from "./shared";
+import { buildTypenameExtractor } from "./typename";
 
 const tableModes = {
   standard: "collection",
@@ -69,10 +71,19 @@ export const renderTableElement = (props: {
     return;
   }
 
+  const schema = context.schemaLoader;
+  if (schema.status === "loading") {
+    return <Loader />;
+  }
+
+  const typenameExtractor = buildTypenameExtractor({
+    targetValue: rootValue,
+    schemaSet: schema.schemaSet,
+  });
+
   const { component, tableMode } = props;
   const subFields = getSubFields(
-    context,
-    rootValue,
+    typenameExtractor,
     fields,
     tableMode == "standard" ? "collection" : "edges.node",
   );

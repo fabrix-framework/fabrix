@@ -1,7 +1,7 @@
 import { ComponentType, ReactNode } from "react";
 import { FabrixComponentProps } from "@renderer";
 import { ViewFieldSchema } from "@directive/schema";
-import { FieldType } from "@renderers/shared";
+import { FieldType } from "@renderers/typename";
 import { FabrixCustomComponent } from "@customRenderer";
 import {
   ComponentTypeByName,

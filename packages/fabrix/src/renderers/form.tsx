@@ -5,13 +5,13 @@ import { FabrixContextType } from "../context";
 import {
   buildClassName,
   CommonFabrixComponentRendererProps,
-  defaultFieldType,
   FieldConfigByType,
   getFieldConfigByKey,
   Loader,
 } from "./shared";
 import { buildAjvSchema } from "./form/validation";
 import { ajvResolver } from "./form/ajvResolver";
+import { defaultFieldType } from "./typename";
 
 export type FormFields = FieldConfigByType<"form">["configs"]["fields"];
 export type FormField = FormFields[number];

@@ -1,5 +1,5 @@
 import { createElement, useCallback, useContext, useMemo } from "react";
-import { FabrixContext, FabrixContextType } from "@context";
+import { FabrixContext } from "@context";
 import { Value } from "@fetcher";
 import {
   assertObjectValue,
@@ -7,9 +7,14 @@ import {
   CommonFabrixComponentRendererProps,
   FieldConfigByType,
   getFieldConfigByKey,
-  resolveFieldTypesFromTypename,
+  Loader,
 } from "./shared";
 import { getTableMode, renderTable } from "./table";
+import {
+  FieldType,
+  TypenameExtractor,
+  buildTypenameExtractor,
+} from "./typename";
 
 export type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
 type ViewField = ViewFields[number];
@@ -24,6 +29,16 @@ export const ViewRenderer = ({
   const tableType = useMemo(() => getTableMode(rootField.fields), [rootField]);
 
   const renderFields = useCallback(() => {
+    const schema = context.schemaLoader;
+    if (schema.status === "loading") {
+      return <Loader />;
+    }
+
+    const typenameExtractor = buildTypenameExtractor({
+      targetValue: rootField.data,
+      schemaSet: schema.schemaSet,
+    });
+
     if (componentFieldsRenderer) {
       return componentFieldsRenderer({
         getField: (name, extraProps) => {
@@ -36,16 +51,12 @@ export const ViewRenderer = ({
             rootField,
             extraClassName: extraProps?.className,
             indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
-            subFields: getSubFields(
-              context,
-              rootField.data,
-              rootField.fields,
-              name,
-            ),
+            subFields: getSubFields(typenameExtractor, rootField.fields, name),
             field: {
               ...field,
               ...extraProps,
             },
+            fieldType: typenameExtractor.getFieldTypeByPath(field.field),
           });
         },
       });
@@ -63,13 +74,9 @@ export const ViewRenderer = ({
         return renderField({
           rootField,
           indexKey: `${rootField.name}-${fieldIndex}`,
-          subFields: getSubFields(
-            context,
-            rootField.data,
-            rootField.fields,
-            name,
-          ),
+          subFields: getSubFields(typenameExtractor, rootField.fields, name),
           field,
+          fieldType: typenameExtractor.getFieldTypeByPath(field.field),
         });
       });
 
@@ -86,30 +93,13 @@ export const ViewRenderer = ({
 };
 
 /**
- * Get the type name of the given field by looking at the __typename field.
- */
-const getTypeName = (
-  context: FabrixContextType,
-  rootValue: Value | undefined,
-  name: string,
-) => {
-  if (Array.isArray(rootValue)) {
-    return resolveFieldTypesFromTypename(context, rootValue[0][name]);
-  } else if (typeof rootValue?.[name] === "object") {
-    return resolveFieldTypesFromTypename(context, rootValue?.[name]);
-  } else {
-    return {};
-  }
-};
-
-/**
  * Get the sub fields of the given field.
  *
  * This also sorts the fields by the index value.
  */
 export const getSubFields = (
-  context: FabrixContextType,
-  rootValue: Value | undefined,
+  // context: FabrixContextType,
+  typenameExtractor: TypenameExtractor,
   fields: ViewFields,
   name: string,
 ) =>
@@ -119,8 +109,7 @@ export const getSubFields = (
     .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
     .map((value) => ({
       value,
-      type:
-        getTypeName(context, rootValue, name)[value.field.getName()] ?? null,
+      type: typenameExtractor.getFieldTypeByPath(value.field),
       label: value.config.label || value.field.getName(),
     }));
 
@@ -137,12 +126,14 @@ type RenderFieldProps = {
   rootField: CommonFabrixComponentRendererProps<ViewFields>["rootField"];
   indexKey: string;
   field: ViewField;
+  fieldType: FieldType;
   subFields: SubFields;
   extraClassName?: string;
 };
 const renderField = ({
   rootField,
   field,
+  fieldType,
   subFields,
   indexKey,
   extraClassName,
@@ -151,9 +142,6 @@ const renderField = ({
   if (field.config.hidden) {
     return;
   }
-
-  const fieldName = field.field.getName();
-  const fieldType = rootField.type?.[fieldName];
 
   assertObjectValue(rootField.data);
 
@@ -177,7 +165,7 @@ const renderField = ({
     key: indexKey,
     name: field.field.asKey(),
     path: field.field.value,
-    value: rootField.data?.[fieldName] ?? "-",
+    value: rootField.data?.[field.field.getName()] ?? "-",
     type: fieldType,
     subFields: subFields.map((subField) => ({
       key: subField.value.field.getName(),

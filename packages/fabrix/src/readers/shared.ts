@@ -1,4 +1,4 @@
-import { FieldType } from "@renderers/shared";
+import { FieldType } from "@renderers/typename";
 import { Path } from "@visitor/path";
 
 type FieldMeta = {

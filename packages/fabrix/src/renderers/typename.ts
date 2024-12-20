@@ -1,6 +1,14 @@
 import { SchemaSet } from "@context";
-import { GraphQLObjectType } from "graphql";
-import { FieldType, resolveFieldType } from "./shared";
+import {
+  GraphQLEnumType,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLNullableType,
+  GraphQLObjectType,
+  GraphQLOutputType,
+  GraphQLScalarType,
+} from "graphql";
+import { Path } from "@visitor/path";
 
 /*
  * A function extract the __typename field from the target value.
@@ -26,17 +34,13 @@ import { FieldType, resolveFieldType } from "./shared";
  * }
  * ```
  */
-export const useTypenameExtractor = (props: {
+export const buildTypenameExtractor = (props: {
   targetValue: ObjectLikeValue2;
   schemaSet: SchemaSet;
 }) => {
   const { targetValue, schemaSet } = props;
-  if (!targetValue || typeof targetValue !== "object") {
-    return null;
-  }
-
   const typenamesByPath: Record<string, string> = {};
-  const traverse = (value: NonNullable<ObjectLikeValue2>, path: string) => {
+  const traverse = (value: ObjectLikeValue2, path: string) => {
     if (Array.isArray(value)) {
       value.forEach((item) => {
         traverse(item as typeof value, path);
@@ -57,7 +61,11 @@ export const useTypenameExtractor = (props: {
     }
   };
 
-  const resolveTypenameByPath = (path: string) => {
+  const resolveTypenameByPath = (path: string | undefined) => {
+    if (!path) {
+      return {};
+    }
+
     const typename = typenamesByPath[path];
     const valueType = schemaSet.serverSchema.getType(typename);
     if (!(valueType instanceof GraphQLObjectType)) {
@@ -77,6 +85,13 @@ export const useTypenameExtractor = (props: {
         [key]: typeInfo,
       };
     }, {});
+  };
+
+  const getFieldTypeByPath = (path: Path) => {
+    const parentKey = path.getParent()?.asKey();
+    const typeInfo = resolveTypenameByPath(parentKey);
+    const fieldName = path.getName();
+    return typeInfo[fieldName] ?? null;
   };
 
   traverse(targetValue, "");
@@ -121,11 +136,86 @@ export const useTypenameExtractor = (props: {
      * ```
      */
     typenamesByPath,
+
+    /**
+     * A function to get the field type by the path.
+     */
+    getFieldTypeByPath,
   };
 };
+
+export type TypenameExtractor = ReturnType<typeof buildTypenameExtractor>;
 
 export type ObjectLikeValue2 =
   | Record<string, unknown>
   | Record<string, Array<NonNullable<ObjectLikeValue2>>>
   | Array<NonNullable<ObjectLikeValue2>>
   | undefined;
+
+type ScalarType = {
+  type: "Scalar";
+  name: string;
+};
+
+type EnumType = {
+  type: "Enum";
+  name: string;
+  meta: {
+    values: string[];
+  };
+};
+
+type ObjectType = {
+  type: "Object";
+  name: string;
+};
+
+type ListType = {
+  type: "List";
+  innerType: NonNullable<FieldType>;
+};
+
+export type FieldType = ScalarType | EnumType | ObjectType | ListType | null;
+export const defaultFieldType = {
+  type: "Scalar" as const,
+  name: "String",
+};
+
+export const resolveFieldType = (
+  field: GraphQLOutputType | GraphQLNullableType,
+): FieldType => {
+  if (field instanceof GraphQLScalarType) {
+    return {
+      type: "Scalar" as const,
+      name: field.name,
+    };
+  } else if (field instanceof GraphQLEnumType) {
+    return {
+      type: "Enum" as const,
+      name: field.name,
+      meta: {
+        values: field.getValues().map((value) => value.name),
+      },
+    };
+  } else if (field instanceof GraphQLObjectType) {
+    return {
+      type: "Object" as const,
+      name: field.name,
+    };
+  } else if (field instanceof GraphQLList) {
+    const innerType = resolveFieldType(field.ofType);
+    if (!innerType) {
+      return null;
+    }
+
+    return {
+      type: "List" as const,
+      innerType: innerType,
+    };
+  } else if (field instanceof GraphQLNonNull) {
+    return resolveFieldType(field.ofType);
+  } else {
+    // Interface is not supported as well
+    return null;
+  }
+};

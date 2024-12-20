@@ -3,7 +3,7 @@ import { renderHook } from "@testing-library/react";
 import { providerWrapper } from "../../__tests__/supports/render";
 import { testingComponents } from "../../__tests__/supports/components";
 import { mockSchema } from "../../__tests__/mocks/handlers";
-import { useTypenameExtractor } from "./typename";
+import { buildTypenameExtractor } from "./typename";
 
 describe("extractTypename", () => {
   const schemaSet = {
@@ -44,7 +44,7 @@ describe("extractTypename", () => {
     };
 
     const r = renderHook(() =>
-      useTypenameExtractor({
+      buildTypenameExtractor({
         targetValue,
         schemaSet,
       }),
@@ -55,18 +55,18 @@ describe("extractTypename", () => {
 
   it("should return null for non-object input", () => {
     const r = renderHook(() =>
-      useTypenameExtractor({
+      buildTypenameExtractor({
         targetValue: undefined,
         schemaSet,
       }),
     );
 
-    expect(r.result.current?.typenamesByPath).toBeUndefined();
+    expect(r.result.current?.typenamesByPath).toEqual({});
   });
 
   it("should return an empty object for an empty input object", () => {
     const r = renderHook(() =>
-      useTypenameExtractor({
+      buildTypenameExtractor({
         targetValue: {},
         schemaSet,
       }),
@@ -92,7 +92,7 @@ describe("extractTypename", () => {
     };
 
     const r = renderHook(() =>
-      useTypenameExtractor({
+      buildTypenameExtractor({
         targetValue: input,
         schemaSet,
       }),
@@ -120,7 +120,7 @@ describe("extractTypename", () => {
     ])("should resolve typenames by path (%s)", (path, keys) => {
       const { result } = renderHook(
         () =>
-          useTypenameExtractor({
+          buildTypenameExtractor({
             targetValue: input,
             schemaSet,
           }),
