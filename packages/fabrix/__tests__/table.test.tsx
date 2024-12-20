@@ -24,7 +24,7 @@ describe("query", () => {
           }
         `}
       />,
-      async () => {
+      () => {
         screen.debug();
       },
     );
