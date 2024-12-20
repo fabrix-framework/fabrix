@@ -120,6 +120,49 @@ describe("query", () => {
     },
   );
 
+  it("should render the table with nested fields", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          query getUsers {
+            users {
+              collection {
+                id
+                name
+                address {
+                  city
+                  street
+                  zip
+                }
+              }
+            }
+          }
+        `}
+      />,
+      async () => {
+        const table = await screen.findByRole("table");
+        expect(table).toBeInTheDocument();
+
+        const rows = await within(table).findAllByRole("row");
+        expect(rows.length).toBe(users.length + 1);
+
+        const user = users[0];
+        const cells = await within(rows[1]).findAllByRole("cell");
+        const cellValues = cells.map((cell) => cell.textContent);
+
+        expect(cellValues).toEqual(
+          expect.arrayContaining([
+            user.id,
+            user.name,
+            user.address.city,
+            user.address.street,
+            user.address.zip,
+          ]),
+        );
+      },
+    );
+  });
+
   it("should render the table with customized labels", async () => {
     await testWithUnmount(
       <FabrixComponent
