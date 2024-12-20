@@ -1,7 +1,12 @@
+import { FabrixContext } from "@context";
+import { GraphQLObjectType } from "graphql";
+import { useCallback, useContext } from "react";
+import { FieldType, resolveFieldType } from "./shared";
+
 /*
  * A function extract the __typename field from the target value.
  *
- * Given a target value like this:
+ * `targetValue` param like this:
  * ```
  * {
  *   user: {
@@ -21,22 +26,14 @@
  *   }
  * }
  * ```
- *
- * Result can be as follows:
- * ```
- * {
- *   "user": "User",
- *   "user.address": "UserAddress",
- *   "user.contacts": "UserContact",
- * }
- * ```
  */
-export const extractTypename = (targetValue: ObjectLikeValue2) => {
+export const useTypenameExtractor = (targetValue: ObjectLikeValue2) => {
+  const context = useContext(FabrixContext);
   if (!targetValue || typeof targetValue !== "object") {
     return null;
   }
 
-  const result: Record<string, string> = {};
+  const typenamesByPath: Record<string, string> = {};
   const traverse = (value: NonNullable<ObjectLikeValue2>, path: string) => {
     if (Array.isArray(value)) {
       value.forEach((item) => {
@@ -45,7 +42,7 @@ export const extractTypename = (targetValue: ObjectLikeValue2) => {
     } else if (value && typeof value === "object") {
       const typename = (value as { __typename?: string }).__typename;
       if (typeof typename === "string") {
-        result[path] = typename;
+        typenamesByPath[path] = typename;
       }
       for (const key of Object.keys(value)) {
         if (key !== "__typename") {
@@ -58,11 +55,87 @@ export const extractTypename = (targetValue: ObjectLikeValue2) => {
     }
   };
 
+  const resolveTypenameByPath = useCallback(
+    (path: string) => {
+      console.log(context.schemaLoader.status);
+      if (context.schemaLoader.status === "loading") {
+        return {};
+      }
+
+      const typename = typenamesByPath[path];
+      const valueType =
+        context.schemaLoader.schemaSet.serverSchema.getType(typename);
+      if (!(valueType instanceof GraphQLObjectType)) {
+        return {};
+      }
+
+      const fields = valueType.getFields();
+      return Object.keys(fields).reduce<Record<string, FieldType>>(
+        (acc, key) => {
+          const field = fields[key];
+          const typeInfo = resolveFieldType(field.type);
+          if (!typeInfo) {
+            return acc;
+          }
+
+          return {
+            ...acc,
+            [key]: typeInfo,
+          };
+        },
+        {},
+      );
+    },
+    [context],
+  );
+
   traverse(targetValue, "");
-  return result;
+
+  return {
+    /**
+     * A function to resolve the type information by the path.
+     *
+     * With this input:
+     * ```
+     * {
+     *   user: {
+     *     id: "1",
+     *      name: "John",
+     *     address: {
+     *       city: "New York",
+     *       __typename: "UserAddress",
+     *     },
+     *   },
+     * }
+     * ```
+     *
+     * If you call `resolveTypenameByPath("user.address")`, you will get the following result:
+     * ```
+     * {
+     *   "city: { type: "Scalar", name: "String" },
+     * }
+     * ```
+     */
+    resolveTypenameByPath,
+
+    /**
+     * A map of the __typename field by the path.
+     *
+     * For example, the result can be as follows:
+     * ```
+     * {
+     *   "user": "User",
+     *   "user.address": "UserAddress",
+     *   "user.contacts": "UserContact",
+     * }
+     * ```
+     */
+    typenamesByPath,
+  };
 };
 
 export type ObjectLikeValue2 =
   | Record<string, unknown>
   | Record<string, Array<NonNullable<ObjectLikeValue2>>>
+  | Array<NonNullable<ObjectLikeValue2>>
   | undefined;
