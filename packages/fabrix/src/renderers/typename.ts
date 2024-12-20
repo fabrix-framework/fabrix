@@ -1,6 +1,5 @@
-import { FabrixContext } from "@context";
+import { SchemaSet } from "@context";
 import { GraphQLObjectType } from "graphql";
-import { useCallback, useContext } from "react";
 import { FieldType, resolveFieldType } from "./shared";
 
 /*
@@ -27,8 +26,11 @@ import { FieldType, resolveFieldType } from "./shared";
  * }
  * ```
  */
-export const useTypenameExtractor = (targetValue: ObjectLikeValue2) => {
-  const context = useContext(FabrixContext);
+export const useTypenameExtractor = (props: {
+  targetValue: ObjectLikeValue2;
+  schemaSet: SchemaSet;
+}) => {
+  const { targetValue, schemaSet } = props;
   if (!targetValue || typeof targetValue !== "object") {
     return null;
   }
@@ -55,39 +57,27 @@ export const useTypenameExtractor = (targetValue: ObjectLikeValue2) => {
     }
   };
 
-  const resolveTypenameByPath = useCallback(
-    (path: string) => {
-      console.log(context.schemaLoader.status);
-      if (context.schemaLoader.status === "loading") {
-        return {};
+  const resolveTypenameByPath = (path: string) => {
+    const typename = typenamesByPath[path];
+    const valueType = schemaSet.serverSchema.getType(typename);
+    if (!(valueType instanceof GraphQLObjectType)) {
+      return {};
+    }
+
+    const fields = valueType.getFields();
+    return Object.keys(fields).reduce<Record<string, FieldType>>((acc, key) => {
+      const field = fields[key];
+      const typeInfo = resolveFieldType(field.type);
+      if (!typeInfo) {
+        return acc;
       }
 
-      const typename = typenamesByPath[path];
-      const valueType =
-        context.schemaLoader.schemaSet.serverSchema.getType(typename);
-      if (!(valueType instanceof GraphQLObjectType)) {
-        return {};
-      }
-
-      const fields = valueType.getFields();
-      return Object.keys(fields).reduce<Record<string, FieldType>>(
-        (acc, key) => {
-          const field = fields[key];
-          const typeInfo = resolveFieldType(field.type);
-          if (!typeInfo) {
-            return acc;
-          }
-
-          return {
-            ...acc,
-            [key]: typeInfo,
-          };
-        },
-        {},
-      );
-    },
-    [context],
-  );
+      return {
+        ...acc,
+        [key]: typeInfo,
+      };
+    }, {});
+  };
 
   traverse(targetValue, "");
 
