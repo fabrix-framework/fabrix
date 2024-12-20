@@ -98,7 +98,6 @@ export const ViewRenderer = ({
  * This also sorts the fields by the index value.
  */
 export const getSubFields = (
-  // context: FabrixContextType,
   typenameExtractor: TypenameExtractor,
   fields: ViewFields,
   name: string,
