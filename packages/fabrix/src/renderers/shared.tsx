@@ -110,7 +110,7 @@ export const getFieldConfigByKey = <C extends Record<string, unknown>>(
 
 export type ObjectLikeValue =
   | Record<string, unknown>
-  | Array<Record<string, unknown>>
+  | Array<NonNullable<ObjectLikeValue>>
   | undefined;
 
 /**
