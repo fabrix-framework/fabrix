@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { FabrixComponent } from "@renderer";
 import { ComponentRegistry } from "@registry";
+import { gql } from "urql";
 import { users } from "./mocks/data";
 import { testWithUnmount } from "./supports/render";
 
@@ -20,6 +21,7 @@ describe("query", () => {
     ],
     ["getComponent", ({ getComponent }) => getComponent("getUsers", "users")],
   ] satisfies [string, FabrixComponentChildrenProps][];
+
   it.each(childrenPropPattern)(
     "should render the table with collection | %s",
     async (_, children) => {
@@ -50,10 +52,46 @@ describe("query", () => {
     },
   );
 
-  it("should render the table with edges", async () => {
-    await testWithUnmount(
-      <FabrixComponent
-        query={`
+  it.each([1, 2])(
+    "should render the table with data correctly (row index #%i)",
+    async (rowIndex) => {
+      await testWithUnmount(
+        <FabrixComponent
+          query={gql`
+            query {
+              userEdges {
+                edges {
+                  node {
+                    id
+                    name
+                    email
+                  }
+                }
+              }
+            }
+          `}
+        />,
+        async () => {
+          const table = await screen.findByRole("table");
+          const rows = await within(table).findAllByRole("row");
+          const cells = await within(rows[rowIndex]).findAllByRole("cell");
+          const cellValues = cells.map((cell) => cell.textContent);
+          const user = users[rowIndex - 1];
+
+          expect(cellValues).toEqual(
+            expect.arrayContaining([user.id, user.name, user.email]),
+          );
+        },
+      );
+    },
+  );
+
+  it.each([1, 2])(
+    "should render the table with data correnctly with edges (row index #%i)",
+    async (rowIndex) => {
+      await testWithUnmount(
+        <FabrixComponent
+          query={`
           query getUsers {
             userEdges {
               edges {
@@ -66,16 +104,21 @@ describe("query", () => {
             }
           }
         `}
-      />,
-      async () => {
-        const table = await screen.findByRole("table");
-        expect(table).toBeInTheDocument();
+        />,
+        async () => {
+          const table = await screen.findByRole("table");
+          const rows = await within(table).findAllByRole("row");
+          const cells = await within(rows[rowIndex]).findAllByRole("cell");
+          const cellValues = cells.map((cell) => cell.textContent);
+          const user = users[rowIndex - 1];
 
-        const rows = await within(table).findAllByRole("row");
-        expect(rows.length).toBe(users.length + 1);
-      },
-    );
-  });
+          expect(cellValues).toEqual(
+            expect.arrayContaining([user.id, user.name, user.email]),
+          );
+        },
+      );
+    },
+  );
 
   it("should render the table with customized labels", async () => {
     await testWithUnmount(
@@ -89,9 +132,6 @@ describe("query", () => {
                 id
                 name
                 email
-                address {
-                  zip 
-                }
               }
             }
           }

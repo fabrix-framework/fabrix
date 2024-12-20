@@ -82,15 +82,12 @@ export const renderTableElement = (props: {
   });
 
   const { component, tableMode } = props;
-  const subFields = getSubFields(
-    typenameExtractor,
-    fields,
-    tableMode == "standard" ? "collection" : "edges.node",
-  );
+  const basePath = tableMode == "standard" ? "collection" : "edges.node";
+  const subFields = getSubFields(typenameExtractor, fields, basePath);
 
   const element = createElement(component, {
     name,
-    headers: buildHeaders(context, subFields),
+    headers: buildHeaders(context, subFields, basePath),
     values: getTableValues(rootValue, tableMode),
     customProps: props.customProps,
   });
@@ -101,6 +98,7 @@ export const renderTableElement = (props: {
 export const buildHeaders = (
   context: FabrixContextType,
   subFields: SubFields,
+  basePath: string,
 ) =>
   subFields.flatMap((subField) => {
     if (subField.value.config.hidden) {
@@ -122,17 +120,18 @@ export const buildHeaders = (
       {},
     );
 
-    const key = subField.value.field.asKey();
+    const key = subField.value.field.asKey().slice(basePath.length + 1);
+    const name = subField.value.field.getName();
     const cellRenderer = component
       ? (rowValue: Record<string, unknown>) => {
           return createElement(component, {
             key,
-            name: key,
+            name,
             path: subField.value.field.value,
             type: subField.type,
             value: rowValue,
             subFields: subFields.map((subField) => ({
-              key: subField.value.field.asKey(),
+              key: subField.value.field.asKey().slice(basePath.length + 1),
               label: subField.label,
               type: subField.type,
             })),
