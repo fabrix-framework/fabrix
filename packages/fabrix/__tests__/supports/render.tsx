@@ -5,15 +5,7 @@ import {
   screen,
 } from "@testing-library/react";
 import { ComponentRegistry } from "@registry";
-import { PropsWithChildren } from "react";
 import { testingComponents } from "./components";
-
-export const providerWrapper =
-  (components: ComponentRegistry) => (props: PropsWithChildren) => (
-    <FabrixProvider url="http://localhost:1234" componentRegistry={components}>
-      {props.children}
-    </FabrixProvider>
-  );
 
 export const testWithUnmount = async (
   ui: React.ReactNode,
@@ -35,7 +27,14 @@ export const testWithUnmount = async (
     : testingComponents;
 
   const component = render(ui, {
-    wrapper: providerWrapper(components),
+    wrapper: ({ children }) => (
+      <FabrixProvider
+        url="http://localhost:1234"
+        componentRegistry={components}
+      >
+        {children}
+      </FabrixProvider>
+    ),
   });
 
   if (!options?.noLoader) {

@@ -1,7 +1,4 @@
 import { describe, it, expect } from "vitest";
-import { renderHook } from "@testing-library/react";
-import { providerWrapper } from "../../__tests__/supports/render";
-import { testingComponents } from "../../__tests__/supports/components";
 import { mockSchema } from "../../__tests__/mocks/handlers";
 import { buildTypenameExtractor } from "./typename";
 
@@ -43,36 +40,30 @@ describe("extractTypename", () => {
       "user.contacts.email": "UserContactEmail",
     };
 
-    const r = renderHook(() =>
-      buildTypenameExtractor({
-        targetValue,
-        schemaSet,
-      }),
-    );
+    const te = buildTypenameExtractor({
+      targetValue,
+      schemaSet,
+    });
 
-    expect(r.result.current?.typenamesByPath).toEqual(expectedOutput);
+    expect(te.typenamesByPath).toEqual(expectedOutput);
   });
 
   it("should return null for non-object input", () => {
-    const r = renderHook(() =>
-      buildTypenameExtractor({
-        targetValue: undefined,
-        schemaSet,
-      }),
-    );
+    const te = buildTypenameExtractor({
+      targetValue: undefined,
+      schemaSet,
+    });
 
-    expect(r.result.current?.typenamesByPath).toEqual({});
+    expect(te.typenamesByPath).toEqual({});
   });
 
   it("should return an empty object for an empty input object", () => {
-    const r = renderHook(() =>
-      buildTypenameExtractor({
-        targetValue: {},
-        schemaSet,
-      }),
-    );
+    const te = buildTypenameExtractor({
+      targetValue: {},
+      schemaSet,
+    });
 
-    expect(r.result.current?.typenamesByPath).toEqual({});
+    expect(te.typenamesByPath).toEqual({});
   });
 
   it("should handle objects without __typename fields", () => {
@@ -91,14 +82,12 @@ describe("extractTypename", () => {
       },
     };
 
-    const r = renderHook(() =>
-      buildTypenameExtractor({
-        targetValue: input,
-        schemaSet,
-      }),
-    );
+    const te = buildTypenameExtractor({
+      targetValue: input,
+      schemaSet,
+    });
 
-    expect(r.result.current?.typenamesByPath).toEqual({});
+    expect(te.typenamesByPath).toEqual({});
   });
 
   describe("resolveTypenameByPath", () => {
@@ -118,18 +107,12 @@ describe("extractTypename", () => {
       ["user", ["id", "name", "email", "address"]],
       ["user.address", ["city", "street", "zip"]],
     ])("should resolve typenames by path (%s)", (path, keys) => {
-      const { result } = renderHook(
-        () =>
-          buildTypenameExtractor({
-            targetValue: input,
-            schemaSet,
-          }),
-        {
-          wrapper: providerWrapper(testingComponents),
-        },
-      );
+      const te = buildTypenameExtractor({
+        targetValue: input,
+        schemaSet,
+      });
 
-      const userType = result.current?.resolveTypenameByPath(path);
+      const userType = te.resolveTypenameByPath(path);
       expect(Object.keys(userType ?? {})).toEqual(expect.arrayContaining(keys));
     });
   });
