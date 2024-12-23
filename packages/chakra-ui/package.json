@@ -26,7 +26,7 @@
     "@chakra-ui/icons": "^2.2.4",
     "@emotion/css": "^11.13.0",
     "@emotion/react": "^11.13.5",
-    "@emotion/styled": "^11.13.0",
+    "@emotion/styled": "^11.14.0",
     "@fabrix-framework/fabrix": "workspace:*",
     "@tanstack/react-table": "^8.19.3",
     "chakra-react-select": "^5.0.1",
