@@ -17,8 +17,8 @@ const fieldView = (props: FieldComponentProps) => {
   }
 
   return (
-    <div>
-      <span>{name}</span>
+    <div role="region">
+      <label>{name}:</label>
       <span>{value as ReactNode}</span>
     </div>
   );
