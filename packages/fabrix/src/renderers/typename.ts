@@ -62,11 +62,11 @@ export const buildTypenameExtractor = (props: {
     }
   };
 
-  const resolveTypenameByPath = (path: string | undefined) => {
-    if (!path) {
-      return {};
-    }
-
+  /**
+   * NOTE: resolveTypenameByPath should accept empty string as the path.
+   * If the path is empty, it works accessing the root object to get the __typename.
+   */
+  const resolveTypenameByPath = (path: string) => {
     const typename = typenamesByPath[path];
     const valueType = schemaSet.serverSchema.getType(typename);
     if (!(valueType instanceof GraphQLObjectType)) {
@@ -89,7 +89,7 @@ export const buildTypenameExtractor = (props: {
   };
 
   const getFieldTypeByPath = (path: Path) => {
-    const parentKey = path.getParent()?.asKey();
+    const parentKey = path.getParent()?.asKey() ?? "";
     const typeInfo = resolveTypenameByPath(parentKey);
     const fieldName = path.getName();
     return typeInfo[fieldName] ?? null;
@@ -130,9 +130,9 @@ export const buildTypenameExtractor = (props: {
      * For example, the result can be as follows:
      * ```
      * {
-     *   "user": "User",
-     *   "user.address": "UserAddress",
-     *   "user.contacts": "UserContact",
+     *   "": "User",
+     *   "address": "UserAddress",
+     *   "contacts": "UserContact",
      * }
      * ```
      */
