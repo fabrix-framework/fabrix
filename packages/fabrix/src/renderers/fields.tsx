@@ -15,6 +15,7 @@ import {
   TypenameExtractor,
   buildTypenameExtractor,
 } from "./typename";
+import { get } from "es-toolkit/compat";
 
 export type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
 type ViewField = ViewFields[number];
@@ -160,11 +161,12 @@ const renderField = ({
   }, {});
 
   const className = buildClassName(field.config, extraClassName);
+  const name = field.field.asKey();
   return createElement(component, {
     key: indexKey,
-    name: field.field.asKey(),
+    name,
     path: field.field.value,
-    value: rootField.data?.[field.field.getName()] ?? "-",
+    value: get(rootField.data, name),
     type: fieldType,
     subFields: subFields.map((subField) => ({
       key: subField.value.field.getName(),
