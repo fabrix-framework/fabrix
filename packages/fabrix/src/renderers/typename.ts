@@ -7,6 +7,7 @@ import {
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
+  GraphQLType,
 } from "graphql";
 import { Path } from "@visitor/path";
 
@@ -152,24 +153,45 @@ type ObjectLikeValue =
   | Array<NonNullable<ObjectLikeValue>>
   | undefined;
 
-type ScalarType = {
-  type: "Scalar";
-  name: string;
-};
-
-type EnumType = {
-  type: "Enum";
-  name: string;
-  meta: {
-    values: string[];
+const newScalarTypeField = (field: GraphQLScalarType) => {
+  return {
+    type: "Scalar" as const,
+    name: field.name,
   };
 };
 
-type ObjectType = {
-  type: "Object";
-  name: string;
+const newEnumTypeField = (field: GraphQLEnumType) => {
+  return {
+    type: "Enum" as const,
+    name: field.name,
+    meta: {
+      values: field.getValues().map((value) => value.name),
+    },
+  };
 };
 
+const newObjectTypeField = (field: GraphQLObjectType) => {
+  return {
+    type: "Object" as const,
+    name: field.name,
+  };
+};
+
+export const newListTypeField = (field: GraphQLList<GraphQLType>) => {
+  const innerType = resolveFieldType(field.ofType);
+  if (!innerType) {
+    return null;
+  }
+
+  return {
+    type: "List" as const,
+    innerType: innerType,
+  };
+};
+
+type ScalarType = ReturnType<typeof newScalarTypeField>;
+type EnumType = ReturnType<typeof newEnumTypeField>;
+type ObjectType = ReturnType<typeof newObjectTypeField>;
 type ListType = {
   type: "List";
   innerType: NonNullable<FieldType>;
@@ -185,33 +207,13 @@ export const resolveFieldType = (
   field: GraphQLOutputType | GraphQLNullableType,
 ): FieldType => {
   if (field instanceof GraphQLScalarType) {
-    return {
-      type: "Scalar" as const,
-      name: field.name,
-    };
+    return newScalarTypeField(field);
   } else if (field instanceof GraphQLEnumType) {
-    return {
-      type: "Enum" as const,
-      name: field.name,
-      meta: {
-        values: field.getValues().map((value) => value.name),
-      },
-    };
+    return newEnumTypeField(field);
   } else if (field instanceof GraphQLObjectType) {
-    return {
-      type: "Object" as const,
-      name: field.name,
-    };
+    return newObjectTypeField(field);
   } else if (field instanceof GraphQLList) {
-    const innerType = resolveFieldType(field.ofType);
-    if (!innerType) {
-      return null;
-    }
-
-    return {
-      type: "List" as const,
-      innerType: innerType,
-    };
+    return newListTypeField(field);
   } else if (field instanceof GraphQLNonNull) {
     return resolveFieldType(field.ofType);
   } else {
