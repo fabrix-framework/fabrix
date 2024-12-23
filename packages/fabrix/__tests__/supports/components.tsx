@@ -10,9 +10,18 @@ import { useController } from "react-hook-form";
 import { get } from "es-toolkit/compat";
 
 const fieldView = (props: FieldComponentProps) => {
-  const { value } = props;
+  const { value, type, name } = props;
 
-  return <span>{value as string}</span>;
+  if (type?.type === "Object" || type?.type === "List") {
+    return null;
+  }
+
+  return (
+    <div>
+      <span>{name}</span>
+      <span>{value as ReactNode}</span>
+    </div>
+  );
 };
 
 const tableView = (props: TableComponentProps) => {
