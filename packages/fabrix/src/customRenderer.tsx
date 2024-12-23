@@ -6,6 +6,7 @@ import {
   getComponentFn,
   getComponentRendererFn,
 } from "@renderer";
+import { CustomComponentFormRenderer } from "@renderers/custom/form";
 import { CustomComponentTableRenderer } from "@renderers/custom/table";
 
 export type ComponentRendererProps<
@@ -31,6 +32,22 @@ export const FabrixCustomComponent = (
           ensureFieldType(fieldConfig, "view");
           return (
             <CustomComponentTableRenderer
+              {...props}
+              key={`table-${fieldConfig.name}`}
+              fieldConfig={fieldConfig}
+              data={data}
+              component={{
+                name: props.component.name,
+                entry: componentEntry,
+                customProps: props.component.customProps,
+              }}
+            />
+          );
+        }
+        case "form": {
+          ensureFieldType(fieldConfig, "form");
+          return (
+            <CustomComponentFormRenderer
               {...props}
               key={`table-${fieldConfig.name}`}
               fieldConfig={fieldConfig}
