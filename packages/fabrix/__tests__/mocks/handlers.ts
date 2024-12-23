@@ -47,6 +47,7 @@ type UsersConnection {
 }
 
 type Query {
+  firstUser: User
   users: UsersResult
   userEdges: UsersConnection
 }
@@ -70,6 +71,7 @@ type Mutation {
 `);
 
 const resolvers = {
+  firstUser: () => users[0],
   users: () => ({
     collection: users,
     size: users.length,
