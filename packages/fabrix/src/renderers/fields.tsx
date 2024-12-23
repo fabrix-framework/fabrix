@@ -1,6 +1,7 @@
 import { createElement, useCallback, useContext, useMemo } from "react";
 import { FabrixContext } from "@context";
 import { Value } from "@fetcher";
+import { get } from "es-toolkit/compat";
 import {
   assertObjectValue,
   buildClassName,
@@ -15,7 +16,6 @@ import {
   TypenameExtractor,
   buildTypenameExtractor,
 } from "./typename";
-import { get } from "es-toolkit/compat";
 
 export type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
 type ViewField = ViewFields[number];
