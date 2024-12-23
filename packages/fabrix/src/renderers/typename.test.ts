@@ -2,11 +2,11 @@ import { describe, it, expect } from "vitest";
 import { mockSchema } from "../../__tests__/mocks/handlers";
 import { buildTypenameExtractor } from "./typename";
 
-describe("extractTypename", () => {
-  const schemaSet = {
-    serverSchema: mockSchema,
-  };
+const schemaSet = {
+  serverSchema: mockSchema,
+};
 
+describe("typenamesByPath", () => {
   it("should extract __typename fields from nested objects", () => {
     const targetValue = {
       user: {
@@ -89,31 +89,51 @@ describe("extractTypename", () => {
 
     expect(te.typenamesByPath).toEqual({});
   });
+});
 
-  describe("resolveTypenameByPath", () => {
-    const input = {
-      user: {
-        id: "1",
-        name: "John",
-        address: {
-          city: "New York",
-          __typename: "UserAddress",
-        },
-        __typename: "User",
+describe("resolveTypenameByPath", () => {
+  const input = {
+    user: {
+      id: "1",
+      name: "John",
+      category: "ADMIN",
+      address: {
+        city: "New York",
+        __typename: "UserAddress",
       },
-    };
+      __typename: "User",
+    },
+  };
 
-    it.each([
-      ["user", ["id", "name", "email", "address"]],
-      ["user.address", ["city", "street", "zip"]],
-    ])("should resolve typenames by path (%s)", (path, keys) => {
-      const te = buildTypenameExtractor({
+  it("should resolve types from simple path", () => {
+    expect(
+      buildTypenameExtractor({
         targetValue: input,
         schemaSet,
-      });
+      }).resolveTypenameByPath("user"),
+    ).toStrictEqual({
+      id: { type: "Scalar", name: "ID" },
+      name: { type: "Scalar", name: "String" },
+      email: { type: "Scalar", name: "String" },
+      category: {
+        type: "Enum",
+        name: "UserCategory",
+        meta: { values: ["ADMIN", "USER"] },
+      },
+      address: { type: "Object", name: "UserAddress" },
+    });
+  });
 
-      const userType = te.resolveTypenameByPath(path);
-      expect(Object.keys(userType ?? {})).toEqual(expect.arrayContaining(keys));
+  it("should resolve types from nested path", () => {
+    expect(
+      buildTypenameExtractor({
+        targetValue: input,
+        schemaSet,
+      }).resolveTypenameByPath("user.address"),
+    ).toStrictEqual({
+      city: { type: "Scalar", name: "String" },
+      street: { type: "Scalar", name: "String" },
+      zip: { type: "Scalar", name: "String" },
     });
   });
 });

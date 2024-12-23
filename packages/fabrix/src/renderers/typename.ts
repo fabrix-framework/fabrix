@@ -177,7 +177,7 @@ const newObjectTypeField = (field: GraphQLObjectType) => {
   };
 };
 
-export const newListTypeField = (field: GraphQLList<GraphQLType>) => {
+const newListTypeField = (field: GraphQLList<GraphQLType>) => {
   const innerType = resolveFieldType(field.ofType);
   if (!innerType) {
     return null;
