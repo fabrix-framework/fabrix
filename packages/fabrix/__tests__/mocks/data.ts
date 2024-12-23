@@ -5,6 +5,7 @@ export const users = [
     id: faker.string.uuid(),
     name: "first user",
     email: faker.internet.email(),
+    category: "ADMIN",
     address: {
       city: faker.location.city(),
       street: faker.location.street(),
@@ -15,6 +16,7 @@ export const users = [
     id: faker.string.uuid(),
     name: "second user",
     email: faker.internet.email(),
+    category: "USER",
     address: {
       zip: faker.location.zipCode(),
     },
