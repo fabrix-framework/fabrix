@@ -1,13 +1,4 @@
-import {
-  DocumentNode,
-  GraphQLEnumType,
-  GraphQLList,
-  GraphQLNonNull,
-  GraphQLNullableType,
-  GraphQLObjectType,
-  GraphQLOutputType,
-  GraphQLScalarType,
-} from "graphql";
+import { DocumentNode } from "graphql";
 import { DirectiveAttributes } from "@registry";
 import { FabrixContextType } from "@context";
 import { FieldConfigWithMeta } from "@readers/shared";
@@ -57,7 +48,6 @@ export type CommonFabrixComponentRendererProps<F> = {
     name: string;
     fields: F;
     data: Value;
-    type: Record<string, FieldType>;
     document: DocumentNode;
   };
   componentFieldsRenderer?: FabrixComponentFieldsRenderer;
@@ -96,8 +86,6 @@ export const assertObjectValue: (
   }
 };
 
-export type FieldTypes = ReturnType<typeof resolveFieldTypesFromTypename>;
-
 export type FieldConfigByType<T extends FieldConfig["type"]> = Extract<
   FieldConfig,
   { type: T }
@@ -107,125 +95,6 @@ export const getFieldConfigByKey = <C extends Record<string, unknown>>(
   fields: Array<FieldConfigWithMeta<C>>,
   name: string,
 ) => fields.find((f) => f.field.asKey() == name);
-
-export type ObjectLikeValue =
-  | Record<string, unknown>
-  | Array<Record<string, unknown>>
-  | undefined;
-
-/**
- * A helper function to resolve header types from the __typename field.
- */
-export const resolveFieldTypesFromTypename = (
-  context: FabrixContextType,
-  values: ObjectLikeValue,
-): Record<string, FieldType> => {
-  if (!values) {
-    return {};
-  }
-
-  const firstValue = Array.isArray(values) ? values[0] : values;
-  if (
-    !firstValue ||
-    !("__typename" in firstValue) ||
-    typeof firstValue.__typename !== "string"
-  ) {
-    return {};
-  }
-
-  if (context.schemaLoader.status === "loading") {
-    return {};
-  }
-
-  const typeName = firstValue.__typename;
-  const valueType =
-    context.schemaLoader.schemaSet.serverSchema.getType(typeName);
-  if (!(valueType instanceof GraphQLObjectType)) {
-    return {};
-  }
-
-  const fields = valueType.getFields();
-  return Object.keys(fields).reduce<Record<string, FieldType>>((acc, key) => {
-    const field = fields[key];
-    const typeInfo = resolveFieldType(field.type);
-    if (!typeInfo) {
-      return acc;
-    }
-
-    return {
-      ...acc,
-      [key]: typeInfo,
-    };
-  }, {});
-};
-
-type ScalarType = {
-  type: "Scalar";
-  name: string;
-};
-
-type EnumType = {
-  type: "Enum";
-  name: string;
-  meta: {
-    values: string[];
-  };
-};
-
-type ObjectType = {
-  type: "Object";
-  name: string;
-};
-
-type ListType = {
-  type: "List";
-  innerType: NonNullable<FieldType>;
-};
-
-export type FieldType = ScalarType | EnumType | ObjectType | ListType | null;
-export const defaultFieldType = {
-  type: "Scalar" as const,
-  name: "String",
-};
-
-export const resolveFieldType = (
-  field: GraphQLOutputType | GraphQLNullableType,
-): FieldType => {
-  if (field instanceof GraphQLScalarType) {
-    return {
-      type: "Scalar" as const,
-      name: field.name,
-    };
-  } else if (field instanceof GraphQLEnumType) {
-    return {
-      type: "Enum" as const,
-      name: field.name,
-      meta: {
-        values: field.getValues().map((value) => value.name),
-      },
-    };
-  } else if (field instanceof GraphQLObjectType) {
-    return {
-      type: "Object" as const,
-      name: field.name,
-    };
-  } else if (field instanceof GraphQLList) {
-    const innerType = resolveFieldType(field.ofType);
-    if (!innerType) {
-      return null;
-    }
-
-    return {
-      type: "List" as const,
-      innerType: innerType,
-    };
-  } else if (field instanceof GraphQLNonNull) {
-    return resolveFieldType(field.ofType);
-  } else {
-    // Interface is not supported as well
-    return null;
-  }
-};
 
 export const Loader = () => {
   return (

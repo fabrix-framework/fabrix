@@ -15,11 +15,18 @@ const fieldView = (props: FieldComponentProps) => {
 };
 
 const tableView = (props: TableComponentProps) => {
+  const headers = props.headers.map((header) => {
+    return {
+      key: header.key,
+      label: `${header.label} (${header.type?.type})`,
+    };
+  });
+
   return (
     <table>
       <thead>
         <tr>
-          {props.headers.map((header) => (
+          {headers.map((header) => (
             <th key={header.key}>{header.label}</th>
           ))}
         </tr>
@@ -27,7 +34,7 @@ const tableView = (props: TableComponentProps) => {
       <tbody>
         {props.values.map((item, index) => (
           <tr key={index}>
-            {props.headers.map((header) => (
+            {headers.map((header) => (
               <td key={header.key}>{item[header.key] as ReactNode}</td>
             ))}
           </tr>

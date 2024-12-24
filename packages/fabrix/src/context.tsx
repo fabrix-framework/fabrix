@@ -12,7 +12,7 @@ import {
 import { createContext, useCallback, useContext } from "react";
 import { ComponentRegistry, emptyComponentRegistry } from "@registry";
 
-type SchemaSet = {
+export type SchemaSet = {
   serverSchema: GraphQLSchema;
   operationSchema?: DocumentNode;
 };

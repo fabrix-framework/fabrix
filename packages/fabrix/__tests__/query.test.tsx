@@ -10,72 +10,85 @@ type FabrixComponentChildrenProps = Parameters<
 >[0]["children"];
 
 describe("query", () => {
-  const childrenPropPattern = [
-    ["no children", undefined],
-    ["getOperation", ({ getOperation }) => getOperation("getUsers")],
+  const collectionQuery = `
+    query getUsers {
+      users {
+        collection {
+          id
+          name
+          email
+        }
+      }
+    }
+  `;
+
+  const edgeQuery = `
+    query getUsers {
+      userEdges {
+        edges {
+          node {
+            id
+            name
+            email
+          }
+        }
+      }
+    }
+  `;
+
+  const testPatterns = [
+    ["collection", collectionQuery, undefined],
+    ["edges", edgeQuery, undefined],
+    [
+      "getOperation",
+      collectionQuery,
+      ({ getOperation }) => getOperation("getUsers"),
+    ],
     [
       "getOperation/getComponent",
+      collectionQuery,
       ({ getOperation }) =>
         getOperation("getUsers", ({ getComponent }) => getComponent("users")),
     ],
-    ["getComponent", ({ getComponent }) => getComponent("getUsers", "users")],
-  ] satisfies [string, FabrixComponentChildrenProps][];
-  it.each(childrenPropPattern)(
-    "should render the table with collection | %s",
-    async (_, children) => {
+    [
+      "getComponent",
+      collectionQuery,
+      ({ getComponent }) => getComponent("getUsers", "users"),
+    ],
+  ] satisfies [string, string, FabrixComponentChildrenProps][];
+
+  it.each(testPatterns)(
+    "should render the table (%s)",
+    async (_, query, children) => {
       await testWithUnmount(
-        <FabrixComponent
-          query={`
-          query getUsers {
-            users {
-              collection {
-                id
-                name
-                email
-              }
-            }
-          }
-        `}
-        >
-          {children}
-        </FabrixComponent>,
+        <FabrixComponent query={query}>{children}</FabrixComponent>,
         async () => {
           const table = await screen.findByRole("table");
-          expect(table).toBeInTheDocument();
+          const rowGroups = await within(table).findAllByRole("rowgroup");
 
-          const rows = await within(table).findAllByRole("row");
-          expect(rows.length).toBe(users.length + 1);
+          const headers = await within(rowGroups[0]).findAllByRole(
+            "columnheader",
+          );
+          const headerNames = headers.map((v) => v.textContent);
+          expect(headerNames).toEqual([
+            "id (Scalar)",
+            "name (Scalar)",
+            "email (Scalar)",
+          ]);
+
+          const cells = await within(rowGroups[1]).findAllByRole("cell");
+          expect(cells.map((v) => v.textContent)).toEqual([
+            users[0].id,
+            users[0].name,
+            users[0].email,
+            users[1].id,
+            users[1].name,
+            users[1].email,
+          ]);
         },
       );
     },
   );
-
-  it("should render the table with edges", async () => {
-    await testWithUnmount(
-      <FabrixComponent
-        query={`
-          query getUsers {
-            userEdges {
-              edges {
-                node {
-                  id
-                  name
-                  email
-                }
-              }
-            }
-          }
-        `}
-      />,
-      async () => {
-        const table = await screen.findByRole("table");
-        expect(table).toBeInTheDocument();
-
-        const rows = await within(table).findAllByRole("row");
-        expect(rows.length).toBe(users.length + 1);
-      },
-    );
-  });
 
   it("should render the table with customized labels", async () => {
     await testWithUnmount(
@@ -170,7 +183,7 @@ describe("query", () => {
     );
   });
 
-  it("should render the table with collection", async () => {
+  it("should be able to access the response data for by an operation", async () => {
     await testWithUnmount(
       <FabrixComponent query={`query getUsers { users { size } }`}>
         {({ getOperation }) =>

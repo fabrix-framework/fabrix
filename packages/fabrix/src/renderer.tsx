@@ -4,11 +4,7 @@ import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
 import { FormRenderer } from "@renderers/form";
 import { FabrixContext, FabrixContextType } from "@context";
-import {
-  FabrixComponentFieldsRenderer,
-  Loader,
-  resolveFieldTypesFromTypename,
-} from "@renderers/shared";
+import { FabrixComponentFieldsRenderer, Loader } from "@renderers/shared";
 import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
@@ -285,7 +281,6 @@ export const FabrixComponent = (props: FabrixComponentProps) => {
             name: field.name,
             fields: field.configs.fields,
             data,
-            type: resolveFieldTypesFromTypename(context, data),
             document: field.document,
             className: props.contentClassName,
             componentFieldsRenderer,
