@@ -4,7 +4,7 @@ import {
   FormFieldSchema,
   formFieldSchema,
 } from "@directive/schema";
-import { resolveFieldType } from "@renderers/shared";
+import { resolveFieldType } from "@renderers/typename";
 import { FieldVariables } from "@visitor";
 import { Path } from "@visitor/path";
 import { deepmerge } from "deepmerge-ts";
