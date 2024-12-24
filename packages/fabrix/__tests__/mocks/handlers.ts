@@ -3,7 +3,7 @@ import { buildSchema, graphql as executeGraphql } from "graphql";
 import { ObjMap } from "graphql/jsutils/ObjMap";
 import { users } from "./data";
 
-const mockSchema = buildSchema(`
+export const mockSchema = buildSchema(`
 # Relay Node
 interface Node {
   id: ID!
