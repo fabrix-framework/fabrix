@@ -7,19 +7,42 @@ import {
 } from "@registry";
 import { ReactNode } from "react";
 import { useController } from "react-hook-form";
+import { get } from "es-toolkit/compat";
 
 const fieldView = (props: FieldComponentProps) => {
-  const { value } = props;
+  const { value, type, name } = props;
 
-  return <span>{value as string}</span>;
+  if (type?.type === "Object" || type?.type === "List") {
+    return null;
+  }
+
+  return (
+    <div role="region">
+      <label>{name}:</label>
+      <span>{value as ReactNode}</span>
+    </div>
+  );
 };
 
 const tableView = (props: TableComponentProps) => {
+  const headers = props.headers.flatMap((header) => {
+    if (header.type?.type === "Object" || header.type?.type === "List") {
+      return [];
+    }
+
+    return [
+      {
+        key: header.key,
+        label: header.label,
+      },
+    ];
+  });
+
   return (
     <table>
       <thead>
         <tr>
-          {props.headers.map((header) => (
+          {headers.map((header) => (
             <th key={header.key}>{header.label}</th>
           ))}
         </tr>
@@ -27,8 +50,8 @@ const tableView = (props: TableComponentProps) => {
       <tbody>
         {props.values.map((item, index) => (
           <tr key={index}>
-            {props.headers.map((header) => (
-              <td key={header.key}>{item[header.key] as ReactNode}</td>
+            {headers.map((header) => (
+              <td key={header.key}>{get(item, header.key) as ReactNode}</td>
             ))}
           </tr>
         ))}

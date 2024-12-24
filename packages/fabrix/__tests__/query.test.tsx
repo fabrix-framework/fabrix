@@ -5,11 +5,48 @@ import { ComponentRegistry } from "@registry";
 import { users } from "./mocks/data";
 import { testWithUnmount } from "./supports/render";
 
-type FabrixComponentChildrenProps = Parameters<
-  typeof FabrixComponent
->[0]["children"];
-
 describe("query", () => {
+  it("should render the fields", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          query {
+            firstUser {
+              id
+              name
+              email
+              address {
+                city
+                street
+                zip
+              }
+            }
+          }
+        `}
+      />,
+      async () => {
+        const fields = await screen.findAllByRole("region");
+        const textContents = fields.map((field) => field.textContent);
+
+        const user = users[0];
+        expect(textContents).toEqual([
+          `id:${user.id}`,
+          `name:${user.name}`,
+          `email:${user.email}`,
+          `address.city:${user.address.city}`,
+          `address.street:${user.address.street}`,
+          `address.zip:${user.address.zip}`,
+        ]);
+      },
+    );
+  });
+});
+
+describe("collection", () => {
+  type FabrixComponentChildrenProps = Parameters<
+    typeof FabrixComponent
+  >[0]["children"];
+
   const childrenPropPattern = [
     ["no children", undefined],
     ["getOperation", ({ getOperation }) => getOperation("getUsers")],
@@ -50,31 +87,63 @@ describe("query", () => {
     },
   );
 
-  it("should render the table with edges", async () => {
-    await testWithUnmount(
-      <FabrixComponent
-        query={`
-          query getUsers {
-            userEdges {
-              edges {
-                node {
-                  id
-                  name
-                  email
-                }
+  it.each([
+    [
+      "collection",
+      `query getUsers {
+        users {
+          collection {
+            id
+            name
+            address {
+              city
+              street
+              zip
+            }
+          }
+        }
+      }`,
+    ],
+    [
+      "edges",
+      `query getUsers {
+        userEdges {
+          edges {
+            node {
+              id
+              name
+              address {
+                city
+                street
+                zip
               }
             }
           }
-        `}
-      />,
-      async () => {
-        const table = await screen.findByRole("table");
-        expect(table).toBeInTheDocument();
+        }
+      }`,
+    ],
+  ])("should render the table with nested fields (%s)", async (_, query) => {
+    await testWithUnmount(<FabrixComponent query={query} />, async () => {
+      const table = await screen.findByRole("table");
+      expect(table).toBeInTheDocument();
 
-        const rows = await within(table).findAllByRole("row");
-        expect(rows.length).toBe(users.length + 1);
-      },
-    );
+      const rows = await within(table).findAllByRole("row");
+      expect(rows.length).toBe(users.length + 1);
+
+      const user = users[0];
+      const cells = await within(rows[1]).findAllByRole("cell");
+      const cellValues = cells.map((cell) => cell.textContent);
+
+      expect(cellValues).toEqual(
+        expect.arrayContaining([
+          user.id,
+          user.name,
+          user.address.city,
+          user.address.street,
+          user.address.zip,
+        ]),
+      );
+    });
   });
 
   it("should render the table with customized labels", async () => {
