@@ -3,7 +3,7 @@ import { buildSchema, graphql as executeGraphql } from "graphql";
 import { ObjMap } from "graphql/jsutils/ObjMap";
 import { users } from "./data";
 
-const mockSchema = buildSchema(`
+export const mockSchema = buildSchema(`
 # Relay Node
 interface Node {
   id: ID!
@@ -21,6 +21,8 @@ type User implements Node {
   id: ID!
   name: String!
   email: String!
+  category: UserCategory!
+  address: UserAddress!
 }
 
 type UsersResult {
@@ -39,8 +41,15 @@ type UsersConnection {
 }
 
 type Query {
+  firstUser: User
   users: UsersResult
   userEdges: UsersConnection
+}
+
+type UserAddress {
+  city: String
+  street: String
+  zip: String!
 }
 
 enum UserCategory {
@@ -62,6 +71,7 @@ type Mutation {
 `);
 
 const resolvers = {
+  firstUser: () => users[0],
   users: () => ({
     collection: users,
     size: users.length,

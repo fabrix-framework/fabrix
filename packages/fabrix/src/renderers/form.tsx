@@ -1,15 +1,15 @@
 import { createElement, useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useMutation } from "urql";
-import { FabrixContextType } from "../context";
+import { defaultFieldType } from "@renderers/typename";
+import { FabrixContextType } from "@context";
 import {
   buildClassName,
   CommonFabrixComponentRendererProps,
-  defaultFieldType,
   FieldConfigByType,
   getFieldConfigByKey,
   Loader,
-} from "./shared";
+} from "@renderers/shared";
 import { buildAjvSchema } from "./form/validation";
 import { ajvResolver } from "./form/ajvResolver";
 
