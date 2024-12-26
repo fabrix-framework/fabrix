@@ -33,7 +33,7 @@ const tableView = (props: TableComponentProps) => {
     return [
       {
         key: header.key,
-        label: header.label,
+        label: `${header.label} (${header.type?.type})`,
       },
     ];
   });
