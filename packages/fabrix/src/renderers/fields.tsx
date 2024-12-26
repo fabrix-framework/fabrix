@@ -160,7 +160,6 @@ const renderField = ({
     };
   }, {});
 
-  const fieldName = field.field.getName();
   const className = buildClassName(field.config, extraClassName);
   const name = field.field.asKey();
   return createElement(component, {

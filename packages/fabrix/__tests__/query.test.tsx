@@ -53,7 +53,11 @@ describe("collection", () => {
         collection {
           id
           name
-          email
+          age
+          category
+          address {
+            zip
+          }
         }
       }
     }
@@ -66,7 +70,11 @@ describe("collection", () => {
           node {
             id
             name
-            email
+            age
+            category
+            address {
+              zip
+            }
           }
         }
       }
@@ -108,83 +116,30 @@ describe("collection", () => {
           );
           const headerNames = headers.map((v) => v.textContent);
           expect(headerNames).toEqual([
-            "id (Scalar)",
-            "name (Scalar)",
-            "email (Scalar)",
+            "id (Scalar:ID)",
+            "name (Scalar:String)",
+            "age (Scalar:Int)",
+            "category (Enum:UserCategory)",
+            "zip (Scalar:String)",
           ]);
 
           const cells = await within(rowGroups[1]).findAllByRole("cell");
           expect(cells.map((v) => v.textContent)).toEqual([
             users[0].id,
             users[0].name,
-            users[0].email,
+            users[0].age + "",
+            users[0].category,
+            users[0].address.zip,
             users[1].id,
             users[1].name,
-            users[1].email,
+            users[1].age + "",
+            users[1].category,
+            users[1].address.zip,
           ]);
         },
       );
     },
   );
-
-  it.each([
-    [
-      "collection",
-      `query getUsers {
-        users {
-          collection {
-            id
-            name
-            address {
-              city
-              street
-              zip
-            }
-          }
-        }
-      }`,
-    ],
-    [
-      "edges",
-      `query getUsers {
-        userEdges {
-          edges {
-            node {
-              id
-              name
-              address {
-                city
-                street
-                zip
-              }
-            }
-          }
-        }
-      }`,
-    ],
-  ])("should render the table with nested fields (%s)", async (_, query) => {
-    await testWithUnmount(<FabrixComponent query={query} />, async () => {
-      const table = await screen.findByRole("table");
-      expect(table).toBeInTheDocument();
-
-      const rows = await within(table).findAllByRole("row");
-      expect(rows.length).toBe(users.length + 1);
-
-      const user = users[0];
-      const cells = await within(rows[1]).findAllByRole("cell");
-      const cellValues = cells.map((cell) => cell.textContent);
-
-      expect(cellValues).toEqual(
-        expect.arrayContaining([
-          user.id,
-          user.name,
-          user.address.city,
-          user.address.street,
-          user.address.zip,
-        ]),
-      );
-    });
-  });
 
   it("should render the table with customized labels", async () => {
     await testWithUnmount(
