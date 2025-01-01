@@ -21,6 +21,7 @@ type User implements Node {
   id: ID!
   name: String!
   email: String!
+  age: Int!
   category: UserCategory!
   address: UserAddress!
 }

@@ -1,6 +1,7 @@
 import { createElement, useCallback, useContext, useMemo } from "react";
 import { FabrixContext } from "@context";
 import { Value } from "@fetcher";
+import { get } from "es-toolkit/compat";
 import {
   assertObjectValue,
   buildClassName,
@@ -104,7 +105,10 @@ export const getSubFields = (
 ) =>
   // filters fields by parent key and maps the filtered values to the array of SubField
   fields
-    .filter((f) => f.field.getParent()?.asKey() === name)
+    .filter((f) => {
+      const parentKey = f.field.getParent()?.asKey();
+      return parentKey === name || parentKey?.startsWith(`${name}.`)
+    })
     .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
     .map((value) => ({
       value,
@@ -159,13 +163,13 @@ const renderField = ({
     };
   }, {});
 
-  const fieldName = field.field.getName();
   const className = buildClassName(field.config, extraClassName);
+  const name = field.field.asKey();
   return createElement(component, {
     key: indexKey,
-    name: field.field.asKey(),
+    name,
     path: field.field.value,
-    value: rootField.data?.[fieldName] ?? "-",
+    value: get(rootField.data, name),
     type: fieldType,
     subFields: subFields.map((subField) => ({
       key: subField.value.field.getName(),

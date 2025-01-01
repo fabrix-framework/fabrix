@@ -1,4 +1,4 @@
-import { ComponentType, ReactNode } from "react";
+import { ComponentType } from "react";
 import { FabrixComponentProps } from "@renderer";
 import { ViewFieldSchema } from "@directive/schema";
 import { FieldType } from "@renderers/typename";

@@ -5,18 +5,59 @@ import { ComponentRegistry } from "@registry";
 import { users } from "./mocks/data";
 import { testWithUnmount } from "./supports/render";
 
-type FabrixComponentChildrenProps = Parameters<
-  typeof FabrixComponent
->[0]["children"];
-
 describe("query", () => {
+  it("should render the fields", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          query {
+            firstUser {
+              id
+              name
+              email
+              address {
+                city
+                street
+                zip
+              }
+            }
+          }
+        `}
+      />,
+      async () => {
+        const fields = await screen.findAllByRole("region");
+        const textContents = fields.map((field) => field.textContent);
+
+        const user = users[0];
+        expect(textContents).toEqual([
+          `id:${user.id}`,
+          `name:${user.name}`,
+          `email:${user.email}`,
+          `address.city:${user.address.city}`,
+          `address.street:${user.address.street}`,
+          `address.zip:${user.address.zip}`,
+        ]);
+      },
+    );
+  });
+});
+
+describe("collection", () => {
+  type FabrixComponentChildrenProps = Parameters<
+    typeof FabrixComponent
+  >[0]["children"];
+
   const collectionQuery = `
     query getUsers {
       users {
         collection {
           id
           name
-          email
+          age
+          category
+          address {
+            zip
+          }
         }
       }
     }
@@ -29,7 +70,11 @@ describe("query", () => {
           node {
             id
             name
-            email
+            age
+            category
+            address {
+              zip
+            }
           }
         }
       }
@@ -71,19 +116,25 @@ describe("query", () => {
           );
           const headerNames = headers.map((v) => v.textContent);
           expect(headerNames).toEqual([
-            "id (Scalar)",
-            "name (Scalar)",
-            "email (Scalar)",
+            "id (Scalar:ID)",
+            "name (Scalar:String)",
+            "age (Scalar:Int)",
+            "category (Enum:UserCategory)",
+            "zip (Scalar:String)",
           ]);
 
           const cells = await within(rowGroups[1]).findAllByRole("cell");
           expect(cells.map((v) => v.textContent)).toEqual([
             users[0].id,
             users[0].name,
-            users[0].email,
+            users[0].age + "",
+            users[0].category,
+            users[0].address.zip,
             users[1].id,
             users[1].name,
-            users[1].email,
+            users[1].age + "",
+            users[1].category,
+            users[1].address.zip,
           ]);
         },
       );

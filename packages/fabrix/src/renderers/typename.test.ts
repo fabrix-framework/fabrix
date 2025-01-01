@@ -115,6 +115,7 @@ describe("resolveTypenameByPath", () => {
       id: { type: "Scalar", name: "ID" },
       name: { type: "Scalar", name: "String" },
       email: { type: "Scalar", name: "String" },
+      age: { type: "Scalar", name: "Int" },
       category: {
         type: "Enum",
         name: "UserCategory",
