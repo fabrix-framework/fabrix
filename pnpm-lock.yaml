@@ -280,8 +280,16 @@ importers:
         specifier: ^5.5.3
         version: 5.7.2
       vite-tsconfig-paths:
+<<<<<<< HEAD
         specifier: ^4.3.2
         version: 5.1.4(typescript@5.7.2)(vite@5.4.8(@types/node@22.10.5))
+||||||| parent of fa62182 (Bump vite-tsconfig-paths from 4.3.2 to 5.1.4)
+        specifier: ^4.3.2
+        version: 4.3.2(typescript@5.6.3)(vite@5.4.8(@types/node@22.7.5))
+=======
+        specifier: ^5.1.4
+        version: 5.1.4(typescript@5.6.3)(vite@5.4.8(@types/node@22.7.5))
+>>>>>>> fa62182 (Bump vite-tsconfig-paths from 4.3.2 to 5.1.4)
       vitest:
         specifier: ^2.1.8
         version: 2.1.8(@types/node@22.10.5)(happy-dom@16.5.2)(msw@2.7.0(@types/node@22.10.5)(typescript@5.7.2))
@@ -9390,7 +9398,13 @@ snapshots:
     transitivePeerDependencies:
       - rollup
 
+<<<<<<< HEAD
   vite-tsconfig-paths@5.1.4(typescript@5.7.2)(vite@5.4.8(@types/node@22.10.5)):
+||||||| parent of fa62182 (Bump vite-tsconfig-paths from 4.3.2 to 5.1.4)
+  vite-tsconfig-paths@4.3.2(typescript@5.6.3)(vite@5.4.8(@types/node@22.7.5)):
+=======
+  vite-tsconfig-paths@5.1.4(typescript@5.6.3)(vite@5.4.8(@types/node@22.7.5)):
+>>>>>>> fa62182 (Bump vite-tsconfig-paths from 4.3.2 to 5.1.4)
     dependencies:
       debug: 4.3.7
       globrex: 0.1.2
