@@ -105,7 +105,10 @@ export const getSubFields = (
 ) =>
   // filters fields by parent key and maps the filtered values to the array of SubField
   fields
-    .filter((f) => f.field.getParent()?.asKey().startsWith(name))
+    .filter((f) => {
+      const parentKey = f.field.getParent()?.asKey();
+      return parentKey === name || parentKey?.startsWith(`${name}.`)
+    })
     .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
     .map((value) => ({
       value,
