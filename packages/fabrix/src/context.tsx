@@ -11,7 +11,7 @@ import {
 } from "graphql";
 import { createContext, useCallback, useContext } from "react";
 import { ComponentRegistry, emptyComponentRegistry } from "@registry";
-import { Client as UrqlClient } from "urql";
+import { Client as UrqlClient, useClient } from "urql";
 
 export type SchemaSet = {
   serverSchema: GraphQLSchema;
@@ -98,11 +98,6 @@ export const useFabrixContext = () => {
 
 export type BuildFabrixContextProps = {
   /**
-   * The urql client to be used in the Fabrix context.
-   */
-  client: UrqlClient;
-
-  /**
    * The schema of the server.
    *
    * If the schema is a URL, the schema will be fetched from the URL through introspection query.
@@ -120,29 +115,35 @@ export type BuildFabrixContextProps = {
   componentRegistry: ComponentRegistry;
 };
 
-export const buildSchemaSet = async (
-  props: BuildFabrixContextProps,
-): Promise<SchemaSet> => {
-  const resolvedServerSchema = await resolveServerSchema(props);
+export const useSchemaSetBuilder = (props: BuildFabrixContextProps) => {
+  const urqlClient = useClient();
 
   return {
-    serverSchema: resolvedServerSchema,
-    operationSchema:
-      props.operationSchema !== undefined
-        ? typeof props.operationSchema === "string"
-          ? parse(props.operationSchema)
-          : props.operationSchema
-        : undefined,
+    build: async () => {
+      const resolvedServerSchema = await resolveServerSchema(
+        urqlClient,
+        props.serverSchema,
+      );
+
+      return {
+        serverSchema: resolvedServerSchema,
+        operationSchema:
+          props.operationSchema !== undefined
+            ? typeof props.operationSchema === "string"
+              ? parse(props.operationSchema)
+              : props.operationSchema
+            : undefined,
+      };
+    },
   };
 };
 
 const resolveServerSchema = async (
-  props: Pick<BuildFabrixContextProps, "client" | "serverSchema">,
+  client: UrqlClient,
+  serverSchema: BuildFabrixContextProps["serverSchema"],
 ): Promise<GraphQLSchema> => {
-  const serverSchema = props.serverSchema;
-
   if (!serverSchema) {
-    const r = await props.client.query(getIntrospectionQuery(), {});
+    const r = await client.query(getIntrospectionQuery(), {});
     return buildClientSchema(r.data as IntrospectionQuery);
   }
 

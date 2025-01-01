@@ -10,7 +10,7 @@ import { removeDirectivesExchange } from "@exchanges/removeDirectives";
 import { addTypenameFieldExchange } from "@exchanges/addTypename";
 import { removeTypenameFromVariableExchange } from "@exchanges/removeTypenameFromVariable";
 import {
-  buildSchemaSet,
+  useSchemaSetBuilder,
   BuildFabrixContextProps,
   FabrixContext,
   SchemaLoader,
@@ -51,9 +51,7 @@ export const FabrixProvider = (
 
   return (
     <UrqlProvider value={client}>
-      <FabrixContextProvider {...props} client={client}>
-        {props.children}
-      </FabrixContextProvider>
+      <FabrixContextProvider {...props}>{props.children}</FabrixContextProvider>
     </UrqlProvider>
   );
 };
@@ -61,16 +59,18 @@ export const FabrixProvider = (
 const FabrixContextProvider = (
   props: React.PropsWithChildren<BuildFabrixContextProps>,
 ) => {
+  const builder = useSchemaSetBuilder(props);
   const [schemaSetStatus, setSchemaSetStatus] = useState<SchemaLoader>({
     status: "loading",
   });
 
   useEffect(() => {
-    buildSchemaSet(props)
-      .then((value) => {
+    builder
+      .build()
+      .then((schemaSet) => {
         setSchemaSetStatus({
           status: "loaded",
-          schemaSet: value,
+          schemaSet,
         });
       })
       .catch((e: Error) => {
