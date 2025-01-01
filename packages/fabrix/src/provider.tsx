@@ -10,13 +10,20 @@ import { removeDirectivesExchange } from "@exchanges/removeDirectives";
 import { addTypenameFieldExchange } from "@exchanges/addTypename";
 import { removeTypenameFromVariableExchange } from "@exchanges/removeTypenameFromVariable";
 import {
-  buildSchemaSet,
+  useSchemaSetBuilder,
   BuildFabrixContextProps,
   FabrixContext,
   SchemaLoader,
 } from "./context";
 
 type FabrixProviderProps = {
+  /**
+   * The URL of the GraphQL server to connect to.
+   *
+   * This prop will be used to fetch the schema of the server if the `serverSchema` is not provided.
+   */
+  url: string;
+
   /**
    * A list of urql exchanges to prepend to the default exchanges.
    */
@@ -52,16 +59,18 @@ export const FabrixProvider = (
 const FabrixContextProvider = (
   props: React.PropsWithChildren<BuildFabrixContextProps>,
 ) => {
+  const builder = useSchemaSetBuilder(props);
   const [schemaSetStatus, setSchemaSetStatus] = useState<SchemaLoader>({
     status: "loading",
   });
 
   useEffect(() => {
-    buildSchemaSet(props)
-      .then((value) => {
+    builder
+      .build()
+      .then((schemaSet) => {
         setSchemaSetStatus({
           status: "loaded",
-          schemaSet: value,
+          schemaSet,
         });
       })
       .catch((e: Error) => {

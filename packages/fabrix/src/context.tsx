@@ -11,6 +11,7 @@ import {
 } from "graphql";
 import { createContext, useCallback, useContext } from "react";
 import { ComponentRegistry, emptyComponentRegistry } from "@registry";
+import { Client as UrqlClient, useClient } from "urql";
 
 export type SchemaSet = {
   serverSchema: GraphQLSchema;
@@ -97,13 +98,6 @@ export const useFabrixContext = () => {
 
 export type BuildFabrixContextProps = {
   /**
-   * The URL of the GraphQL server to connect to.
-   *
-   * This prop will be used to fetch the schema of the server if the `serverSchema` is not provided.
-   */
-  url: string;
-
-  /**
    * The schema of the server.
    *
    * If the schema is a URL, the schema will be fetched from the URL through introspection query.
@@ -121,41 +115,39 @@ export type BuildFabrixContextProps = {
   componentRegistry: ComponentRegistry;
 };
 
-export const buildSchemaSet = async (
-  props: BuildFabrixContextProps,
-): Promise<SchemaSet> => {
-  const resolvedServerSchema = await resolveServerSchema(
-    props.serverSchema ?? props.url,
-  );
+export const useSchemaSetBuilder = (props: BuildFabrixContextProps) => {
+  const urqlClient = useClient();
 
   return {
-    serverSchema: resolvedServerSchema,
-    operationSchema:
-      props.operationSchema !== undefined
-        ? typeof props.operationSchema === "string"
-          ? parse(props.operationSchema)
-          : props.operationSchema
-        : undefined,
+    build: async () => {
+      const resolvedServerSchema = await resolveServerSchema(
+        urqlClient,
+        props.serverSchema,
+      );
+
+      return {
+        serverSchema: resolvedServerSchema,
+        operationSchema:
+          props.operationSchema !== undefined
+            ? typeof props.operationSchema === "string"
+              ? parse(props.operationSchema)
+              : props.operationSchema
+            : undefined,
+      };
+    },
   };
 };
 
 const resolveServerSchema = async (
-  input: GraphQLSchema | string,
+  client: UrqlClient,
+  serverSchema: BuildFabrixContextProps["serverSchema"],
 ): Promise<GraphQLSchema> => {
-  if (
-    typeof input === "string" &&
-    (input.startsWith("https://") || input.startsWith("http://"))
-  ) {
-    const introspectionQuery = getIntrospectionQuery();
-    const result = await fetch(input, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: introspectionQuery }),
-    });
-
-    const { data } = (await result.json()) as { data: IntrospectionQuery };
-    return buildClientSchema(data);
+  if (!serverSchema) {
+    const r = await client.query(getIntrospectionQuery(), {});
+    return buildClientSchema(r.data as IntrospectionQuery);
   }
 
-  return typeof input === "string" ? buildSchema(input) : input;
+  return typeof serverSchema === "string"
+    ? buildSchema(serverSchema)
+    : serverSchema;
 };
