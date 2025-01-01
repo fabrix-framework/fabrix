@@ -11,6 +11,7 @@ import {
 } from "graphql";
 import { createContext, useCallback, useContext } from "react";
 import { ComponentRegistry, emptyComponentRegistry } from "@registry";
+import { Client as UrqlClient } from "urql";
 
 export type SchemaSet = {
   serverSchema: GraphQLSchema;
@@ -97,11 +98,9 @@ export const useFabrixContext = () => {
 
 export type BuildFabrixContextProps = {
   /**
-   * The URL of the GraphQL server to connect to.
-   *
-   * This prop will be used to fetch the schema of the server if the `serverSchema` is not provided.
+   * The urql client to be used in the Fabrix context.
    */
-  url: string;
+  client: UrqlClient;
 
   /**
    * The schema of the server.
@@ -124,9 +123,7 @@ export type BuildFabrixContextProps = {
 export const buildSchemaSet = async (
   props: BuildFabrixContextProps,
 ): Promise<SchemaSet> => {
-  const resolvedServerSchema = await resolveServerSchema(
-    props.serverSchema ?? props.url,
-  );
+  const resolvedServerSchema = await resolveServerSchema(props);
 
   return {
     serverSchema: resolvedServerSchema,
@@ -140,22 +137,16 @@ export const buildSchemaSet = async (
 };
 
 const resolveServerSchema = async (
-  input: GraphQLSchema | string,
+  props: Pick<BuildFabrixContextProps, "client" | "serverSchema">,
 ): Promise<GraphQLSchema> => {
-  if (
-    typeof input === "string" &&
-    (input.startsWith("https://") || input.startsWith("http://"))
-  ) {
-    const introspectionQuery = getIntrospectionQuery();
-    const result = await fetch(input, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: introspectionQuery }),
-    });
+  const serverSchema = props.serverSchema;
 
-    const { data } = (await result.json()) as { data: IntrospectionQuery };
-    return buildClientSchema(data);
+  if (!serverSchema) {
+    const r = await props.client.query(getIntrospectionQuery(), {});
+    return buildClientSchema(r.data as IntrospectionQuery);
   }
 
-  return typeof input === "string" ? buildSchema(input) : input;
+  return typeof serverSchema === "string"
+    ? buildSchema(serverSchema)
+    : serverSchema;
 };

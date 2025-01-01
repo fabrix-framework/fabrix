@@ -18,6 +18,13 @@ import {
 
 type FabrixProviderProps = {
   /**
+   * The URL of the GraphQL server to connect to.
+   *
+   * This prop will be used to fetch the schema of the server if the `serverSchema` is not provided.
+   */
+  url: string;
+
+  /**
    * A list of urql exchanges to prepend to the default exchanges.
    */
   prependExchanges?: Array<Exchange>;
@@ -44,7 +51,9 @@ export const FabrixProvider = (
 
   return (
     <UrqlProvider value={client}>
-      <FabrixContextProvider {...props}>{props.children}</FabrixContextProvider>
+      <FabrixContextProvider {...props} client={client}>
+        {props.children}
+      </FabrixContextProvider>
     </UrqlProvider>
   );
 };
