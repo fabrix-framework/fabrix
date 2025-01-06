@@ -18,14 +18,14 @@
     "@fabrix-framework/fabrix": "workspace:*",
     "framer-motion": "^11.11.17",
     "graphql-tag": "^2.12.6",
-    "react": "^18.3.1",
+    "react": "^19.0.0",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@fabrix-framework/eslint-config": "workspace:*",
     "@fabrix-framework/prettier-config": "workspace:*",
-    "@types/react": "^18.3.12",
+    "@types/react": "^19.0.2",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
     "eslint": "^9.17.0",
