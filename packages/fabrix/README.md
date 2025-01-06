@@ -1,4 +1,4 @@
-![cover](../../assets/cover.png)
+![cover](https://github.com/fabrix-framework/.github/blob/main/assets/cover.png)
 
 # fabrix <!-- omit in toc -->
 
