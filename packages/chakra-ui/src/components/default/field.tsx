@@ -20,7 +20,7 @@ export const ChakraField = (props: FieldComponentProps) => {
   };
 
   return (
-    <Stack className={className} spacing={2} marginTop={2}>
+    <Stack className={className} marginTop={2}>
       <LabelledHeading {...props} />
       {renderValue()}
     </Stack>

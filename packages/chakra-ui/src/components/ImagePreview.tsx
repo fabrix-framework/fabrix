@@ -1,4 +1,4 @@
-import { Stack, Img, Text } from "@chakra-ui/react";
+import { Stack, Image, Text } from "@chakra-ui/react";
 import { FieldComponentProps } from "@fabrix-framework/fabrix";
 import { LabelledHeading } from "./default/shared";
 
@@ -12,11 +12,11 @@ export const ImagePreview = (props: FieldComponentProps<ImagePreviewProps>) => {
   const userProps = props.userProps;
 
   return (
-    <Stack className={className} spacing={2}>
+    <Stack className={className} gap={2}>
       <LabelledHeading {...props} />
       <Text fontSize="sm">
         {typeof props.value === "string" ? (
-          <Img
+          <Image
             src={String(props.value)}
             width={userProps?.width}
             height={userProps?.height}
