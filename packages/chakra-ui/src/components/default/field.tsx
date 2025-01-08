@@ -3,7 +3,6 @@ import { Text, Stack, Badge } from "@chakra-ui/react";
 import createColor from "create-color";
 import chroma from "chroma-js";
 import { useMemo } from "react";
-import { CheckCircleIcon } from "@chakra-ui/icons";
 import { ChakraReactTable } from "./table";
 import { LabelledHeading } from "./shared";
 
@@ -39,8 +38,6 @@ export const SingleValueField = (props: {
       return <EnumBadgeField {...props} />;
     case "Scalar":
       switch (type.name) {
-        case "Boolean":
-          return value ? <CheckCircleIcon /> : "-";
         default:
           return renderAsText();
       }

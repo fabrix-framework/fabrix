@@ -23,10 +23,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@chakra-ui/icons": "^2.2.4",
-    "@emotion/css": "^11.13.5",
-    "@emotion/react": "^11.13.5",
-    "@emotion/styled": "^11.14.0",
+    "@emotion/react": "^11.14.0",
     "@fabrix-framework/fabrix": "workspace:*",
     "@tanstack/react-table": "^8.19.3",
     "chakra-react-select": "^6.0.0",
@@ -36,6 +33,7 @@
     "zod": "^3.23.8"
   },
   "peerDependencies": {
+    "@emotion/react": "^11",
     "@chakra-ui/react": "^3",
     "react": "^18",
     "react-dom": "^18"

@@ -5,7 +5,7 @@ import {
   gql,
 } from "@fabrix-framework/fabrix";
 import { ChakraUIRegistry } from "@fabrix-framework/chakra-ui";
-import { ChakraProvider } from "@chakra-ui/react";
+import { Provider as ChakraProvider } from "./components/ui/provider.tsx";
 import { IDActionCell } from "./components/IDActionCell.tsx";
 import App from "./App.tsx";
 import "./index.css";
