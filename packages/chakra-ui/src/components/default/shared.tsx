@@ -12,15 +12,17 @@ export const LabelledHeading = (
   const { attributes } = props;
 
   return (
-    <Field label={props.name}>
-      <HStack gap={2}>
-        <Heading size="xs">{attributes.label}</Heading>
-        {isRequired && (
-          <Badge colorScheme="red" fontSize="xs">
-            REQUIRED
-          </Badge>
-        )}
-      </HStack>
-    </Field>
+    <Field
+      label={
+        <HStack gap={2}>
+          <Heading size="xs">{attributes.label}</Heading>
+          {isRequired && (
+            <Badge colorScheme="red" fontSize="xs">
+              REQUIRED
+            </Badge>
+          )}
+        </HStack>
+      }
+    />
   );
 };
