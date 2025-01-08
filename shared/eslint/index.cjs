@@ -31,6 +31,7 @@ module.exports = tsEslint.config(
     },
     rules: {
       // @typescript-eslint
+      "@typescript-eslint/no-base-to-string": "off",
       "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
       "@typescript-eslint/no-non-null-assertion": "error",
       "@typescript-eslint/no-empty-function": "error",
