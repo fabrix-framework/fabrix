@@ -40,7 +40,12 @@ export const IDActionCell = {
     }, [client, context, props]);
 
     return (
-      <Button onClick={mutate} colorScheme={color} isDisabled={isMutating}>
+      <Button
+        onClick={mutate}
+        colorScheme={color}
+        // @ts-expect-error
+        isDisabled={isMutating}
+      >
         {label}
       </Button>
     );
