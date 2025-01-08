@@ -38,6 +38,17 @@ export const SingleValueField = (props: {
       return <EnumBadgeField {...props} />;
     case "Scalar":
       switch (type.name) {
+        case "Boolean":
+          return (
+            <Badge
+              borderRadius={3}
+              alignSelf="flex-start"
+              backgroundColor={value ? "green.500" : "red.500"}
+              color="#FFFFFF"
+            >
+              {value ? "True" : "False"}
+            </Badge>
+          );
         default:
           return renderAsText();
       }
