@@ -96,7 +96,12 @@ const formFieldView = (props: FormFieldComponentProps) => {
           }
         }}
       />
-      {error && <div role="alert">{error?.message?.toString()}</div>}
+      {error && (
+        <div role="alert">
+          {// eslint-disable-next-line @typescript-eslint/no-base-to-string
+          error?.message?.toString()}
+        </div>
+      )}
     </fieldset>
   );
 };
