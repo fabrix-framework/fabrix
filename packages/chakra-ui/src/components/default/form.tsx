@@ -3,7 +3,8 @@ import {
   FormComponentProps,
   FieldType,
 } from "@fabrix-framework/fabrix";
-import { Text, Switch, Input, Stack, Button, Box } from "@chakra-ui/react";
+import { Text, Input, Stack, Box, Button } from "@chakra-ui/react";
+import { Switch } from "@components/ui/switch";
 import { Select } from "chakra-react-select";
 import { useController } from "@fabrix-framework/fabrix/rhf";
 import { LabelledHeading } from "./shared";
@@ -17,6 +18,7 @@ export const ChakraForm = (props: FormComponentProps) => {
           className="col-12"
           colorScheme="blue"
           marginTop={2}
+          // @ts-expect-error
           isDisabled={isSubmitting}
           onClick={() => submit()}
         >
@@ -63,7 +65,7 @@ const ErrorField = (props: FormFieldComponentProps) => {
 
   return (
     error && (
-      <Text color="red.500" size="sm" role="alert">
+      <Text color="red.500" fontSize="sm" role="alert">
         {error?.message?.toString()}
       </Text>
     )
@@ -85,7 +87,7 @@ const MultiSelectFormField = (
   }));
 
   return (
-    <Stack className={className} spacing={2}>
+    <Stack className={className} gap={2}>
       <LabelledHeading {...props} />
       <Select
         isMulti
@@ -112,7 +114,7 @@ const SelectFormField = (
   }));
 
   return (
-    <Stack className={className} spacing={2}>
+    <Stack className={className} gap={2}>
       <LabelledHeading {...props} />
       <Select
         options={values}
@@ -134,7 +136,7 @@ const TextFormField = (props: FormFieldComponentProps) => {
   });
 
   return (
-    <Stack className={attributes.className} spacing={2}>
+    <Stack className={attributes.className} gap={2}>
       <LabelledHeading {...props} />
       <Input {...field} placeholder="Enter value" />
       <ErrorField {...props} />
@@ -150,7 +152,7 @@ const NumberFormField = (props: FormFieldComponentProps) => {
   });
 
   return (
-    <Stack className={className} spacing={2}>
+    <Stack className={className} gap={2}>
       <LabelledHeading {...props} />
       <Input
         {...field}
@@ -172,7 +174,7 @@ const BooleanFormField = (props: FormFieldComponentProps) => {
   });
 
   return (
-    <Stack className={className} spacing={2}>
+    <Stack className={className} gap={2}>
       <LabelledHeading {...props} />
       <Switch {...field} size="lg" />
       <ErrorField {...props} />

@@ -3,7 +3,6 @@ import { Text, Stack, Badge } from "@chakra-ui/react";
 import createColor from "create-color";
 import chroma from "chroma-js";
 import { useMemo } from "react";
-import { CheckCircleIcon } from "@chakra-ui/icons";
 import { ChakraReactTable } from "./table";
 import { LabelledHeading } from "./shared";
 
@@ -20,7 +19,7 @@ export const ChakraField = (props: FieldComponentProps) => {
   };
 
   return (
-    <Stack className={className} spacing={2} marginTop={2}>
+    <Stack className={className} marginTop={2}>
       <LabelledHeading {...props} />
       {renderValue()}
     </Stack>
@@ -40,7 +39,16 @@ export const SingleValueField = (props: {
     case "Scalar":
       switch (type.name) {
         case "Boolean":
-          return value ? <CheckCircleIcon /> : "-";
+          return (
+            <Badge
+              borderRadius={3}
+              alignSelf="flex-start"
+              backgroundColor={value ? "green.500" : "red.500"}
+              color="#FFFFFF"
+            >
+              {value ? "True" : "False"}
+            </Badge>
+          );
         default:
           return renderAsText();
       }

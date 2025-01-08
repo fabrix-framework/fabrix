@@ -1,4 +1,5 @@
-import { Flex, Heading, Badge } from "@chakra-ui/react";
+import { Heading, Badge, HStack } from "@chakra-ui/react";
+import { Field } from "@components/ui/field";
 import {
   FieldComponentProps,
   FormFieldComponentProps,
@@ -11,13 +12,17 @@ export const LabelledHeading = (
   const { attributes } = props;
 
   return (
-    <Flex gap={2} as="label" htmlFor={props.name}>
-      <Heading size="xs">{attributes.label}</Heading>
-      {isRequired && (
-        <Badge colorScheme="red" fontSize="xs">
-          REQUIRED
-        </Badge>
-      )}
-    </Flex>
+    <Field
+      label={
+        <HStack gap={2}>
+          <Heading size="xs">{attributes.label}</Heading>
+          {isRequired && (
+            <Badge colorScheme="red" fontSize="xs">
+              REQUIRED
+            </Badge>
+          )}
+        </HStack>
+      }
+    />
   );
 };

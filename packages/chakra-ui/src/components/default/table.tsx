@@ -1,5 +1,5 @@
 import { TableComponentProps } from "@fabrix-framework/fabrix";
-import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/react";
+import { Table } from "@chakra-ui/react";
 import {
   createColumnHelper,
   useReactTable,
@@ -55,34 +55,34 @@ export const ChakraReactTable = (props: TableComponentProps) => {
   });
 
   return (
-    <Table className={className} marginTop={2}>
-      <Thead>
+    <Table.Root className={className} marginTop={2}>
+      <Table.Header>
         {table.getHeaderGroups().map((headerGroup) => (
-          <Tr key={headerGroup.id}>
+          <Table.Row key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <Th key={header.id} paddingStart={0}>
+              <Table.ColumnHeader key={header.id} paddingStart={0}>
                 {renderHeader(header)}
-              </Th>
+              </Table.ColumnHeader>
             ))}
-          </Tr>
+          </Table.Row>
         ))}
-      </Thead>
-      <Tbody>
+      </Table.Header>
+      <Table.Body>
         {table.getRowModel().rows.map((row) => (
-          <Tr key={row.id}>
+          <Table.Row key={row.id}>
             {row.getVisibleCells().map((cell) => (
-              <Td
+              <Table.Cell
                 key={cell.id}
                 paddingStart={0}
                 paddingTop={2}
                 paddingBottom={2}
               >
                 {renderCell(cell)}
-              </Td>
+              </Table.Cell>
             ))}
-          </Tr>
+          </Table.Row>
         ))}
-      </Tbody>
-    </Table>
+      </Table.Body>
+    </Table.Root>
   );
 };
