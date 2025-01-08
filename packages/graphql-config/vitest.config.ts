@@ -1,12 +1,11 @@
 import { defineConfig } from "vitest/config";
-import stringPlugin from "vite-plugin-string";
+import { stringPlugin } from "vite-string-plugin";
 
 export default defineConfig({
   plugins: [
     // Load .graphql files as strings as production build with tsup also does
     stringPlugin({
-      include: "**/*.graphql",
-      compress: false,
+      match: /\.graphql$/,
     }),
   ],
   test: {
