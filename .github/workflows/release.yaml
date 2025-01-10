@@ -1,4 +1,4 @@
-name: Release Candidate
+name: Release
 
 on:
   push:
@@ -27,5 +27,7 @@ jobs:
           node-version-file: './package.json'
       - run: pnpm install
       - uses: changesets/action@v1
+        with:
+          publish: pnpm changeset:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
