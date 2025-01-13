@@ -6,7 +6,7 @@
     ".": "./index.cjs"
   },
   "dependencies": {
-    "@eslint/compat": "^1.2.4",
+    "@eslint/compat": "^1.2.5",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "typescript-eslint": "^8.0.1"
