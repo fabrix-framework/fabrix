@@ -33,7 +33,7 @@
     "@fabrix-framework/prettier-config": "workspace:*",
     "@types/node": "^22.7.5",
     "eslint": "^9.18.0",
-    "memfs": "^4.15.1",
+    "memfs": "^4.17.0",
     "prettier": "^3.4.2",
     "tsup": "^8.3.5",
     "typescript": "^5.5.3",
