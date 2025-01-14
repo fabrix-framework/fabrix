@@ -3,6 +3,11 @@
   "private": false,
   "version": "0.3.0",
   "description": "schema-driven UI packages",
+  "homepage": "https://fabrix-framework.github.io/docs/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fabrix-framework/fabrix.git"
+  },
   "exports": {
     ".": {
       "types": "./dist/fabrix.d.mts",
@@ -23,7 +28,12 @@
     "type-check": "tsc --noEmit --incremental --pretty",
     "test": "vitest run"
   },
-  "keywords": [],
+  "keywords": [
+    "react",
+    "graphql",
+    "codegen",
+    "generator"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {

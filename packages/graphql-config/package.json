@@ -4,6 +4,11 @@
   "type": "module",
   "version": "0.2.0",
   "description": "GraphQL configuration for fabrix",
+  "homepage": "https://fabrix-framework.github.io/docs/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fabrix-framework/fabrix.git"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
