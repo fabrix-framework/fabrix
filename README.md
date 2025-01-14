@@ -1,52 +1,22 @@
-# fabrix
-
 ![cover](https://github.com/fabrix-framework/.github/blob/main/assets/cover.png)
+  
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/fabrix-framework/fabrix/ci-packages.yaml?branch=main)](https://github.com/fabrix-framework/fabrix/actions)
+[![GitHub](https://img.shields.io/github/license/fabrix-framework/fabrix)](https://github.com/fabrix-framework/fabrix/blob/main/LICENSE)
+[![npm](https://img.shields.io/npm/v/@fabrix-framework/fabrix?logo=nodedotjs)](https://www.npmjs.com/package/@fabrix-framework/fabrix)
 
-Fabrix is a framework for building React applications that are backed by GraphQL backend. With fabrix, React components are generated from queries and mutations and automatically rendered with the data fetched from the GraphQL server.
+<hr />
 
-Consider the component in the Star Wars application that displays information of a character:
+Fabrix is a framework for building React applications that are backed by GraphQL backend. 
 
-```tsx
-const Character = (id: string) => 
-  <FabrixComponent 
-    query={`
-      query getCharacter($id: ID!) {
-        character(id: $id) {
-          name
-          status
-          profileImage
-        }
-      } 
-    `}
-    variables={{ id }}
-  />
-```
+# Features
 
-According to the query above, fabrix renders components.
-
-## Why fabrix? 
-
-At [Tailor](https://www.tailor.tech/), we frequently build frontend applications with numerous screens and heavy CRUD (Create, Read, Update, Delete) operations, particularly in admin panels and ERP systems.
-
-While generating type definitions and hooks from GraphQL is a common practice in React applications, this approach is often applied on a component-by-component basis. For applications requiring fine-tuned styling and high flexibility, this level of detail is necessary. However, in admin panels and ERP systems—where functionality and data management are prioritized over intricate styling—this granularity often becomes a burden.
-
-Fabrix solves this problem by automating the rendering of React components from GraphQL queries and schemas, significantly streamlining the development of complex, data-driven applications.
+* **Snappy DX** :heart: - Finally, all you need to do is just writing GraphQL! Free from repetitive tasks to ship your frontend to customers.
+* **Just works with React app** :rocket: - Fabrix can work with any existing React app, and can be used with any GraphQL schema. See [Component API](https://fabrix-framework.github.io/docs/guides/component/) for more information.
+* **Bring your own components** 🛠️ - Fabrix is designed to be agnostic to the components you use. You can use any component library, or [even build your own](https://fabrix-framework.github.io/docs/guides/component-registry/). We already have several component libraries that you can use out of the box.
 
 # Quick start
 
-See the instruction at [the quick start](./packages/fabrix/README.md#quick-start) to use fabrix in your React app
-
-> [!WARNING]
-> Fabrix is still in the **early stage of development**.
-> The API may change without any notice.
->
-> We are still actively developing the features. Tell us your idea or feedback on [discussions](https://github.com/fabrix-framework/fabrix/discussions).
-
-## Fabrix editor
-
-We have an [online interactive editor](https://fabrix-framework.github.io/editor/) to see how fabrix works out without any setups.
-
-![image](https://github.com/user-attachments/assets/9e2143fa-c953-488c-9085-5f689e323311)
+See the instruction at [our documentation](https://fabrix-framework.github.io/docs/) to use fabrix in your React app
 
 ## Examples
 
