@@ -1,7 +1,7 @@
 {
   "name": "@fabrix-framework/chakra-ui",
   "private": false,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Chakra UI components for Fabrix",
   "homepage": "https://fabrix-framework.github.io/docs/",
   "repository": {

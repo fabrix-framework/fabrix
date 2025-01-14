@@ -2,7 +2,7 @@
   "name": "@fabrix-framework/graphql-config",
   "private": false,
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "GraphQL configuration for fabrix",
   "homepage": "https://fabrix-framework.github.io/docs/",
   "repository": {
