@@ -1,7 +1,7 @@
 ![cover](https://github.com/fabrix-framework/.github/blob/main/assets/cover.png)
   
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/fabrix-framework/fabrix/ci-packages.yaml?branch=main)](https://github.com/honojs/hono/actions)
-[![GitHub](https://img.shields.io/github/license/honojs/hono)](https://github.com/fabrix-framework/fabrix/blob/main/LICENSE)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/fabrix-framework/fabrix/ci-packages.yaml?branch=main)](https://github.com/fabrix-framework/fabrix/actions)
+[![GitHub](https://img.shields.io/github/license/fabrix-framework/fabrix)](https://github.com/fabrix-framework/fabrix/blob/main/LICENSE)
 [![npm](https://img.shields.io/npm/v/@fabrix-framework/fabrix?logo=nodedotjs)](https://www.npmjs.com/package/@fabrix-framework/fabrix)
 
 <hr />
