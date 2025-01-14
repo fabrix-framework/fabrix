@@ -3,6 +3,9 @@
   "private": false,
   "version": "0.3.0",
   "description": "Chakra UI components for Fabrix",
+  "publishConfig": {
+    "provenance": true
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",

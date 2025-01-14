@@ -4,6 +4,9 @@
   "type": "module",
   "version": "0.2.0",
   "description": "GraphQL configuration for fabrix",
+  "publishConfig": {
+    "provenance": true
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
