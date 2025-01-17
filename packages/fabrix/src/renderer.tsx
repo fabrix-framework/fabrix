@@ -151,11 +151,14 @@ export const useFieldConfigs = <
   return { fieldConfigs };
 };
 
-type FabrixComponentCommonProps = {
+type FabrixComponentCommonProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+> = {
   /**
    * The variables to call the query with.
    */
-  variables?: Record<string, unknown>;
+  variables?: TVariables;
 
   /**
    * The title of the query.
