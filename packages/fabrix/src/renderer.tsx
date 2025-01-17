@@ -109,8 +109,12 @@ export type FieldConfigs = {
   fields: FieldConfig[];
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const useFieldConfigs = <TData = any, TVariables = Record<string, any>>(
+export const useFieldConfigs = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+>(
   query: GeneralDocumentType<TData, TVariables>,
 ) => {
   const rootDocument = buildRootDocument(query);
@@ -279,7 +283,14 @@ export type FabrixComponentChildrenProps<TData = any> = {
  * </FabrixComponent>
  * ```
  */
-export const FabrixComponent = (props: FabrixComponentProps) => {
+export const FabrixComponent = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+>(
+  props: FabrixComponentProps<TData, TVariables>,
+) => {
   const renderComponent = getComponentRendererFn(
     props,
     getComponentFn(
