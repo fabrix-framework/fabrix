@@ -9,7 +9,6 @@ import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
 import { buildDefaultFormFieldConfigs, formFieldMerger } from "@readers/form";
-import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import {
   buildRootDocument,
   FieldVariables,
@@ -110,6 +109,7 @@ export type FieldConfigs = {
   fields: FieldConfig[];
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const useFieldConfigs = <TData = any, TVariables = Record<string, any>>(
   query: GeneralDocumentType<TData, TVariables>,
 ) => {
@@ -170,7 +170,9 @@ type FabrixComponentCommonProps = {
 };
 
 export type FabrixComponentProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TVariables = Record<string, any>,
 > = FabrixComponentCommonProps & {
   /**
@@ -207,6 +209,7 @@ type FabrixGetComponentFn = (
   fieldsRenderer?: FabrixComponentFieldsRenderer,
 ) => ReactNode;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FabrixGetOperationFn<TData = any> = (
   indexOrName: number | string,
   renderer?: (props: {
@@ -215,6 +218,7 @@ export type FabrixGetOperationFn<TData = any> = (
   }) => ReactNode,
 ) => ReactNode;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FabrixComponentChildrenProps<TData = any> = {
   /**
    * Get the operation result by operation name or index

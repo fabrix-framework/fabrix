@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { FabrixComponent } from "@renderer";
 import { faker } from "@faker-js/faker";
+import gql from "graphql-tag";
 import { testWithUnmount } from "./supports/render";
 import { findForm } from "./supports/utils";
-import gql from "graphql-tag";
 
 describe("String", () => {
   it("minLength/maxLength", async () => {

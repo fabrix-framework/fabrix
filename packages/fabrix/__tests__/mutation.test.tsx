@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { FabrixComponent } from "@renderer";
-import { testWithUnmount } from "./supports/render";
 import gql from "graphql-tag";
+import { testWithUnmount } from "./supports/render";
 
 describe("mutation", () => {
   it("should render the form", async () => {

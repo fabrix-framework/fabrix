@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { FabrixComponent } from "@renderer";
 import { ComponentRegistry } from "@registry";
-import { users } from "./mocks/data";
-import { testWithUnmount } from "./supports/render";
 import gql from "graphql-tag";
 import { DocumentNode } from "graphql";
+import { users } from "./mocks/data";
+import { testWithUnmount } from "./supports/render";
 
 describe("query", () => {
   it("should render the fields", async () => {
@@ -250,6 +250,7 @@ describe("collection", () => {
       >
         {({ getOperation }) =>
           getOperation("getUsers", ({ data }) => (
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             <div role="result-size">{data.users.size}</div>
           ))
         }
