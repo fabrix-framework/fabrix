@@ -2,4 +2,4 @@
 "@fabrix-framework/fabrix": minor
 ---
 
-Support TypedDocumentNode for data prop
+Add `TypedDocumentNode` support: now if the `TypedDocumentNode` query is given to `FabrixComponent`, `variables` prop and `data` in render props that `getOperation` has are typed. 
