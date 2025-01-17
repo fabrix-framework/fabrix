@@ -3,16 +3,20 @@ import { FabrixComponent } from "@renderer";
 import { faker } from "@faker-js/faker";
 import { testWithUnmount } from "./supports/render";
 import { findForm } from "./supports/utils";
+import gql from "graphql-tag";
 
 describe("String", () => {
   it("minLength/maxLength", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
-            createUser(input: $input) @fabrixForm(input: [
-              { field: "name", constraint: { minLength: 5, maxLength: 10 } }
-            ]) {
+            createUser(input: $input)
+              @fabrixForm(
+                input: [
+                  { field: "name", constraint: { minLength: 5, maxLength: 10 } }
+                ]
+              ) {
               id
             }
           }
@@ -46,11 +50,12 @@ describe("String", () => {
   it("pattern", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
-            createUser(input: $input) @fabrixForm(input: [
-              { field: "name", constraint: { pattern: "^[a-z]+$" } }
-            ]) {
+            createUser(input: $input)
+              @fabrixForm(
+                input: [{ field: "name", constraint: { pattern: "^[a-z]+$" } }]
+              ) {
               id
             }
           }
@@ -74,11 +79,12 @@ describe("String", () => {
   it("format (email)", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
-            createUser(input: $input) @fabrixForm(input: [
-              { field: "email", constraint: { format: "email" } }
-            ]) {
+            createUser(input: $input)
+              @fabrixForm(
+                input: [{ field: "email", constraint: { format: "email" } }]
+              ) {
               id
             }
           }
@@ -102,11 +108,17 @@ describe("String", () => {
   it("oneOf", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
-            createUser(input: $input) @fabrixForm(input: [
-              { field: "name", constraint: { oneOf: ["EmployeeA", "EmployeeB"] } }
-            ]) {
+            createUser(input: $input)
+              @fabrixForm(
+                input: [
+                  {
+                    field: "name"
+                    constraint: { oneOf: ["EmployeeA", "EmployeeB"] }
+                  }
+                ]
+              ) {
               id
             }
           }
@@ -132,11 +144,12 @@ describe("Int/Float", () => {
   it("min/max", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
-            createUser(input: $input) @fabrixForm(input: [
-              { field: "age", constraint: { min: 20, max: 30 } }
-            ]) {
+            createUser(input: $input)
+              @fabrixForm(
+                input: [{ field: "age", constraint: { min: 20, max: 30 } }]
+              ) {
               id
             }
           }
@@ -169,11 +182,17 @@ describe("Int/Float", () => {
   it("exclusive min/max", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
-            createUser(input: $input) @fabrixForm(input: [
-              { field: "age", constraint: { exclusiveMin: 20, exclusiveMax: 30 } }
-            ]) {
+            createUser(input: $input)
+              @fabrixForm(
+                input: [
+                  {
+                    field: "age"
+                    constraint: { exclusiveMin: 20, exclusiveMax: 30 }
+                  }
+                ]
+              ) {
               id
             }
           }
@@ -206,11 +225,12 @@ describe("Int/Float", () => {
   it("multipleOf", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
-            createUser(input: $input) @fabrixForm(input: [
-              { field: "age", constraint: { multipleOf: 5 } }
-            ]) {
+            createUser(input: $input)
+              @fabrixForm(
+                input: [{ field: "age", constraint: { multipleOf: 5 } }]
+              ) {
               id
             }
           }
@@ -234,11 +254,12 @@ describe("Int/Float", () => {
   it("oneOf", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
-            createUser(input: $input) @fabrixForm(input: [
-              { field: "age", constraint: { oneOf: [20, 30] } }
-            ]) {
+            createUser(input: $input)
+              @fabrixForm(
+                input: [{ field: "age", constraint: { oneOf: [20, 30] } }]
+              ) {
               id
             }
           }

@@ -2,12 +2,13 @@ import { describe, expect, it } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { FabrixComponent } from "@renderer";
 import { testWithUnmount } from "./supports/render";
+import gql from "graphql-tag";
 
 describe("mutation", () => {
   it("should render the form", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
             createUser(input: $input) {
               id
@@ -28,12 +29,15 @@ describe("mutation", () => {
   it("should render the form with customized labels", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           mutation createUser($input: CreateUserInput!) {
-            createUser(input: $input) @fabrixForm(input: [
-              { field: "id", config: { hidden: true } },
-              { field: "name", config: { label: "UserName" } }
-            ]) {
+            createUser(input: $input)
+              @fabrixForm(
+                input: [
+                  { field: "id", config: { hidden: true } }
+                  { field: "name", config: { label: "UserName" } }
+                ]
+              ) {
               id
             }
           }

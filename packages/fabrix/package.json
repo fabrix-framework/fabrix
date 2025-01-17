@@ -58,6 +58,8 @@
     "@fabrix-framework/eslint-config": "workspace:*",
     "@fabrix-framework/prettier-config": "workspace:*",
     "@faker-js/faker": "^9.4.0",
+    "@graphql-codegen/typed-document-node": "^5.0.12",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.5.2",

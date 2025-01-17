@@ -4,12 +4,14 @@ import { FabrixComponent } from "@renderer";
 import { ComponentRegistry } from "@registry";
 import { users } from "./mocks/data";
 import { testWithUnmount } from "./supports/render";
+import gql from "graphql-tag";
+import { DocumentNode } from "graphql";
 
 describe("query", () => {
   it("should render the fields", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           query {
             firstUser {
               id
@@ -47,7 +49,7 @@ describe("collection", () => {
     typeof FabrixComponent
   >[0]["children"];
 
-  const collectionQuery = `
+  const collectionQuery = gql`
     query getUsers {
       users {
         collection {
@@ -63,7 +65,7 @@ describe("collection", () => {
     }
   `;
 
-  const edgeQuery = `
+  const edgeQuery = gql`
     query getUsers {
       userEdges {
         edges {
@@ -100,7 +102,7 @@ describe("collection", () => {
       collectionQuery,
       ({ getComponent }) => getComponent("getUsers", "users"),
     ],
-  ] satisfies [string, string, FabrixComponentChildrenProps][];
+  ] satisfies [string, DocumentNode, FabrixComponentChildrenProps][];
 
   it.each(testPatterns)(
     "should render the table (%s)",
@@ -144,11 +146,14 @@ describe("collection", () => {
   it("should render the table with customized labels", async () => {
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           query getUsers {
-            users @fabrixView(input: [
-              { field: "collection.name", config: { label: "UserName" } }
-            ]) {
+            users
+              @fabrixView(
+                input: [
+                  { field: "collection.name", config: { label: "UserName" } }
+                ]
+              ) {
               collection {
                 id
                 name
@@ -186,31 +191,29 @@ describe("collection", () => {
 
     await testWithUnmount(
       <FabrixComponent
-        query={`
+        query={gql`
           query getUsers {
-            users @fabrixView(input: [
-              {
-                field: "collection.id",
-                config: {
-                  hidden: true
-                }
-              },
-              {
-                field: "collection.actions",
-                config: {
-                  label: "操作",
-                  index: -1
-                  componentType: {
-                    name: "ActionCell",
-                    props: [
-                      { name: "label", value: "Delete" },
-                      { name: "color", value: "red" },
-                      { name: "mutation", value: "deleteUser" }
-                    ]
+            users
+              @fabrixView(
+                input: [
+                  { field: "collection.id", config: { hidden: true } }
+                  {
+                    field: "collection.actions"
+                    config: {
+                      label: "操作"
+                      index: -1
+                      componentType: {
+                        name: "ActionCell"
+                        props: [
+                          { name: "label", value: "Delete" }
+                          { name: "color", value: "red" }
+                          { name: "mutation", value: "deleteUser" }
+                        ]
+                      }
+                    }
                   }
-                }
-              }
-            ]) {
+                ]
+              ) {
               collection {
                 id
                 name
@@ -236,9 +239,17 @@ describe("collection", () => {
 
   it("should be able to access the response data for by an operation", async () => {
     await testWithUnmount(
-      <FabrixComponent query={`query getUsers { users { size } }`}>
+      <FabrixComponent
+        query={gql`
+          query getUsers {
+            users {
+              size
+            }
+          }
+        `}
+      >
         {({ getOperation }) =>
-          getOperation<{ users: { size: number } }>("getUsers", ({ data }) => (
+          getOperation("getUsers", ({ data }) => (
             <div role="result-size">{data.users.size}</div>
           ))
         }

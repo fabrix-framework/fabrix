@@ -10,6 +10,7 @@ import {
   ValueNode,
   visit,
 } from "graphql";
+import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 
 export type FieldVariables = Record<
   string,
@@ -26,7 +27,17 @@ type S = {
   fields: Fields;
 };
 
-export const buildRootDocument = (document: DocumentNode) =>
+export type GeneralDocumentType<
+  TData = unknown,
+  TVariables = Record<string, unknown>,
+> = DocumentNode | TypedDocumentNode<TData, TVariables>;
+
+export const buildRootDocument = <
+  TData = unknown,
+  TVariables = Record<string, unknown>,
+>(
+  document: GeneralDocumentType<TData, TVariables>,
+) =>
   document.definitions.map((def) =>
     buildQueryStructure({
       kind: Kind.DOCUMENT,
