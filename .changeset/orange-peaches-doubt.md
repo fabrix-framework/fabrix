@@ -2,4 +2,6 @@
 "@fabrix-framework/fabrix": minor
 ---
 
-Add `TypedDocumentNode` support: now if the `TypedDocumentNode` query is given to `FabrixComponent`, some functions and variables that are accessible thorugh children props are typed.
+Add `TypedDocumentNode` support: now when the `TypedDocumentNode` query is given, `data` and `variables` are typed.
+
+Also, `getComponent` has the first argument that is typed to help users select the component associated to the query.
