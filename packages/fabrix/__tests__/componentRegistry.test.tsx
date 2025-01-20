@@ -136,7 +136,7 @@ describe("getFabrixComponent", () => {
           title: "Custom Table",
         }}
         query={gql`
-          query getUsers {
+          query {
             users {
               collection {
                 id
@@ -149,9 +149,7 @@ describe("getFabrixComponent", () => {
       >
         {({ getComponent }) => {
           return (
-            <div data-testid="component-wrapper">
-              {getComponent("getUsers", "users")}
-            </div>
+            <div data-testid="component-wrapper">{getComponent("users")}</div>
           );
         }}
       </CustomTable>,

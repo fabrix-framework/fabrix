@@ -85,20 +85,9 @@ describe("collection", () => {
     ["collection", collectionQuery, undefined],
     ["edges", edgeQuery, undefined],
     [
-      "getOperation",
-      collectionQuery,
-      ({ getOperation }) => getOperation("getUsers"),
-    ],
-    [
-      "getOperation/getComponent",
-      collectionQuery,
-      ({ getOperation }) =>
-        getOperation("getUsers", ({ getComponent }) => getComponent("users")),
-    ],
-    [
       "getComponent",
       collectionQuery,
-      ({ getComponent }) => getComponent("getUsers", "users"),
+      ({ getComponent }) => getComponent("users"),
     ],
   ] satisfies [string, string, FabrixComponentChildrenProps][];
 
@@ -231,23 +220,6 @@ describe("collection", () => {
         expect(headers[0]).toHaveTextContent("操作");
       },
       { components },
-    );
-  });
-
-  it("should be able to access the response data for by an operation", async () => {
-    await testWithUnmount(
-      <FabrixComponent query={`query getUsers { users { size } }`}>
-        {({ getOperation }) =>
-          getOperation<{ users: { size: number } }>("getUsers", ({ data }) => (
-            <div role="result-size">{data.users.size}</div>
-          ))
-        }
-      </FabrixComponent>,
-      async () => {
-        const result = await screen.findByRole("result-size");
-        expect(result).toBeInTheDocument();
-        expect(result).toHaveTextContent(users.length.toString());
-      },
     );
   });
 });
