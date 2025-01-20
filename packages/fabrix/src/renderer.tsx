@@ -185,12 +185,12 @@ export type FabrixComponentProps = FabrixComponentCommonProps & {
 
 type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FabrixComponentChildrenProps<TData = any> = {
+export type FabrixComponentChildrenProps = {
   /**
    * The data fetched from the query
    */
-  data: TData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
 
   /**
    * Get the component by root field name
@@ -270,10 +270,7 @@ export const FabrixComponent = (props: FabrixComponentProps) => {
   return <div className="fabrix wrapper">{renderComponent()}</div>;
 };
 
-export const getComponentRendererFn = <
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TData = any,
->(
+export const getComponentRendererFn = (
   props: FabrixComponentProps,
   getComponent: ReturnType<typeof getComponentFn>,
 ) => {
@@ -302,7 +299,7 @@ export const getComponentRendererFn = <
     const component = getComponent(fieldConfig, data, context);
     if (props.children) {
       return props.children({
-        data: data as TData,
+        data,
         getComponent: component,
       });
     }
