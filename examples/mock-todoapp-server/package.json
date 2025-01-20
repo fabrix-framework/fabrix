@@ -10,7 +10,7 @@
     "graphql-tag": "^2.12.6"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.0.2",
+    "@faker-js/faker": "^9.4.0",
     "tsx": "^4.19.1",
     "typescript": "^5.7.3",
     "globals": "^15.9.0",
