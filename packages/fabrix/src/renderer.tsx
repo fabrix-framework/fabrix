@@ -1,13 +1,5 @@
-<<<<<<< HEAD
 import { DirectiveNode, DocumentNode, OperationTypeNode, parse } from "graphql";
-import { ReactNode, useCallback, useContext, useMemo } from "react";
-||||||| parent of 8ca3de2 (Remove getOperation function)
-import { DirectiveNode, DocumentNode, OperationTypeNode } from "graphql";
-import { ReactNode, useCallback, useContext, useMemo } from "react";
-=======
-import { DirectiveNode, DocumentNode, OperationTypeNode } from "graphql";
 import { ReactNode, useContext, useMemo } from "react";
->>>>>>> 8ca3de2 (Remove getOperation function)
 import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
 import { FormRenderer } from "@renderers/form";
@@ -193,62 +185,12 @@ export type FabrixComponentProps = FabrixComponentCommonProps & {
 
 type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
 
-<<<<<<< HEAD
-type FabrixGetComponentFn = (
-  /**
-   * The name that corresponds to the GQL query.
-   */
-  name: string,
-  extraProps?: FabrixComponentChildrenExtraProps,
-  fieldsRenderer?: FabrixComponentFieldsRenderer,
-) => ReactNode;
-
-export type FabrixGetOperationFn = <
-  T extends Record<string, unknown> = Record<string, unknown>,
->(
-  indexOrName: number | string,
-  renderer?: (props: {
-    data: T;
-    getComponent: FabrixGetComponentFn;
-  }) => ReactNode,
-) => ReactNode;
-
-export type FabrixComponentChildrenProps = {
-||||||| parent of 8ca3de2 (Remove getOperation function)
-type FabrixGetComponentFn = (
-  /**
-   * The name that corresponds to the GQL query.
-   */
-  name: string,
-  extraProps?: FabrixComponentChildrenExtraProps,
-  fieldsRenderer?: FabrixComponentFieldsRenderer,
-) => ReactNode;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FabrixGetOperationFn<TData = any> = (
-  indexOrName: number | string,
-  renderer?: (props: {
-    data: TData;
-    getComponent: FabrixGetComponentFn;
-  }) => ReactNode,
-) => ReactNode;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FabrixComponentChildrenProps<TData = any> = {
-=======
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FabrixComponentChildrenProps<TData = any> = {
->>>>>>> 8ca3de2 (Remove getOperation function)
   /**
    * The data fetched from the query
    */
-<<<<<<< HEAD
-  getOperation: FabrixGetOperationFn;
-||||||| parent of 8ca3de2 (Remove getOperation function)
-  getOperation: FabrixGetOperationFn<TData>;
-=======
   data: TData;
->>>>>>> 8ca3de2 (Remove getOperation function)
 
   /**
    * Get the component by root field name
@@ -332,65 +274,15 @@ export const getComponentRendererFn = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
 >(
-  props: FabrixComponentProps<TData>,
+  props: FabrixComponentProps,
   getComponent: ReturnType<typeof getComponentFn>,
 ) => {
   const context = useContext(FabrixContext);
   const { fieldConfigs } = useFieldConfigs(props.query);
-<<<<<<< HEAD
-  const getOperation: FabrixComponentChildrenProps["getOperation"] =
-    useCallback(
-      (indexOrName, renderer) => {
-        const fieldConfig =
-          typeof indexOrName === "number"
-            ? fieldConfigs[indexOrName]
-            : fieldConfigs.find(({ name }) => name == indexOrName);
-        if (!fieldConfig) {
-          throw new Error(`No operation found for indexOrName: ${indexOrName}`);
-        }
-
-        return (
-          <OperationRenderer
-            key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
-            operation={fieldConfig}
-            variables={props.variables}
-            getComponentFn={getComponent}
-            renderer={renderer as Parameters<FabrixGetOperationFn>[1]}
-          />
-        );
-      },
-      [fieldConfigs, props.variables],
-    );
-||||||| parent of 8ca3de2 (Remove getOperation function)
-  const getOperation: FabrixComponentChildrenProps["getOperation"] =
-    useCallback(
-      (indexOrName, renderer) => {
-        const fieldConfig =
-          typeof indexOrName === "number"
-            ? fieldConfigs[indexOrName]
-            : fieldConfigs.find(({ name }) => name == indexOrName);
-        if (!fieldConfig) {
-          throw new Error(`No operation found for indexOrName: ${indexOrName}`);
-        }
-
-        return (
-          <OperationRenderer
-            key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
-            operation={fieldConfig}
-            variables={props.variables}
-            getComponentFn={getComponent}
-            renderer={renderer}
-          />
-        );
-      },
-      [fieldConfigs, props.variables],
-    );
-=======
   const fieldConfig = fieldConfigs[0];
   if (!fieldConfig) {
     throw new Error(`No operation found`);
   }
->>>>>>> 8ca3de2 (Remove getOperation function)
 
   return () => {
     const { fetching, error, data } = useDataFetch({

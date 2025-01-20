@@ -222,4 +222,28 @@ describe("collection", () => {
       { components },
     );
   });
+
+  it("should be able to access the response data for by an operation", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          query getUsers {
+            users {
+              size
+            }
+          }
+        `}
+      >
+        {({ data }) => (
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          <div role="result-size">{data.users.size}</div>
+        )}
+      </FabrixComponent>,
+      async () => {
+        const result = await screen.findByRole("result-size");
+        expect(result).toBeInTheDocument();
+        expect(result).toHaveTextContent(users.length.toString());
+      },
+    );
+  });
 });
