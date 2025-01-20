@@ -48,7 +48,7 @@
     "@types/chroma-js": "^2.4.4",
     "@types/node": "^22.7.5",
     "@types/react": "^19.0.3",
-    "@types/react-dom": "^19.0.2",
+    "@types/react-dom": "^19.0.3",
     "eslint": "^9.18.0",
     "prettier": "^3.4.2",
     "tsup": "^8.3.5",
