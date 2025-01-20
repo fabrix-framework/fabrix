@@ -315,7 +315,7 @@ export const getComponentRendererFn = <
   }
 
   return () => {
-    const { fetching, error, data } = useDataFetch<TData>({
+    const { fetching, error, data } = useDataFetch<TData, TVariables>({
       query: fieldConfig.document,
       variables: props.variables,
       pause: fieldConfig.type !== OperationTypeNode.QUERY,
@@ -353,7 +353,15 @@ type RendererFn = (
 ) => ReactNode;
 
 export const getComponentFn =
-  (props: FabrixComponentProps, rendererFn: RendererFn) =>
+  <
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TData = any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TVariables = Record<string, any>,
+  >(
+    props: FabrixComponentProps<TData, TVariables>,
+    rendererFn: RendererFn,
+  ) =>
   (
     fieldConfig: FieldConfigs,
     data: FabrixComponentData | undefined,
