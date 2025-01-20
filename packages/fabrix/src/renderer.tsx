@@ -1,4 +1,4 @@
-import { DirectiveNode, DocumentNode, OperationTypeNode, parse } from "graphql";
+import { DirectiveNode, DocumentNode, OperationTypeNode } from "graphql";
 import { ReactNode, useContext, useMemo } from "react";
 import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
@@ -9,7 +9,11 @@ import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
 import { buildDefaultFormFieldConfigs, formFieldMerger } from "@readers/form";
-import { buildRootDocument, FieldVariables } from "@/visitor";
+import {
+  buildRootDocument,
+  FieldVariables,
+  GeneralDocumentType,
+} from "@/visitor";
 import { Field, Fields } from "@/visitor/fields";
 import { FabrixComponentData, useDataFetch, Value } from "@/fetcher";
 
@@ -105,10 +109,15 @@ export type FieldConfigs = {
   fields: FieldConfig[];
 };
 
-export const useFieldConfigs = (query: DocumentNode | string) => {
-  const rootDocument = buildRootDocument(
-    typeof query === "string" ? parse(query) : query,
-  );
+export const useFieldConfigs = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+>(
+  query: GeneralDocumentType<TData, TVariables>,
+) => {
+  const rootDocument = buildRootDocument(query);
   const context = useContext(FabrixContext);
   const fieldConfigs = useMemo(() => {
     return rootDocument.map(({ name, document, fields, opType, variables }) =>
@@ -142,11 +151,14 @@ export const useFieldConfigs = (query: DocumentNode | string) => {
   return { fieldConfigs };
 };
 
-type FabrixComponentCommonProps = {
+type FabrixComponentCommonProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+> = {
   /**
    * The variables to call the query with.
    */
-  variables?: Record<string, unknown>;
+  variables?: TVariables;
 
   /**
    * The title of the query.
@@ -164,7 +176,12 @@ type FabrixComponentCommonProps = {
   contentClassName?: string;
 };
 
-export type FabrixComponentProps = FabrixComponentCommonProps & {
+export type FabrixComponentProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+> = FabrixComponentCommonProps & {
   /**
    * The query to render.
    *
@@ -178,19 +195,21 @@ export type FabrixComponentProps = FabrixComponentCommonProps & {
    * }
    * ```
    */
-  query: DocumentNode | string;
+  query: GeneralDocumentType<TData, TVariables>;
 
   children?: (props: FabrixComponentChildrenProps) => ReactNode;
 };
 
 type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
 
-export type FabrixComponentChildrenProps = {
+export type FabrixComponentChildrenProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+> = {
   /**
    * The data fetched from the query
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
+  data: TData;
 
   /**
    * Get the component by root field name

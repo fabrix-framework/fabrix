@@ -1,4 +1,5 @@
 import { Fields, SelectionField } from "@visitor/fields";
+import { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import {
   DirectiveNode,
   DocumentNode,
@@ -26,15 +27,28 @@ type S = {
   fields: Fields;
 };
 
-export const buildRootDocument = (document: DocumentNode) =>
-  document.definitions.map((def) =>
+export type GeneralDocumentType<
+  TData = unknown,
+  TVariables = Record<string, unknown>,
+> = string | DocumentNode | TypedDocumentNode<TData, TVariables>;
+
+export const buildRootDocument = <
+  TData = unknown,
+  TVariables = Record<string, unknown>,
+>(
+  document: GeneralDocumentType<TData, TVariables>,
+) => {
+  const parsedDocument =
+    typeof document === "string" ? parse(document) : document;
+  return parsedDocument.definitions.map((def) =>
     buildQueryStructure({
       kind: Kind.DOCUMENT,
       definitions: [def],
     }),
   );
+};
 
-const buildQueryStructure = (ast: DocumentNode | string) => {
+const buildQueryStructure = (ast: DocumentNode) => {
   const operationStructure = {} as S;
 
   const extractTypeNode = (node: TypeNode) => {
@@ -51,7 +65,7 @@ const buildQueryStructure = (ast: DocumentNode | string) => {
   };
 
   const currentPath: string[] = [];
-  visit(typeof ast === "string" ? parse(ast) : ast, {
+  visit(ast, {
     OperationDefinition: (node) => {
       // No fragment support currently
       if (
