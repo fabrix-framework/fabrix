@@ -181,7 +181,7 @@ export type FabrixComponentProps<
   TData = any,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TVariables = Record<string, any>,
-> = FabrixComponentCommonProps & {
+> = FabrixComponentCommonProps<TVariables> & {
   /**
    * The query to render.
    *
