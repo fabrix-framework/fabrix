@@ -4,10 +4,10 @@ import { useClient, useQuery } from "urql";
 export const useDataFetch = (props: {
   query: DocumentNode | string;
   variables?: Record<string, unknown>;
+  pause?: boolean;
 }) => {
   const [{ data, fetching, error }] = useQuery<FabrixComponentData>({
-    query: props.query,
-    variables: props.variables,
+    ...props,
   });
 
   return {

@@ -1,5 +1,5 @@
 import { DirectiveNode, DocumentNode, OperationTypeNode } from "graphql";
-import { ReactNode, useCallback, useContext, useMemo } from "react";
+import { ReactNode, useContext, useMemo } from "react";
 import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
 import { FormRenderer } from "@renderers/form";
@@ -207,43 +207,12 @@ export type FabrixComponentProps<
 
 type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
 
-type FabrixGetComponentFn = (
-  /**
-   * The name that corresponds to the GQL query.
-   */
-  name: string,
-  extraProps?: FabrixComponentChildrenExtraProps,
-  fieldsRenderer?: FabrixComponentFieldsRenderer,
-) => ReactNode;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type FabrixGetOperationFn<TData = any> = (
-  indexOrName: number | string,
-  renderer?: (props: {
-    data: TData;
-    getComponent: FabrixGetComponentFn;
-  }) => ReactNode,
-) => ReactNode;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FabrixComponentChildrenProps<TData = any> = {
   /**
-   * Get the operation result by operation name or index
-   *
-   * ```tsx
-   * <FabrixComponent query={getUsersQuery}>
-   *   {({ getOperation }) => (
-   *     {getOperation("getUsers", ({ data, getComponent }) => (
-   *       <>
-   *         <h2>{data.users.size} users</h2>
-   *         {getComponent("users")}
-   *       </>
-   *     ))}
-   *   )}
-   * </FabrixComponent>
-   * ```
+   * The data fetched from the query
    */
-  getOperation: FabrixGetOperationFn<TData>;
+  data: TData;
 
   /**
    * Get the component by root field name
@@ -251,13 +220,12 @@ export type FabrixComponentChildrenProps<TData = any> = {
    * ```tsx
    * <FabrixComponent query={getUsersQuery}>
    *   {({ getComponent }) => (
-   *     {getComponent("getUsers", "users")}
+   *     {getComponent("users")}
    *   )}
    * </FabrixComponent>
    * ```
    */
   getComponent: (
-    operationIndexOrName: number | string,
     rootFieldName: string,
     extraProps?: FabrixComponentChildrenExtraProps,
     fieldsRenderer?: FabrixComponentFieldsRenderer,
@@ -331,52 +299,48 @@ export const FabrixComponent = <
   return <div className="fabrix wrapper">{renderComponent()}</div>;
 };
 
-export const getComponentRendererFn = (
-  props: FabrixComponentProps,
+export const getComponentRendererFn = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+>(
+  props: FabrixComponentProps<TData>,
   getComponent: ReturnType<typeof getComponentFn>,
 ) => {
+  const context = useContext(FabrixContext);
   const { fieldConfigs } = useFieldConfigs(props.query);
-  const getOperation: FabrixComponentChildrenProps["getOperation"] =
-    useCallback(
-      (indexOrName, renderer) => {
-        const fieldConfig =
-          typeof indexOrName === "number"
-            ? fieldConfigs[indexOrName]
-            : fieldConfigs.find(({ name }) => name == indexOrName);
-        if (!fieldConfig) {
-          throw new Error(`No operation found for indexOrName: ${indexOrName}`);
-        }
-
-        return (
-          <OperationRenderer
-            key={`fabrix-operation${typeof indexOrName === "number" ? `-${indexOrName}` : ""}-${fieldConfig.name}`}
-            operation={fieldConfig}
-            variables={props.variables}
-            getComponentFn={getComponent}
-            renderer={renderer}
-          />
-        );
-      },
-      [fieldConfigs, props.variables],
-    );
+  const fieldConfig = fieldConfigs[0];
+  if (!fieldConfig) {
+    throw new Error(`No operation found`);
+  }
 
   return () => {
+    const { fetching, error, data } = useDataFetch({
+      query: fieldConfig.document,
+      variables: props.variables,
+      pause: fieldConfig.type !== OperationTypeNode.QUERY,
+    });
+
+    if (fetching) {
+      return <Loader />;
+    }
+
+    if (error) {
+      throw error;
+    }
+
+    const component = getComponent(fieldConfig, data, context);
     if (props.children) {
       return props.children({
-        getOperation,
-        getComponent: (
-          operationIndexOrName,
-          rootFieldName,
-          extraProps,
-          fieldsRenderer,
-        ) =>
-          getOperation(operationIndexOrName, ({ getComponent }) =>
-            getComponent(rootFieldName, extraProps, fieldsRenderer),
-          ),
+        data: data as TData,
+        getComponent: component,
       });
     }
 
-    return fieldConfigs.map((_, i) => getOperation(i));
+    return fieldConfig.fields.map((field) =>
+      component(field.name, {
+        key: `fabrix-${fieldConfig.name}-${field.name}`,
+      }),
+    );
   };
 };
 
@@ -391,7 +355,7 @@ export const getComponentFn =
   (props: FabrixComponentProps, rendererFn: RendererFn) =>
   (
     fieldConfig: FieldConfigs,
-    data: FabrixComponentData,
+    data: FabrixComponentData | undefined,
     context: FabrixContextType,
   ) =>
   (
@@ -404,81 +368,14 @@ export const getComponentFn =
       throw new Error(`No root field found for name: ${name}`);
     }
 
+    const dataByName = data ? (name in data ? data[name] : {}) : {};
+
     return (
       <div
         key={extraProps?.key}
         className={`fabrix renderer container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
       >
-        {rendererFn(field, data[name], context, componentFieldsRenderer)}
+        {rendererFn(field, dataByName, context, componentFieldsRenderer)}
       </div>
     );
   };
-
-type GetComponentFn = (
-  op: FieldConfigs,
-  data: FabrixComponentData,
-  context: FabrixContextType,
-) => FabrixGetComponentFn;
-
-type RendererCommonProps = {
-  key: string;
-  operation: FieldConfigs;
-  variables: Record<string, unknown> | undefined;
-  renderer?: Parameters<FabrixGetOperationFn>[1];
-  getComponentFn: GetComponentFn;
-  extraClassName?: string;
-};
-
-const OperationRenderer = (props: RendererCommonProps) => {
-  return props.operation.type === OperationTypeNode.MUTATION ? (
-    <MutateOperationRenderer {...props} />
-  ) : (
-    <QueryOperationRenderer {...props} />
-  );
-};
-
-const QueryOperationRenderer = ({
-  operation,
-  variables,
-  renderer,
-  getComponentFn,
-}: RendererCommonProps) => {
-  const context = useContext(FabrixContext);
-  const { fetching, error, data } = useDataFetch({
-    query: operation.document,
-    variables,
-  });
-
-  if (fetching || !data) {
-    return <Loader />;
-  }
-
-  if (error) {
-    throw error;
-  }
-
-  const getComponent = getComponentFn(operation, data, context);
-  return renderer
-    ? renderer({ data, getComponent })
-    : operation.fields.map((field) =>
-        getComponent(field.name, {
-          key: `fabrix-query-${operation.name}-${field.name}`,
-        }),
-      );
-};
-
-const MutateOperationRenderer = ({
-  operation,
-  renderer,
-  getComponentFn,
-}: RendererCommonProps) => {
-  const context = useContext(FabrixContext);
-  const getComponent = getComponentFn(operation, {}, context);
-  return renderer
-    ? renderer({ data: {}, getComponent })
-    : operation.fields.map((field) =>
-        getComponent(field.name, {
-          key: `fabrix-mutation-${operation.name}-${field.name}`,
-        }),
-      );
-};
