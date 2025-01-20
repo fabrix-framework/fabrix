@@ -1,4 +1,4 @@
-import { DirectiveNode, DocumentNode, OperationTypeNode, parse } from "graphql";
+import { DirectiveNode, DocumentNode, OperationTypeNode } from "graphql";
 import { ReactNode, useContext, useMemo } from "react";
 import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
@@ -9,7 +9,11 @@ import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
 import { buildDefaultFormFieldConfigs, formFieldMerger } from "@readers/form";
-import { buildRootDocument, FieldVariables } from "@/visitor";
+import {
+  buildRootDocument,
+  FieldVariables,
+  GeneralDocumentType,
+} from "@/visitor";
 import { Field, Fields } from "@/visitor/fields";
 import { FabrixComponentData, useDataFetch, Value } from "@/fetcher";
 
@@ -105,10 +109,15 @@ export type FieldConfigs = {
   fields: FieldConfig[];
 };
 
-export const useFieldConfigs = (query: DocumentNode | string) => {
-  const rootDocument = buildRootDocument(
-    typeof query === "string" ? parse(query) : query,
-  );
+export const useFieldConfigs = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+>(
+  query: GeneralDocumentType<TData, TVariables>,
+) => {
+  const rootDocument = buildRootDocument(query);
   const context = useContext(FabrixContext);
   const fieldConfigs = useMemo(() => {
     return rootDocument.map(({ name, document, fields, opType, variables }) =>
@@ -142,11 +151,14 @@ export const useFieldConfigs = (query: DocumentNode | string) => {
   return { fieldConfigs };
 };
 
-type FabrixComponentCommonProps = {
+type FabrixComponentCommonProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+> = {
   /**
    * The variables to call the query with.
    */
-  variables?: Record<string, unknown>;
+  variables?: TVariables;
 
   /**
    * The title of the query.
@@ -164,7 +176,12 @@ type FabrixComponentCommonProps = {
   contentClassName?: string;
 };
 
-export type FabrixComponentProps = FabrixComponentCommonProps & {
+export type FabrixComponentProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+> = FabrixComponentCommonProps<TVariables> & {
   /**
    * The query to render.
    *
@@ -178,19 +195,21 @@ export type FabrixComponentProps = FabrixComponentCommonProps & {
    * }
    * ```
    */
-  query: DocumentNode | string;
+  query: GeneralDocumentType<TData, TVariables>;
 
-  children?: (props: FabrixComponentChildrenProps) => ReactNode;
+  children?: (props: FabrixComponentChildrenProps<TData>) => ReactNode;
 };
 
 type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
 
-export type FabrixComponentChildrenProps = {
+export type FabrixComponentChildrenProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+> = {
   /**
    * The data fetched from the query
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
+  data: TData;
 
   /**
    * Get the component by root field name
@@ -204,7 +223,9 @@ export type FabrixComponentChildrenProps = {
    * ```
    */
   getComponent: (
-    rootFieldName: string,
+    rootFieldName: TData extends Record<string, unknown>
+      ? Exclude<Extract<keyof TData, string>, "__typename">
+      : string,
     extraProps?: FabrixComponentChildrenExtraProps,
     fieldsRenderer?: FabrixComponentFieldsRenderer,
   ) => ReactNode;
@@ -232,7 +253,14 @@ export type FabrixComponentChildrenProps = {
  * </FabrixComponent>
  * ```
  */
-export const FabrixComponent = (props: FabrixComponentProps) => {
+export const FabrixComponent = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+>(
+  props: FabrixComponentProps<TData, TVariables>,
+) => {
   const renderComponent = getComponentRendererFn(
     props,
     getComponentFn(
@@ -270,8 +298,13 @@ export const FabrixComponent = (props: FabrixComponentProps) => {
   return <div className="fabrix wrapper">{renderComponent()}</div>;
 };
 
-export const getComponentRendererFn = (
-  props: FabrixComponentProps,
+export const getComponentRendererFn = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+>(
+  props: FabrixComponentProps<TData, TVariables>,
   getComponent: ReturnType<typeof getComponentFn>,
 ) => {
   const context = useContext(FabrixContext);
@@ -282,7 +315,7 @@ export const getComponentRendererFn = (
   }
 
   return () => {
-    const { fetching, error, data } = useDataFetch({
+    const { fetching, error, data } = useDataFetch<TData, TVariables>({
       query: fieldConfig.document,
       variables: props.variables,
       pause: fieldConfig.type !== OperationTypeNode.QUERY,
@@ -296,10 +329,10 @@ export const getComponentRendererFn = (
       throw error;
     }
 
-    const component = getComponent(fieldConfig, data, context);
+    const component = getComponent(fieldConfig, data ?? {}, context);
     if (props.children) {
       return props.children({
-        data,
+        data: data ?? ({} as TData),
         getComponent: component,
       });
     }
@@ -320,7 +353,15 @@ type RendererFn = (
 ) => ReactNode;
 
 export const getComponentFn =
-  (props: FabrixComponentProps, rendererFn: RendererFn) =>
+  <
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TData = any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TVariables = Record<string, any>,
+  >(
+    props: FabrixComponentProps<TData, TVariables>,
+    rendererFn: RendererFn,
+  ) =>
   (
     fieldConfig: FieldConfigs,
     data: FabrixComponentData | undefined,
