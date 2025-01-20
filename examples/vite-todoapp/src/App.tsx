@@ -32,7 +32,11 @@ function App() {
               id
             }
           }
-
+        `}
+      />
+      <FabrixComponent
+        containerClassName={containerClassName}
+        query={gql`
           query todos {
             allTodos
               @fabrixView(
