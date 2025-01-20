@@ -197,7 +197,7 @@ export type FabrixComponentProps<
    */
   query: GeneralDocumentType<TData, TVariables>;
 
-  children?: (props: FabrixComponentChildrenProps) => ReactNode;
+  children?: (props: FabrixComponentChildrenProps<TData>) => ReactNode;
 };
 
 type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
@@ -251,7 +251,14 @@ export type FabrixComponentChildrenProps<
  * </FabrixComponent>
  * ```
  */
-export const FabrixComponent = (props: FabrixComponentProps) => {
+export const FabrixComponent = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+>(
+  props: FabrixComponentProps<TData, TVariables>,
+) => {
   const renderComponent = getComponentRendererFn(
     props,
     getComponentFn(
@@ -289,8 +296,13 @@ export const FabrixComponent = (props: FabrixComponentProps) => {
   return <div className="fabrix wrapper">{renderComponent()}</div>;
 };
 
-export const getComponentRendererFn = (
-  props: FabrixComponentProps,
+export const getComponentRendererFn = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TVariables = Record<string, any>,
+>(
+  props: FabrixComponentProps<TData, TVariables>,
   getComponent: ReturnType<typeof getComponentFn>,
 ) => {
   const context = useContext(FabrixContext);
@@ -301,7 +313,7 @@ export const getComponentRendererFn = (
   }
 
   return () => {
-    const { fetching, error, data } = useDataFetch({
+    const { fetching, error, data } = useDataFetch<TData>({
       query: fieldConfig.document,
       variables: props.variables,
       pause: fieldConfig.type !== OperationTypeNode.QUERY,
@@ -315,10 +327,10 @@ export const getComponentRendererFn = (
       throw error;
     }
 
-    const component = getComponent(fieldConfig, data, context);
+    const component = getComponent(fieldConfig, data ?? {}, context);
     if (props.children) {
       return props.children({
-        data,
+        data: data ?? ({} as TData),
         getComponent: component,
       });
     }
