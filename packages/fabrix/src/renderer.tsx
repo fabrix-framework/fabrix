@@ -224,9 +224,7 @@ export type FabrixComponentChildrenProps<
    */
   getComponent: (
     rootFieldName: TData extends Record<string, unknown>
-      ? Extract<keyof TData, string> extends "__typename"
-        ? never
-        : Extract<keyof TData, string>
+      ? Exclude<Extract<keyof TData, string>, "__typename">
       : string,
     extraProps?: FabrixComponentChildrenExtraProps,
     fieldsRenderer?: FabrixComponentFieldsRenderer,
