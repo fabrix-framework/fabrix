@@ -223,7 +223,9 @@ export type FabrixComponentChildrenProps<
    * ```
    */
   getComponent: (
-    rootFieldName: TData extends Record<string, unknown> ? keyof TData : never,
+    rootFieldName: TData extends Record<string, unknown>
+      ? Extract<keyof TData, string>
+      : never,
     extraProps?: FabrixComponentChildrenExtraProps,
     fieldsRenderer?: FabrixComponentFieldsRenderer,
   ) => ReactNode;
