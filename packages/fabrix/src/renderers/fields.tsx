@@ -1,5 +1,5 @@
 import { createElement, useCallback, useContext, useMemo } from "react";
-import { FabrixContext } from "@context";
+import { FabrixContext, FabrixContextType } from "@context";
 import { Value } from "@fetcher";
 import { get } from "es-toolkit/compat";
 import {
@@ -49,6 +49,7 @@ export const ViewRenderer = ({
           }
 
           return renderField({
+            context,
             rootField,
             extraClassName: extraProps?.className,
             indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
@@ -73,6 +74,7 @@ export const ViewRenderer = ({
         }
 
         return renderField({
+          context,
           rootField,
           indexKey: `${rootField.name}-${fieldIndex}`,
           subFields: getSubFields(typenameExtractor, rootField.fields, name),
@@ -134,6 +136,7 @@ export type SubField = ReturnType<typeof getSubFields>[number];
 export type SubFields = Array<SubField>;
 
 type RenderFieldProps = {
+  context: FabrixContextType;
   rootField: CommonFabrixComponentRendererProps<ViewFields>["rootField"];
   indexKey: string;
   field: ViewField;
@@ -142,6 +145,7 @@ type RenderFieldProps = {
   extraClassName?: string;
 };
 const renderField = ({
+  context,
   rootField,
   field,
   fieldType,
@@ -149,7 +153,6 @@ const renderField = ({
   indexKey,
   extraClassName,
 }: RenderFieldProps) => {
-  const context = useContext(FabrixContext);
   if (field.config.hidden) {
     return;
   }

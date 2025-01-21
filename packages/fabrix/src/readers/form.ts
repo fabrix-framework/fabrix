@@ -117,12 +117,12 @@ export const getInputFields = (
       return [];
     }
 
-    const { type, ...meta } = resolved;
-    return {
-      path: new Path(name.split(".")),
-      meta,
-      subFields: extractSubFormField(type),
-    };
+    const formFields = extractFormFields(name, resolved.type);
+    if (!formFields) {
+      return [];
+    }
+
+    return formFields;
   });
 };
 
@@ -157,7 +157,8 @@ const resolveInputType = (
     return {
       type,
       fieldType: {
-        type: "Input" as const,
+        // TODO: here should be input object type
+        type: "Object" as const,
         name: type.name,
       },
       isRequired: !props.isNull,
@@ -167,22 +168,23 @@ const resolveInputType = (
   return null;
 };
 
-const extractSubFormField = (field: GraphQLNamedType) => {
+const extractFormFields = (basePath: string, field: GraphQLNamedType) => {
   if (field instanceof GraphQLInputObjectType) {
     const fields = field.getFields();
-    return Object.keys(fields).map((key, index) => {
+    return Object.keys(fields).map((key) => {
       const field = fields[key];
 
       return {
-        field: new Path(key.split(".")),
+        field: new Path([basePath, ...key.split(".")]),
         meta: buildFieldMeta(field.type),
-        config: formFieldSchema.parse({
-          index,
-          label: field.name,
-        }),
+        config: {
+          label: key,
+          gridCol: 12,
+          hidden: false,
+        },
       };
     });
   }
 
-  return undefined;
+  return null;
 };

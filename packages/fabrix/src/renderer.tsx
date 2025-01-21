@@ -20,7 +20,6 @@ import {
 } from "@/visitor";
 import { Field, Fields } from "@/visitor/fields";
 import { FabrixComponentData, useDataFetch, Value } from "@/fetcher";
-import { get } from "http";
 
 const decideStrategy = (
   directiveNodes: readonly DirectiveNode[],
@@ -324,7 +323,7 @@ export const FabrixComponent = <
   };
 
   return (
-    <div className="fabrix wrapper">
+    <div className="fabrix-wrapper">
       {getComponentRendererFn(props, (field: FieldConfig) => {
         switch (field.type) {
           case "form": {
@@ -347,9 +346,21 @@ export const FabrixComponent = <
 
           case "generic": {
             return {
-              getInputComponent: getComponentFn(props, () => (
-                <div>TODO: form here</div>
-              )),
+              getInputComponent: getComponentFn(props, (renderFnProps) => {
+                const commonProps = buildCommonProps(renderFnProps);
+
+                return (
+                  <FormRenderer
+                    {...{
+                      ...commonProps,
+                      rootField: {
+                        ...commonProps.rootField,
+                        fields: renderFnProps.field.configs.inputFields,
+                      },
+                    }}
+                  />
+                );
+              }),
               getOutputComponent: getComponentFn(props, (rendererFnProps) => (
                 <ViewRenderer {...buildCommonProps(rendererFnProps)} />
               )),
@@ -424,7 +435,7 @@ export const getComponentRendererFn = <
     }
 
     return operation.fields.map((field) => (
-      <div key={field.name}>
+      <div key={field.name} className="fabrix-component">
         {inputComponent(field.name, {
           key: `fabrix-${operation.name}-input-${field.name}`,
         })}
@@ -472,7 +483,7 @@ export const getComponentFn =
     return (
       <div
         key={extraProps?.key}
-        className={`fabrix renderer container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
+        className={`fabrix-container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
       >
         {rendererFn({
           field,

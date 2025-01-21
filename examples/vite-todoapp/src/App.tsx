@@ -20,7 +20,7 @@ function App() {
             $input: TodoInput!
             $input2: TodoInput!
           ) {
-            addTodo(input: $input1) @fabrixForm {
+            addTodo(input: $input1) {
               id
             }
           }
