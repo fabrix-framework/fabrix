@@ -13,15 +13,15 @@ import {
 import { buildAjvSchema } from "./form/validation";
 import { ajvResolver } from "./form/ajvResolver";
 
-export type FormFields = FieldConfigByType<"form">["configs"]["fields"];
-export type FormField = FormFields[number];
+export type ViewFields = FieldConfigByType<"form">["configs"]["outputFields"];
+export type FormField = ViewFields[number];
 
 export const FormRenderer = ({
   context,
   rootField,
   componentFieldsRenderer,
   className,
-}: CommonFabrixComponentRendererProps<FormFields>) => {
+}: CommonFabrixComponentRendererProps<ViewFields>) => {
   const formContext = useForm({
     resolver: ajvResolver(buildAjvSchema(rootField.fields)),
   });

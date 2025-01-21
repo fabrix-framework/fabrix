@@ -12,7 +12,7 @@ export const CustomComponentTableRenderer = (
     data: Value;
   },
 ) => {
-  const tableMode = getTableMode(props.fieldConfig.configs.fields);
+  const tableMode = getTableMode(props.fieldConfig.configs.outputFields);
   if (!tableMode) {
     throw new Error("Unsupported table mode");
   }
@@ -22,7 +22,7 @@ export const CustomComponentTableRenderer = (
     customProps: props.component.customProps,
     rootField: {
       name: props.fieldConfig.name,
-      fields: props.fieldConfig.configs.fields,
+      fields: props.fieldConfig.configs.outputFields,
       data: props.data,
     },
     tableMode,

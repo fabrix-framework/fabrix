@@ -7,8 +7,12 @@ import { FabrixContext, FabrixContextType } from "@context";
 import { FabrixComponentFieldsRenderer, Loader } from "@renderers/shared";
 import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
-import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
-import { buildDefaultFormFieldConfigs, formFieldMerger } from "@readers/form";
+import { getOutputFields, viewFieldMerger } from "@readers/field";
+import {
+  buildDefaultFormFieldConfigs,
+  formFieldMerger,
+  getInputFields,
+} from "@readers/form";
 import {
   buildRootDocument,
   FieldVariables,
@@ -23,6 +27,13 @@ const decideStrategy = (
 ) => {
   const directive = findDirective(directiveNodes);
   const emptyDirective = { arguments: null } as const;
+
+  if (directive === null) {
+    return {
+      type: "generic",
+      directive: emptyDirective,
+    };
+  }
 
   switch (opType) {
     case OperationTypeNode.QUERY: {
@@ -56,6 +67,7 @@ const getFieldConfig = (
   opType: OperationTypeNode,
 ) => {
   const strategy = decideStrategy(field.value.directives, opType);
+
   switch (strategy?.type) {
     case "view": {
       const directive = parseDirectiveArguments(
@@ -67,8 +79,9 @@ const getFieldConfig = (
         name: field.getName(),
         type: strategy.type,
         configs: {
-          fields: mergeFieldConfigs(
-            buildDefaultViewFieldConfigs(childFields),
+          inputFields: [],
+          outputFields: mergeFieldConfigs(
+            getOutputFields(childFields),
             directive.input,
             viewFieldMerger,
           ),
@@ -85,11 +98,22 @@ const getFieldConfig = (
         name: field.getName(),
         type: strategy.type,
         configs: {
-          fields: mergeFieldConfigs(
+          inputFields: [],
+          outputFields: mergeFieldConfigs(
             buildDefaultFormFieldConfigs(context, fieldVariables),
             directive.input,
             formFieldMerger,
           ),
+        },
+      };
+    }
+    case "generic": {
+      return {
+        name: field.getName(),
+        type: strategy.type,
+        configs: {
+          inputFields: getInputFields(context, fieldVariables),
+          outputFields: getOutputFields(childFields),
         },
       };
     }
@@ -275,7 +299,7 @@ export const FabrixComponent = <
           context,
           rootField: {
             name: field.name,
-            fields: field.configs.fields,
+            fields: field.configs.outputFields,
             data,
             document: field.document,
             className: props.contentClassName,

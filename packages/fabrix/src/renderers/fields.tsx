@@ -17,7 +17,7 @@ import {
   TypenameExtractor,
 } from "./typename";
 
-export type ViewFields = FieldConfigByType<"view">["configs"]["fields"];
+export type ViewFields = FieldConfigByType<"view">["configs"]["outputFields"];
 type ViewField = ViewFields[number];
 
 export const ViewRenderer = ({
@@ -89,7 +89,15 @@ export const ViewRenderer = ({
   }, [componentFieldsRenderer, rootField, getSubFields]);
 
   return tableType !== null
-    ? renderTable(context, rootField, tableType)
+    ? renderTable(
+        context,
+        {
+          name: rootField.name,
+          data: rootField.data,
+          fields: rootField.fields,
+        },
+        tableType,
+      )
     : renderFields();
 };
 
@@ -107,7 +115,7 @@ export const getSubFields = (
   fields
     .filter((f) => {
       const parentKey = f.field.getParent()?.asKey();
-      return parentKey === name || parentKey?.startsWith(`${name}.`)
+      return parentKey === name || parentKey?.startsWith(`${name}.`);
     })
     .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
     .map((value) => ({

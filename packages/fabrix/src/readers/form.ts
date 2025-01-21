@@ -9,14 +9,17 @@ import { FieldVariables } from "@visitor";
 import { Path } from "@visitor/path";
 import { deepmerge } from "deepmerge-ts";
 import {
+  GraphQLEnumType,
   GraphQLInputObjectType,
-  GraphQLInputType,
+  GraphQLNamedType,
   GraphQLNonNull,
+  GraphQLScalarType,
+  GraphQLType,
 } from "graphql";
 import { z } from "zod";
 import { FieldConfigWithMeta, FieldConfig } from "./shared";
 
-const buildFieldMeta = (type: GraphQLInputType) => ({
+const buildFieldMeta = (type: GraphQLType) => ({
   fieldType: resolveFieldType(
     type instanceof GraphQLNonNull ? type.ofType : type,
   ),
@@ -41,7 +44,7 @@ export const buildDefaultFormFieldConfigs = (
   }
 
   const inputType = context.schemaLoader.schemaSet.serverSchema.getType(
-    fieldVariables.input.type,
+    fieldVariables.input.type.name,
   );
   if (!inputType) {
     return [];
@@ -96,4 +99,90 @@ export const formFieldMerger = (
   } else {
     return null;
   }
+};
+
+export const getInputFields = (
+  context: FabrixContextType,
+  fieldVariables: FieldVariables,
+) => {
+  const formName = Object.keys(fieldVariables);
+  if (formName.length === 0) {
+    return [];
+  }
+
+  return formName.flatMap((name) => {
+    const fieldType = fieldVariables[name].type;
+    const resolved = resolveInputType(context, fieldType);
+    if (!resolved) {
+      return [];
+    }
+
+    const { type, ...meta } = resolved;
+    return {
+      path: new Path(name.split(".")),
+      meta,
+      subFields: extractSubFormField(type),
+    };
+  });
+};
+
+const resolveInputType = (
+  context: FabrixContextType,
+  props: {
+    name: string;
+    isNull: boolean;
+    isList: boolean;
+  },
+) => {
+  if (context.schemaLoader.status === "loading") {
+    return null;
+  }
+
+  const type = context.schemaLoader.schemaSet.serverSchema.getType(props.name);
+
+  // handling variation of GraphQLNamedInputType
+  if (type instanceof GraphQLScalarType) {
+    return {
+      type,
+      fieldType: resolveFieldType(type),
+      isRequired: !props.isNull,
+    };
+  } else if (type instanceof GraphQLEnumType) {
+    return {
+      type,
+      fieldType: resolveFieldType(type),
+      isRequired: !props.isNull,
+    };
+  } else if (type instanceof GraphQLInputObjectType) {
+    return {
+      type,
+      fieldType: {
+        type: "Input" as const,
+        name: type.name,
+      },
+      isRequired: !props.isNull,
+    };
+  }
+
+  return null;
+};
+
+const extractSubFormField = (field: GraphQLNamedType) => {
+  if (field instanceof GraphQLInputObjectType) {
+    const fields = field.getFields();
+    return Object.keys(fields).map((key, index) => {
+      const field = fields[key];
+
+      return {
+        field: new Path(key.split(".")),
+        meta: buildFieldMeta(field.type),
+        config: formFieldSchema.parse({
+          index,
+          label: field.name,
+        }),
+      };
+    });
+  }
+
+  return undefined;
 };
