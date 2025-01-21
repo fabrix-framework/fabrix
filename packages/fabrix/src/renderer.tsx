@@ -102,14 +102,14 @@ const getFieldConfig = (
 export type FieldConfig = ReturnType<typeof getFieldConfig> & {
   document: DocumentNode;
 };
-export type FieldConfigs = {
+export type Operation = {
   name: string;
   document: DocumentNode;
   type: OperationTypeNode;
   fields: FieldConfig[];
 };
 
-export const useFieldConfigs = <
+export const useOperation = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -119,12 +119,12 @@ export const useFieldConfigs = <
 ) => {
   const rootDocument = buildRootDocument(query);
   const context = useContext(FabrixContext);
-  const fieldConfigs = useMemo(() => {
+  const operations = useMemo(() => {
     return rootDocument.map(({ name, document, fields, opType, variables }) =>
       fields
         .unwrap()
         .filter((f) => !f.getParentName())
-        .reduce<FieldConfigs>(
+        .reduce<Operation>(
           (acc, field) => {
             const fieldConfig = getFieldConfig(
               context,
@@ -148,7 +148,7 @@ export const useFieldConfigs = <
     );
   }, [rootDocument, context]);
 
-  return { fieldConfigs };
+  return { operations };
 };
 
 type FabrixComponentCommonProps<
@@ -308,17 +308,17 @@ export const getComponentRendererFn = <
   getComponent: ReturnType<typeof getComponentFn>,
 ) => {
   const context = useContext(FabrixContext);
-  const { fieldConfigs } = useFieldConfigs(props.query);
-  const fieldConfig = fieldConfigs[0];
-  if (!fieldConfig) {
+  const { operations } = useOperation(props.query);
+  const operation = operations[0];
+  if (!operation) {
     throw new Error(`No operation found`);
   }
 
   return () => {
     const { fetching, error, data } = useDataFetch<TData, TVariables>({
-      query: fieldConfig.document,
+      query: operation.document,
       variables: props.variables,
-      pause: fieldConfig.type !== OperationTypeNode.QUERY,
+      pause: operation.type !== OperationTypeNode.QUERY,
     });
 
     if (fetching) {
@@ -329,7 +329,7 @@ export const getComponentRendererFn = <
       throw error;
     }
 
-    const component = getComponent(fieldConfig, data ?? {}, context);
+    const component = getComponent(operation, data ?? {}, context);
     if (props.children) {
       return props.children({
         data: data ?? ({} as TData),
@@ -337,9 +337,9 @@ export const getComponentRendererFn = <
       });
     }
 
-    return fieldConfig.fields.map((field) =>
+    return operation.fields.map((field) =>
       component(field.name, {
-        key: `fabrix-${fieldConfig.name}-${field.name}`,
+        key: `fabrix-${operation.name}-${field.name}`,
       }),
     );
   };
@@ -363,7 +363,7 @@ export const getComponentFn =
     rendererFn: RendererFn,
   ) =>
   (
-    fieldConfig: FieldConfigs,
+    operation: Operation,
     data: FabrixComponentData | undefined,
     context: FabrixContextType,
   ) =>
@@ -372,7 +372,7 @@ export const getComponentFn =
     extraProps?: FabrixComponentChildrenExtraProps,
     componentFieldsRenderer?: FabrixComponentFieldsRenderer,
   ) => {
-    const field = fieldConfig.fields.find((f) => f.name === name);
+    const field = operation.fields.find((f) => f.name === name);
     if (!field) {
       throw new Error(`No root field found for name: ${name}`);
     }
