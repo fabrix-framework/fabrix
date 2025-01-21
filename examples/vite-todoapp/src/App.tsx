@@ -17,10 +17,10 @@ function App() {
         query={gql`
           mutation createTodo(
             $id: ID!
-            $input1: TodoInput!
+            $input: TodoInput!
             $input2: TodoInput!
           ) {
-            addTodo(input: $input1) {
+            addTodo(input: $input1) @fabrixForm {
               id
             }
           }
@@ -30,7 +30,7 @@ function App() {
         containerClassName={containerClassName}
         query={gql`
           query todos {
-            allTodos {
+            allTodos @fabrixView {
               collection {
                 id
                 name

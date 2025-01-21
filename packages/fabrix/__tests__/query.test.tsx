@@ -84,11 +84,7 @@ describe("collection", () => {
   const testPatterns = [
     ["collection", collectionQuery, undefined],
     ["edges", edgeQuery, undefined],
-    [
-      "getComponent",
-      collectionQuery,
-      ({ getComponent }) => getComponent("users"),
-    ],
+    ["getComponent", collectionQuery, ({ getOutput }) => getOutput("users")],
   ] satisfies [string, string, FabrixComponentChildrenProps][];
 
   it.each(testPatterns)(

@@ -147,11 +147,9 @@ describe("getFabrixComponent", () => {
           }
         `}
       >
-        {({ getComponent }) => {
-          return (
-            <div data-testid="component-wrapper">{getComponent("users")}</div>
-          );
-        }}
+        {({ getOutput }) => (
+          <div data-testid="component-wrapper">{getOutput("users")}</div>
+        )}
       </CustomTable>,
       async () => {
         const wrapper = await screen.findByTestId("component-wrapper");
