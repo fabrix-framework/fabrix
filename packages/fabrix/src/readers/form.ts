@@ -11,7 +11,6 @@ import { deepmerge } from "deepmerge-ts";
 import {
   GraphQLEnumType,
   GraphQLInputObjectType,
-  GraphQLNamedType,
   GraphQLNonNull,
   GraphQLScalarType,
   GraphQLType,
@@ -104,87 +103,51 @@ export const formFieldMerger = (
 export const getInputFields = (
   context: FabrixContextType,
   fieldVariables: FieldVariables,
-) => {
-  const formName = Object.keys(fieldVariables);
-  if (formName.length === 0) {
-    return [];
-  }
+) =>
+  Object.keys(fieldVariables).flatMap((name) => {
+    if (context.schemaLoader.status === "loading") {
+      return [];
+    }
 
-  return formName.flatMap((name) => {
     const fieldType = fieldVariables[name].type;
-    const resolved = resolveInputType(context, fieldType);
-    if (!resolved) {
-      return [];
-    }
+    const type = context.schemaLoader.schemaSet.serverSchema.getType(
+      fieldType.name,
+    );
+    const path = new Path([name]);
 
-    const formFields = extractFormFields(name, resolved.type);
-    if (!formFields) {
-      return [];
-    }
-
-    return formFields;
-  });
-};
-
-const resolveInputType = (
-  context: FabrixContextType,
-  props: {
-    name: string;
-    isNull: boolean;
-    isList: boolean;
-  },
-) => {
-  if (context.schemaLoader.status === "loading") {
-    return null;
-  }
-
-  const type = context.schemaLoader.schemaSet.serverSchema.getType(props.name);
-
-  // handling variation of GraphQLNamedInputType
-  if (type instanceof GraphQLScalarType) {
-    return {
-      type,
-      fieldType: resolveFieldType(type),
-      isRequired: !props.isNull,
-    };
-  } else if (type instanceof GraphQLEnumType) {
-    return {
-      type,
-      fieldType: resolveFieldType(type),
-      isRequired: !props.isNull,
-    };
-  } else if (type instanceof GraphQLInputObjectType) {
-    return {
-      type,
-      fieldType: {
-        // TODO: here should be input object type
-        type: "Object" as const,
-        name: type.name,
-      },
-      isRequired: !props.isNull,
-    };
-  }
-
-  return null;
-};
-
-const extractFormFields = (basePath: string, field: GraphQLNamedType) => {
-  if (field instanceof GraphQLInputObjectType) {
-    const fields = field.getFields();
-    return Object.keys(fields).map((key) => {
-      const field = fields[key];
-
-      return {
-        field: new Path([basePath, ...key.split(".")]),
-        meta: buildFieldMeta(field.type),
-        config: {
-          label: key,
-          gridCol: 12,
-          hidden: false,
+    // handling variation of GraphQLNamedInputType
+    if (type instanceof GraphQLScalarType || type instanceof GraphQLEnumType) {
+      return [
+        {
+          field: path,
+          meta: {
+            fieldType: resolveFieldType(type),
+            isRequired: !fieldType.isNull,
+          },
+          config: {
+            label: path.asKey(),
+            gridCol: 12,
+            hidden: false,
+          },
         },
-      };
-    });
-  }
+      ];
+    } else if (type instanceof GraphQLInputObjectType) {
+      const fields = type.getFields();
+      return Object.keys(fields).map((key) => {
+        const field = fields[key];
+        const fieldPath = path.append(new Path(key.split(".")));
 
-  return null;
-};
+        return {
+          field: fieldPath,
+          meta: buildFieldMeta(field.type),
+          config: {
+            label: fieldPath.asKey(),
+            gridCol: 12,
+            hidden: false,
+          },
+        };
+      });
+    }
+
+    return [];
+  });
