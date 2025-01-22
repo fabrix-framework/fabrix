@@ -6,6 +6,7 @@ import {
   assertObjectValue,
   buildClassName,
   CommonFabrixComponentRendererProps,
+  FabrixComponentFieldsRenderer,
   FieldConfigByType,
   getFieldConfigByKey,
   Loader,
@@ -19,16 +20,17 @@ import {
 
 export type ViewFields = FieldConfigByType<"view">["configs"]["outputFields"];
 type ViewField = ViewFields[number];
+type ViewRendererProps = CommonFabrixComponentRendererProps<ViewFields> & {
+  data: Value | undefined;
+  componentFieldsRenderer?: FabrixComponentFieldsRenderer;
+};
 
-export const ViewRenderer = ({
-  context,
-  rootField,
-  componentFieldsRenderer,
-  className,
-}: CommonFabrixComponentRendererProps<ViewFields>) => {
+export const ViewRenderer = (props: ViewRendererProps) => {
+  const { context, rootField, componentFieldsRenderer, className, fetching } =
+    props;
+
   // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
   const tableType = useMemo(() => getTableMode(rootField.fields), [rootField]);
-
   const renderFields = useCallback(() => {
     const schema = context.schemaLoader;
     if (schema.status === "loading") {
@@ -36,7 +38,7 @@ export const ViewRenderer = ({
     }
 
     const typenameExtractor = buildTypenameExtractor({
-      targetValue: rootField.data,
+      targetValue: props.data,
       schemaSet: schema.schemaSet,
     });
 
@@ -50,7 +52,7 @@ export const ViewRenderer = ({
 
           return renderField({
             context,
-            rootField,
+            data: props.data,
             extraClassName: extraProps?.className,
             indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
             subFields: getSubFields(typenameExtractor, rootField.fields, name),
@@ -75,7 +77,7 @@ export const ViewRenderer = ({
 
         return renderField({
           context,
-          rootField,
+          data: props.data,
           indexKey: `${rootField.name}-${fieldIndex}`,
           subFields: getSubFields(typenameExtractor, rootField.fields, name),
           field,
@@ -90,12 +92,16 @@ export const ViewRenderer = ({
     );
   }, [componentFieldsRenderer, rootField, getSubFields]);
 
+  if (fetching) {
+    return <Loader />;
+  }
+
   return tableType !== null
     ? renderTable(
         context,
         {
           name: rootField.name,
-          data: rootField.data,
+          data: props.data,
           fields: rootField.fields,
         },
         tableType,
@@ -137,7 +143,7 @@ export type SubFields = Array<SubField>;
 
 type RenderFieldProps = {
   context: FabrixContextType;
-  rootField: CommonFabrixComponentRendererProps<ViewFields>["rootField"];
+  data: Value | undefined;
   indexKey: string;
   field: ViewField;
   fieldType: FieldType;
@@ -146,7 +152,7 @@ type RenderFieldProps = {
 };
 const renderField = ({
   context,
-  rootField,
+  data,
   field,
   fieldType,
   subFields,
@@ -157,7 +163,7 @@ const renderField = ({
     return;
   }
 
-  assertObjectValue(rootField.data);
+  assertObjectValue(data);
 
   const component = context.componentRegistry.getCustomComponent(
     field.config.componentType?.name,
@@ -180,7 +186,7 @@ const renderField = ({
     key: indexKey,
     name,
     path: field.field.value,
-    value: get(rootField.data, name),
+    value: get(data, name),
     type: fieldType,
     subFields: subFields.map((subField) => ({
       key: subField.value.field.getName(),

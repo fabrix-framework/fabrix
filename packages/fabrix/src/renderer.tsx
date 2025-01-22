@@ -4,7 +4,7 @@ import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
 import { FormRenderer } from "@renderers/form";
 import { FabrixContext, FabrixContextType } from "@context";
-import { FabrixComponentFieldsRenderer, Loader } from "@renderers/shared";
+import { FabrixComponentFieldsRenderer } from "@renderers/shared";
 import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { getOutputFields, viewFieldMerger } from "@readers/field";
@@ -13,6 +13,7 @@ import {
   formFieldMerger,
   getInputFields,
 } from "@readers/form";
+import { AnyVariables, OperationResult, useMutation } from "urql";
 import {
   buildRootDocument,
   FieldVariables,
@@ -302,25 +303,26 @@ export type FabrixComponentChildrenProps<
 export const FabrixComponent = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TVariables = Record<string, any>,
+  TVariables extends AnyVariables = AnyVariables,
 >(
   props: FabrixComponentProps<TData, TVariables>,
 ) => {
   const buildCommonProps = ({
     field,
-    data,
+    fetching,
+    error,
     componentFieldsRenderer,
-  }: RendererFnProps) => {
+  }: RendererFnCommonProps) => {
     return {
+      fetching,
+      error,
       rootField: {
         name: field.name,
         fields: field.configs.outputFields,
-        data,
         document: field.document,
         className: props.contentClassName,
-        componentFieldsRenderer,
       },
+      componentFieldsRenderer,
     };
   };
 
@@ -354,10 +356,13 @@ export const FabrixComponent = <
               getOutputComponent: getComponentFn(props, (rendererFnProps) => (
                 <ViewRenderer
                   context={context}
+                  data={rendererFnProps.data}
                   {...buildCommonProps(rendererFnProps)}
                 />
               )),
-              getActionComponent: () => () => null,
+              getActionComponent:
+                (operation, { executeQuery }) =>
+                () => <button onClick={() => executeQuery()}>Submit</button>,
             };
           }
 
@@ -370,6 +375,7 @@ export const FabrixComponent = <
                   <FormRenderer
                     context={context}
                     {...{
+                      ...commonProps,
                       rootField: {
                         ...commonProps.rootField,
                         fields: renderFnProps.field.configs.inputFields,
@@ -381,10 +387,13 @@ export const FabrixComponent = <
               getOutputComponent: getComponentFn(props, (rendererFnProps) => (
                 <ViewRenderer
                   context={context}
+                  data={rendererFnProps.data}
                   {...buildCommonProps(rendererFnProps)}
                 />
               )),
-              getActionComponent: () => () => null,
+              getActionComponent:
+                (operation, { executeQuery }) =>
+                () => <button onClick={() => executeQuery()}>Submit</button>,
             };
           }
         }
@@ -396,15 +405,23 @@ export const FabrixComponent = <
 export const getComponentRendererFn = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TVariables = Record<string, any>,
+  TVariables extends AnyVariables = AnyVariables,
 >(
   props: FabrixComponentProps<TData, TVariables>,
   operation: Operation,
   componentsResolver: (field: FieldConfig) => {
     getInputComponent: ReturnType<typeof getComponentFn>;
     getOutputComponent: ReturnType<typeof getComponentFn>;
-    getActionComponent: (operation: Operation) => () => React.ReactNode;
+    getActionComponent: (
+      operation: Operation,
+      props: {
+        fetching: boolean;
+        error: Error | undefined;
+        executeQuery: () =>
+          | Promise<void>
+          | Promise<OperationResult<TData, TVariables>>;
+      },
+    ) => () => React.ReactNode;
   },
 ) => {
   const initialField = operation.fields[0];
@@ -413,34 +430,49 @@ export const getComponentRendererFn = <
   }
 
   return () => {
-    const { fetching, error, data } = useDataFetch<TData, TVariables>({
+    const dataFetch = useDataFetch<TData, TVariables>({
       query: operation.document,
       variables: props.variables,
       pause: operation.type !== OperationTypeNode.QUERY,
     });
 
-    if (fetching) {
-      return <Loader />;
-    }
-
-    if (error) {
-      throw error;
-    }
-
-    const resolvedComponnents = componentsResolver(initialField);
-    const outputComponent = resolvedComponnents.getOutputComponent(
-      operation,
-      data ?? {},
+    const [mutationResult, runMutation] = useMutation<TData, TVariables>(
+      operation.document,
     );
-    const inputComponent = resolvedComponnents.getInputComponent(
-      operation,
-      data ?? {},
-    );
-    const actionComponent = resolvedComponnents.getActionComponent(operation);
+    const executeQuery = () => {
+      if (operation.type === OperationTypeNode.QUERY) {
+        return Promise.resolve(
+          dataFetch.refetch({
+            requestPolicy: "network-only",
+          }),
+        );
+      } else if (operation.type === OperationTypeNode.MUTATION) {
+        return runMutation(props.variables ?? ({} as TVariables));
+      }
+
+      return Promise.resolve();
+    };
+
+    const resolvedComponents = componentsResolver(initialField);
+    const outputComponent = resolvedComponents.getOutputComponent(operation, {
+      fetching: dataFetch.fetching,
+      error: dataFetch.error,
+      data: dataFetch.data ?? {},
+    });
+    const inputComponent = resolvedComponents.getInputComponent(operation, {
+      fetching: mutationResult.fetching,
+      error: mutationResult.error,
+      data: mutationResult.data ?? {},
+    });
+    const actionComponent = resolvedComponents.getActionComponent(operation, {
+      fetching: dataFetch.fetching || mutationResult.fetching,
+      error: dataFetch.error || mutationResult.error,
+      executeQuery,
+    });
 
     if (props.children) {
       return props.children({
-        data: data ?? ({} as TData),
+        data: dataFetch.data ?? ({} as TData),
         getInput: outputComponent,
         getOutput: inputComponent,
         getAction: actionComponent,
@@ -452,6 +484,7 @@ export const getComponentRendererFn = <
         {inputComponent(field.name, {
           key: `fabrix-${operation.name}-input-${field.name}`,
         })}
+        {actionComponent()}
         {outputComponent(field.name, {
           key: `fabrix-${operation.name}-output-${field.name}`,
         })}
@@ -460,12 +493,18 @@ export const getComponentRendererFn = <
   };
 };
 
-type RendererFnProps = {
+type RendererFnCommonProps = {
   field: FieldConfig;
-  data: Value;
+  fetching: boolean;
+  error: Error | undefined;
   componentFieldsRenderer?: FabrixComponentFieldsRenderer;
 };
-type RendererFn = (props: RendererFnProps) => ReactNode;
+
+type RendererComponentCommonProps = {
+  fetching: boolean;
+  error: Error | undefined;
+  data: FabrixComponentData | undefined;
+};
 
 export const getComponentFn =
   <
@@ -475,9 +514,13 @@ export const getComponentFn =
     TVariables = Record<string, any>,
   >(
     props: FabrixComponentProps<TData, TVariables>,
-    rendererFn: RendererFn,
+    rendererFn: (
+      props: RendererFnCommonProps & {
+        data: Value;
+      },
+    ) => ReactNode,
   ) =>
-  (operation: Operation, data: FabrixComponentData | undefined) =>
+  (operation: Operation, componentProps: RendererComponentCommonProps) =>
   (
     name: string,
     extraProps?: FabrixComponentChildrenExtraProps,
@@ -495,7 +538,13 @@ export const getComponentFn =
       >
         {rendererFn({
           field,
-          data: data ? (name in data ? data[name] : {}) : {},
+          fetching: componentProps.fetching,
+          error: componentProps.error,
+          data: componentProps.data
+            ? name in componentProps.data
+              ? componentProps.data[name]
+              : {}
+            : {},
           componentFieldsRenderer,
         })}
       </div>

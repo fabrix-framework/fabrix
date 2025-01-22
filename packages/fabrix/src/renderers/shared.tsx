@@ -3,7 +3,6 @@ import { DirectiveAttributes } from "@registry";
 import { FabrixContextType } from "@context";
 import { FieldConfigWithMeta } from "@readers/shared";
 import { FieldConfig } from "@renderer";
-import { Value } from "@fetcher";
 
 type FabrixComponentFieldsRendererExtraProps = Partial<DirectiveAttributes> & {
   key?: string;
@@ -44,13 +43,13 @@ export type RendererQuery = {
 };
 export type CommonFabrixComponentRendererProps<F> = {
   context: FabrixContextType;
+  fetching: boolean;
+  error: Error | undefined;
   rootField: {
     name: string;
     fields: F;
-    data: Value;
     document: DocumentNode;
   };
-  componentFieldsRenderer?: FabrixComponentFieldsRenderer;
   className?: string;
 };
 

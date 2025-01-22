@@ -1,11 +1,11 @@
 import { createElement, useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { useMutation } from "urql";
 import { defaultFieldType } from "@renderers/typename";
 import { FabrixContextType } from "@context";
 import {
   buildClassName,
   CommonFabrixComponentRendererProps,
+  FabrixComponentFieldsRenderer,
   FieldConfigByType,
   getFieldConfigByKey,
   Loader,
@@ -15,21 +15,21 @@ import { ajvResolver } from "./form/ajvResolver";
 
 export type ViewFields = FieldConfigByType<"form">["configs"]["outputFields"];
 export type FormField = ViewFields[number];
+type FormRendererProps = CommonFabrixComponentRendererProps<ViewFields> & {
+  componentFieldsRenderer?: FabrixComponentFieldsRenderer;
+};
 
 export const FormRenderer = ({
   context,
   rootField,
   componentFieldsRenderer,
   className,
-}: CommonFabrixComponentRendererProps<ViewFields>) => {
+}: FormRendererProps) => {
   const formContext = useForm({
     resolver: ajvResolver(buildAjvSchema(rootField.fields)),
   });
-  const [mutationResult, runMutation] = useMutation(rootField.document);
-  const runSubmit = formContext.handleSubmit(async (input) => {
-    // TODO: sending values should be specifiable by the user through something like `path`
-    await runMutation({ input });
-
+  const runSubmit = formContext.handleSubmit(() => {
+    // await onSubmit(input);
     formContext.reset();
   });
 
@@ -83,7 +83,6 @@ export const FormRenderer = ({
     renderSubmit: (submitRenderer) =>
       submitRenderer({
         submit: runSubmit,
-        isSubmitting: mutationResult.fetching,
       }),
     renderReset: (resetRenderer) =>
       resetRenderer({ reset: () => formContext.reset() }),

@@ -21,7 +21,7 @@ export const useDataFetch = <
     fetching,
     error,
     data,
-    executeQuery,
+    refetch: executeQuery,
   };
 };
 
