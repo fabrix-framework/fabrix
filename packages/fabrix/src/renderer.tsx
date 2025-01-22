@@ -1,5 +1,5 @@
 import { DirectiveNode, DocumentNode, OperationTypeNode } from "graphql";
-import { ReactNode, useContext, useMemo } from "react";
+import React, { ReactNode, useContext, useMemo } from "react";
 import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
 import { FormRenderer } from "@renderers/form";
@@ -31,6 +31,7 @@ const decideStrategy = (
   if (directive === null) {
     return {
       type: "generic",
+      documentType: opType,
       directive: emptyDirective,
     };
   }
@@ -112,6 +113,7 @@ const getFieldConfig = (
         name: field.getName(),
         type: strategy.type,
         configs: {
+          documentType: strategy.documentType,
           inputFields: getInputFields(context, fieldVariables),
           outputFields: getOutputFields(childFields),
         },
@@ -271,6 +273,8 @@ export type FabrixComponentChildrenProps<
    * ```
    */
   getOutput: GetComponentType<TData>;
+
+  getAction: () => React.ReactNode;
 };
 
 /**
@@ -304,13 +308,11 @@ export const FabrixComponent = <
   props: FabrixComponentProps<TData, TVariables>,
 ) => {
   const buildCommonProps = ({
-    context,
     field,
     data,
     componentFieldsRenderer,
   }: RendererFnProps) => {
     return {
-      context,
       rootField: {
         name: field.name,
         fields: field.configs.outputFields,
@@ -322,16 +324,27 @@ export const FabrixComponent = <
     };
   };
 
+  const context = useContext(FabrixContext);
+  const { operations } = useOperation(props.query);
+  const operation = operations[0];
+  if (!operation) {
+    throw new Error(`No operation found`);
+  }
+
   return (
     <div className="fabrix-wrapper">
-      {getComponentRendererFn(props, (field: FieldConfig) => {
+      {getComponentRendererFn(props, operation, (field: FieldConfig) => {
         switch (field.type) {
           case "form": {
             return {
               getInputComponent: getComponentFn(props, (rendererFnProps) => (
-                <FormRenderer {...buildCommonProps(rendererFnProps)} />
+                <FormRenderer
+                  context={context}
+                  {...buildCommonProps(rendererFnProps)}
+                />
               )),
               getOutputComponent: getComponentFn(props, () => void 0),
+              getActionComponent: () => () => null,
             };
           }
 
@@ -339,8 +352,12 @@ export const FabrixComponent = <
             return {
               getInputComponent: getComponentFn(props, () => void 0),
               getOutputComponent: getComponentFn(props, (rendererFnProps) => (
-                <ViewRenderer {...buildCommonProps(rendererFnProps)} />
+                <ViewRenderer
+                  context={context}
+                  {...buildCommonProps(rendererFnProps)}
+                />
               )),
+              getActionComponent: () => () => null,
             };
           }
 
@@ -351,8 +368,8 @@ export const FabrixComponent = <
 
                 return (
                   <FormRenderer
+                    context={context}
                     {...{
-                      ...commonProps,
                       rootField: {
                         ...commonProps.rootField,
                         fields: renderFnProps.field.configs.inputFields,
@@ -362,8 +379,12 @@ export const FabrixComponent = <
                 );
               }),
               getOutputComponent: getComponentFn(props, (rendererFnProps) => (
-                <ViewRenderer {...buildCommonProps(rendererFnProps)} />
+                <ViewRenderer
+                  context={context}
+                  {...buildCommonProps(rendererFnProps)}
+                />
               )),
+              getActionComponent: () => () => null,
             };
           }
         }
@@ -379,28 +400,20 @@ export const getComponentRendererFn = <
   TVariables = Record<string, any>,
 >(
   props: FabrixComponentProps<TData, TVariables>,
+  operation: Operation,
   componentsResolver: (field: FieldConfig) => {
     getInputComponent: ReturnType<typeof getComponentFn>;
     getOutputComponent: ReturnType<typeof getComponentFn>;
+    getActionComponent: (operation: Operation) => () => React.ReactNode;
   },
 ) => {
-  const context = useContext(FabrixContext);
-  const { operations } = useOperation(props.query);
-  const operation = operations[0];
-  if (!operation) {
-    throw new Error(`No operation found`);
-  }
-
   const initialField = operation.fields[0];
   if (!initialField) {
     throw new Error(`No field found`);
   }
 
   return () => {
-    const { executeQuery, fetching, error, data } = useDataFetch<
-      TData,
-      TVariables
-    >({
+    const { fetching, error, data } = useDataFetch<TData, TVariables>({
       query: operation.document,
       variables: props.variables,
       pause: operation.type !== OperationTypeNode.QUERY,
@@ -418,19 +431,19 @@ export const getComponentRendererFn = <
     const outputComponent = resolvedComponnents.getOutputComponent(
       operation,
       data ?? {},
-      context,
     );
     const inputComponent = resolvedComponnents.getInputComponent(
       operation,
       data ?? {},
-      context,
     );
+    const actionComponent = resolvedComponnents.getActionComponent(operation);
 
     if (props.children) {
       return props.children({
         data: data ?? ({} as TData),
         getInput: outputComponent,
         getOutput: inputComponent,
+        getAction: actionComponent,
       });
     }
 
@@ -450,7 +463,6 @@ export const getComponentRendererFn = <
 type RendererFnProps = {
   field: FieldConfig;
   data: Value;
-  context: FabrixContextType;
   componentFieldsRenderer?: FabrixComponentFieldsRenderer;
 };
 type RendererFn = (props: RendererFnProps) => ReactNode;
@@ -465,16 +477,12 @@ export const getComponentFn =
     props: FabrixComponentProps<TData, TVariables>,
     rendererFn: RendererFn,
   ) =>
-  (
-    operation: Operation,
-    data: FabrixComponentData | undefined,
-    context: FabrixContextType,
-  ) =>
+  (operation: Operation, data: FabrixComponentData | undefined) =>
   (
     name: string,
     extraProps?: FabrixComponentChildrenExtraProps,
     componentFieldsRenderer?: FabrixComponentFieldsRenderer,
-  ) => {
+  ): React.ReactNode => {
     const field = operation.fields.find((f) => f.name === name);
     if (!field) {
       throw new Error(`No root field found for name: ${name}`);
@@ -488,7 +496,6 @@ export const getComponentFn =
         {rendererFn({
           field,
           data: data ? (name in data ? data[name] : {}) : {},
-          context,
           componentFieldsRenderer,
         })}
       </div>
