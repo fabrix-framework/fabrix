@@ -2,9 +2,9 @@ import { CompositeComponentEntries } from "@registry";
 import {
   FabrixComponentProps,
   FieldConfig,
-  getComponentFn,
   getComponentRendererFn,
   useOperation,
+  getOutputComponentFn,
 } from "@renderer";
 import { CustomComponentTableRenderer } from "@renderers/custom/table";
 
@@ -32,7 +32,7 @@ export const FabrixCustomComponent = (
       {getComponentRendererFn(props, operation, () => {
         return {
           getInputComponent: () => () => null,
-          getOutputComponent: getComponentFn(props, (renderFnProps) => {
+          getOutputComponent: getOutputComponentFn(props, (renderFnProps) => {
             const { field, data } = renderFnProps;
             const componentEntry = props.component.entry;
 

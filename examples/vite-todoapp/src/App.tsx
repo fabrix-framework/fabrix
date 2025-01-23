@@ -15,12 +15,8 @@ function App() {
       <FabrixComponent
         containerClassName={containerClassName}
         query={gql`
-          mutation createTodo(
-            $id: ID!
-            $input: TodoInput!
-            $input2: TodoInput!
-          ) {
-            addTodo(input: $input1) {
+          mutation createTodo($input: TodoInput!) {
+            addTodo(input: $input) {
               id
             }
           }

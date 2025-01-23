@@ -68,15 +68,8 @@ export type FormComponentProps<P = unknown> = CustomProps<P> & {
   name: string;
   className?: string;
   renderFields: () => React.ReactNode;
-  renderSubmit: (
-    renderer: (props: {
-      submit: () => void;
-      isSubmitting: boolean;
-    }) => React.ReactElement,
-  ) => React.ReactNode;
-  renderReset: (
-    renderer: (props: { reset: () => void }) => React.ReactNode,
-  ) => React.ReactNode;
+  renderField: (name: string) => React.ReactNode;
+  renderAction: () => React.ReactNode;
 };
 
 export type TableComponentHeader = Field & {

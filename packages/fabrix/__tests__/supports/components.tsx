@@ -61,14 +61,7 @@ const tableView = (props: TableComponentProps) => {
 };
 
 const formView = (props: FormComponentProps) => {
-  return (
-    <div role="form">
-      {props.renderFields()}
-      {props.renderSubmit(({ submit }) => (
-        <button onClick={() => submit()}>Submit</button>
-      ))}
-    </div>
-  );
+  return <div role="form">{props.renderFields()}</div>;
 };
 
 const formFieldView = (props: FormFieldComponentProps) => {

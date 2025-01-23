@@ -4,10 +4,10 @@ import { FabrixContextType } from "@context";
 import { FieldConfigWithMeta } from "@readers/shared";
 import { FieldConfig } from "@renderer";
 
-type FabrixComponentFieldsRendererExtraProps = Partial<DirectiveAttributes> & {
+export type ChildComponentsExtraProps = Partial<DirectiveAttributes> & {
   key?: string;
 };
-export type FabrixComponentFieldsRenderer = (props: {
+export type ChildComponentsRendererProps = {
   /**
    * Get the field by name
    *
@@ -31,9 +31,9 @@ export type FabrixComponentFieldsRenderer = (props: {
      * The name of the field
      */
     name: string,
-    extraProps?: FabrixComponentFieldsRendererExtraProps,
+    extraProps?: ChildComponentsExtraProps,
   ) => React.ReactNode;
-}) => React.ReactNode;
+};
 
 export type DocumentResolver = () => string | DocumentNode;
 export type RendererQuery = {

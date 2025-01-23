@@ -6,10 +6,10 @@ import {
   assertObjectValue,
   buildClassName,
   CommonFabrixComponentRendererProps,
-  FabrixComponentFieldsRenderer,
   FieldConfigByType,
   getFieldConfigByKey,
   Loader,
+  ChildComponentsRendererProps,
 } from "./shared";
 import { getTableMode, renderTable } from "./table";
 import {
@@ -22,12 +22,11 @@ export type ViewFields = FieldConfigByType<"view">["configs"]["outputFields"];
 type ViewField = ViewFields[number];
 type ViewRendererProps = CommonFabrixComponentRendererProps<ViewFields> & {
   data: Value | undefined;
-  componentFieldsRenderer?: FabrixComponentFieldsRenderer;
+  fieldsRenderer?: (props: ChildComponentsRendererProps) => React.ReactNode;
 };
 
 export const ViewRenderer = (props: ViewRendererProps) => {
-  const { context, rootField, componentFieldsRenderer, className, fetching } =
-    props;
+  const { context, rootField, fieldsRenderer, className, fetching } = props;
 
   // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
   const tableType = useMemo(() => getTableMode(rootField.fields), [rootField]);
@@ -42,8 +41,8 @@ export const ViewRenderer = (props: ViewRendererProps) => {
       schemaSet: schema.schemaSet,
     });
 
-    if (componentFieldsRenderer) {
-      return componentFieldsRenderer({
+    if (fieldsRenderer) {
+      return fieldsRenderer({
         getField: (name, extraProps) => {
           const field = getFieldConfigByKey(rootField.fields, name);
           if (!field) {
@@ -90,7 +89,7 @@ export const ViewRenderer = (props: ViewRendererProps) => {
         {fieldsComponent}
       </div>
     );
-  }, [componentFieldsRenderer, rootField, getSubFields]);
+  }, [fieldsRenderer, rootField, getSubFields]);
 
   if (fetching) {
     return <Loader />;
