@@ -7,6 +7,7 @@ import { Text, Input, Stack, Box } from "@chakra-ui/react";
 import { Switch } from "@components/ui/switch";
 import { Select } from "chakra-react-select";
 import { useController } from "@fabrix-framework/fabrix/rhf";
+import { get } from "es-toolkit/compat";
 import { LabelledHeading } from "./shared";
 
 export const ChakraForm = (props: FormComponentProps) => {
@@ -54,7 +55,7 @@ const ErrorField = (props: FormFieldComponentProps) => {
   const { formState } = useController({
     name: props.name,
   });
-  const error = formState.errors[props.name];
+  const error = get(formState.errors, props.name);
 
   return (
     error && (

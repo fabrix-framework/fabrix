@@ -7,11 +7,7 @@ import { FabrixContext, FabrixContextType } from "@context";
 import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { getOutputFields, viewFieldMerger } from "@readers/field";
-import {
-  buildDefaultFormFieldConfigs,
-  formFieldMerger,
-  getInputFields,
-} from "@readers/form";
+import { formFieldMerger, getInputFields } from "@readers/form";
 import { AnyVariables, OperationResult, useMutation } from "urql";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { DirectiveAttributes } from "@registry";
@@ -105,7 +101,7 @@ const getFieldConfig = (
         configs: {
           inputFields: [],
           outputFields: mergeFieldConfigs(
-            buildDefaultFormFieldConfigs(context, fieldVariables),
+            getInputFields(context, fieldVariables),
             directive.input,
             formFieldMerger,
           ),
@@ -731,8 +727,9 @@ export const getInputComponentFn =
   (...args: Parameters<GetInputFn>): React.ReactNode => {
     const [extraProps, fieldsRenderer] = args;
     const field = operation.fields[0];
+    const schema = buildAjvSchema(field.configs.outputFields);
     const formContext = useForm({
-      resolver: ajvResolver(buildAjvSchema(field.configs.outputFields)),
+      resolver: ajvResolver(schema),
     });
 
     return (

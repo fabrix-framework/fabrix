@@ -11,7 +11,7 @@ const createTODOQuery = gql`
     addTodo(input: $input)
       @fabrixForm(
         input: [
-          { field: "input.name", constraint: { minLength: 5, maxLength: 10 } }
+          { field: "input.name", constraint: { minLength: 3, maxLength: 5 } }
         ]
       ) {
       id

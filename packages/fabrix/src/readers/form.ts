@@ -1,8 +1,8 @@
 import { FabrixContextType } from "@context";
 import {
   formFieldConstraintSchema,
-  FormFieldSchema,
   formFieldSchema,
+  FormFieldSchema,
 } from "@directive/schema";
 import { resolveFieldType } from "@renderers/typename";
 import { FieldVariables } from "@visitor";
@@ -26,49 +26,6 @@ const buildFieldMeta = (type: GraphQLType) => ({
 });
 
 export type FieldMeta = ReturnType<typeof buildFieldMeta> | null;
-
-/**
- * Infer the field configuration from the input object type for the form
- */
-export const buildDefaultFormFieldConfigs = (
-  context: FabrixContextType,
-  fieldVariables: FieldVariables,
-) => {
-  if (!("input" in fieldVariables)) {
-    return [];
-  }
-
-  if (context.schemaLoader.status === "loading") {
-    return [];
-  }
-
-  const inputType = context.schemaLoader.schemaSet.serverSchema.getType(
-    fieldVariables.input.type.name,
-  );
-  if (!inputType) {
-    return [];
-  }
-
-  // Only support object type for "input" argument
-  if (!(inputType instanceof GraphQLInputObjectType)) {
-    return [];
-  }
-
-  const fields = inputType.getFields();
-  return Object.keys(fields).map((key, index) => {
-    const field = fields[key];
-    const path = new Path(key.split("."));
-
-    return {
-      field: path,
-      meta: buildFieldMeta(field.type),
-      config: formFieldSchema.parse({
-        index,
-        label: field.name,
-      }),
-    };
-  });
-};
 
 export type FormFieldExtra = {
   constraint?: z.infer<typeof formFieldConstraintSchema>;
@@ -100,6 +57,9 @@ export const formFieldMerger = (
   }
 };
 
+/**
+ * Infer the field configuration from the input types for the form
+ */
 export const getInputFields = (
   context: FabrixContextType,
   fieldVariables: FieldVariables,
@@ -124,11 +84,9 @@ export const getInputFields = (
             fieldType: resolveFieldType(type),
             isRequired: !fieldType.isNull,
           },
-          config: {
+          config: formFieldSchema.parse({
             label: path.asKey(),
-            gridCol: 12,
-            hidden: false,
-          },
+          }),
         },
       ];
     } else if (type instanceof GraphQLInputObjectType) {
@@ -140,11 +98,9 @@ export const getInputFields = (
         return {
           field: fieldPath,
           meta: buildFieldMeta(field.type),
-          config: {
+          config: formFieldSchema.parse({
             label: fieldPath.asKey(),
-            gridCol: 12,
-            hidden: false,
-          },
+          }),
         };
       });
     }
