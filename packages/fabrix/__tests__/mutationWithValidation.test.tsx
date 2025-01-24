@@ -22,21 +22,21 @@ describe("String", () => {
         const form = await findForm();
         await form.set("name", faker.string.alpha(4));
         await form.submit();
-        expect(await form.findAlert("name")).toHaveTextContent(
+        expect(form.getAlert("name")).toHaveTextContent(
           "must NOT have fewer than 5 characters",
         );
 
         await form.set("name", faker.string.alpha(5));
         await form.submit();
-        expect(await form.findAlert("name")).not.toBeInTheDocument();
+        expect(form.getAlert("name")).not.toBeInTheDocument();
 
         await form.set("name", faker.string.alpha(10));
         await form.submit();
-        expect(await form.findAlert("name")).not.toBeInTheDocument();
+        expect(form.getAlert("name")).not.toBeInTheDocument();
 
         await form.set("name", faker.string.alpha(11));
         await form.submit();
-        expect(await form.findAlert("name")).toHaveTextContent(
+        expect(form.getAlert("name")).toHaveTextContent(
           "must NOT have more than 10 characters",
         );
       },
@@ -60,13 +60,13 @@ describe("String", () => {
         const form = await findForm();
         await form.set("name", "John Doe");
         await form.submit();
-        expect(await form.findAlert("name")).toHaveTextContent(
+        expect(form.getAlert("name")).toHaveTextContent(
           'must match pattern "^[a-z]+$"',
         );
 
         await form.set("name", "johndoe");
         await form.submit();
-        expect(await form.findAlert("name")).not.toBeInTheDocument();
+        expect(form.getAlert("name")).not.toBeInTheDocument();
       },
     );
   });
@@ -88,13 +88,13 @@ describe("String", () => {
         const form = await findForm();
         await form.set("email", "john.doe");
         await form.submit();
-        expect(await form.findAlert("email")).toHaveTextContent(
+        expect(form.getAlert("email")).toHaveTextContent(
           'must match format "email"',
         );
 
         await form.set("email", faker.internet.email());
         await form.submit();
-        expect(await form.findAlert("email")).not.toBeInTheDocument();
+        expect(form.getAlert("email")).not.toBeInTheDocument();
       },
     );
   });
@@ -116,13 +116,13 @@ describe("String", () => {
         const form = await findForm();
         await form.set("name", "EmployeeX");
         await form.submit();
-        expect(await form.findAlert("name")).toHaveTextContent(
+        expect(form.getAlert("name")).toHaveTextContent(
           "must be equal to one of the allowed value",
         );
 
         await form.set("name", "EmployeeA");
         await form.submit();
-        expect(await form.findAlert("name")).not.toBeInTheDocument();
+        expect(form.getAlert("name")).not.toBeInTheDocument();
       },
     );
   });
@@ -149,19 +149,19 @@ describe("Int/Float", () => {
 
         await form.set("age", "19");
         await form.submit();
-        expect(await form.findAlert("age")).toHaveTextContent("must be >= 20");
+        expect(form.getAlert("age")).toHaveTextContent("must be >= 20");
 
         await form.set("age", "20");
         await form.submit();
-        expect(await form.findAlert("age")).not.toBeInTheDocument();
+        expect(form.getAlert("age")).not.toBeInTheDocument();
 
         await form.set("age", "30");
         await form.submit();
-        expect(await form.findAlert("age")).not.toBeInTheDocument();
+        expect(form.getAlert("age")).not.toBeInTheDocument();
 
         await form.set("age", "31");
         await form.submit();
-        expect(await form.findAlert("age")).toHaveTextContent("must be <= 30");
+        expect(form.getAlert("age")).toHaveTextContent("must be <= 30");
       },
     );
   });
@@ -186,19 +186,19 @@ describe("Int/Float", () => {
 
         await form.set("age", "20");
         await form.submit();
-        expect(await form.findAlert("age")).toHaveTextContent("must be > 20");
+        expect(form.getAlert("age")).toHaveTextContent("must be > 20");
 
         await form.set("age", "21");
         await form.submit();
-        expect(await form.findAlert("age")).not.toBeInTheDocument();
+        expect(form.getAlert("age")).not.toBeInTheDocument();
 
         await form.set("age", "29");
         await form.submit();
-        expect(await form.findAlert("age")).not.toBeInTheDocument();
+        expect(form.getAlert("age")).not.toBeInTheDocument();
 
         await form.set("age", "30");
         await form.submit();
-        expect(await form.findAlert("age")).toHaveTextContent("must be < 30");
+        expect(form.getAlert("age")).toHaveTextContent("must be < 30");
       },
     );
   });
@@ -222,13 +222,11 @@ describe("Int/Float", () => {
 
         await form.set("age", "19");
         await form.submit();
-        expect(await form.findAlert("age")).toHaveTextContent(
-          "must be multiple of 5",
-        );
+        expect(form.getAlert("age")).toHaveTextContent("must be multiple of 5");
 
         await form.set("age", "20");
         await form.submit();
-        expect(await form.findAlert("age")).not.toBeInTheDocument();
+        expect(form.getAlert("age")).not.toBeInTheDocument();
       },
     );
   });
@@ -253,17 +251,17 @@ describe("Int/Float", () => {
 
         await form.set("age", "19");
         await form.submit();
-        expect(await form.findAlert("age")).toHaveTextContent(
+        expect(form.getAlert("age")).toHaveTextContent(
           "must be equal to one of the allowed value",
         );
 
         await form.set("age", "20");
         await form.submit();
-        expect(await form.findAlert("age")).not.toBeInTheDocument();
+        expect(form.getAlert("age")).not.toBeInTheDocument();
 
         await form.set("age", "30");
         await form.submit();
-        expect(await form.findAlert("age")).not.toBeInTheDocument();
+        expect(form.getAlert("age")).not.toBeInTheDocument();
       },
     );
   });
