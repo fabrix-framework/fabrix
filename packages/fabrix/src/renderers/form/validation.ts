@@ -77,9 +77,16 @@ export const buildAjvSchema = (fields: FormFields) => {
     const property = convertToAjvProperty(field);
 
     if (property !== null) {
-      current.properties[lastKey] = property;
-      if (field.meta?.isRequired) {
-        current.required.push(lastKey);
+      if (path.length === 1) {
+        schema.properties[lastKey] = property;
+        if (field.meta?.isRequired) {
+          schema.required.push(lastKey);
+        }
+      } else {
+        current.properties[lastKey] = property;
+        if (field.meta?.isRequired) {
+          current.required.push(lastKey);
+        }
       }
     }
   });
