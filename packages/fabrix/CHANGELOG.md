@@ -1,5 +1,19 @@
 # @fabrix-framework/fabrix
 
+## 0.5.0
+
+### Minor Changes
+
+- [#144](https://github.com/fabrix-framework/fabrix/pull/144) [`c19ff4e`](https://github.com/fabrix-framework/fabrix/commit/c19ff4eff372b1b74f07859af663dac07e0b929c) Thanks [@IzumiSy](https://github.com/IzumiSy)! - Add provenance
+
+- [#153](https://github.com/fabrix-framework/fabrix/pull/153) [`7c104b0`](https://github.com/fabrix-framework/fabrix/commit/7c104b0ccd4850585f08847ae60ea8b36ffc62cd) Thanks [@IzumiSy](https://github.com/IzumiSy)! - Add `TypedDocumentNode` support: now when the `TypedDocumentNode` query is given, `data` and `variables` are typed.
+
+  Also, `getComponent` has the first argument that is typed to help users select the component associated to the query.
+
+- [#152](https://github.com/fabrix-framework/fabrix/pull/152) [`d474f8c`](https://github.com/fabrix-framework/fabrix/commit/d474f8cd9ab684167b1b2efec5b494752b951bee) Thanks [@IzumiSy](https://github.com/IzumiSy)! - Remove `getOperation` function from children props in FabrixComponent.
+
+  Now `query` prop in `FabrixComponent` supports only a single query to get it future compatible with TypedDocumentNode.
+
 ## 0.4.0
 
 ### Minor Changes
