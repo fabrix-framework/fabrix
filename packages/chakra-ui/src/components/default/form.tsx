@@ -9,16 +9,18 @@ import { Select } from "chakra-react-select";
 import { useController } from "@fabrix-framework/fabrix/rhf";
 import { LabelledHeading } from "./shared";
 
-export const ChakraForm = (props: FormComponentProps) => (
-  <Box className={props.className} rowGap={"20px"}>
-    {props.children
-      ? props.children
-      : [
-          props.renderFields(),
-          <button onClick={() => props.getAction()}>Submit</button>,
-        ]}
-  </Box>
-);
+export const ChakraForm = (props: FormComponentProps) => {
+  return (
+    <Box className={props.className} rowGap={"20px"}>
+      {props.children
+        ? props.children
+        : [
+            props.renderFields(),
+            <button onClick={() => props.getAction()}>Submit</button>,
+          ]}
+    </Box>
+  );
+};
 
 export const ChakraFormField = (props: FormFieldComponentProps) => {
   switch (props.type?.type) {

@@ -1,8 +1,6 @@
 import { Heading, Stack, HStack } from "@chakra-ui/react";
 import { FabrixComponent, gql } from "@fabrix-framework/fabrix";
 import { css } from "@emotion/css";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 const containerClassName = css`
   padding: 15px 0;
@@ -10,17 +8,16 @@ const containerClassName = css`
 
 const createTODOQuery = gql`
   mutation createTodo($input: TodoInput!) {
-    addTodo(input: $input) {
+    addTodo(input: $input)
+      @fabrixForm(
+        input: [
+          { field: "input.name", constraint: { minLength: 5, maxLength: 10 } }
+        ]
+      ) {
       id
     }
   }
 `;
-
-const createTodoSchema = z.object({
-  input: z.object({
-    name: z.string().min(3),
-  }),
-});
 
 function App() {
   return (
@@ -33,21 +30,16 @@ function App() {
         query={createTODOQuery}
       >
         {({ getInput }) =>
-          getInput(
-            {
-              resolver: zodResolver(createTodoSchema),
-            },
-            ({ Action, Field }) => (
-              <Stack>
-                <p>hello</p>
-                <HStack>
-                  <Field name="input.name" />
-                  <Field name="input.priority" />
-                  <Action />
-                </HStack>
-              </Stack>
-            ),
-          )
+          getInput({}, ({ Action, Field }) => (
+            <Stack>
+              <p>hello</p>
+              <HStack>
+                <Field name="input.name" />
+                <Field name="input.priority" />
+                <Action />
+              </HStack>
+            </Stack>
+          ))
         }
       </FabrixComponent>
       <FabrixComponent

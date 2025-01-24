@@ -13,7 +13,7 @@ import {
   getInputFields,
 } from "@readers/form";
 import { AnyVariables, OperationResult, useMutation } from "urql";
-import { FieldValues, FormProvider, Resolver, useForm } from "react-hook-form";
+import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { DirectiveAttributes } from "@registry";
 import { ajvResolver } from "@renderers/form/ajvResolver";
 import { buildAjvSchema } from "@renderers/form/validation";
@@ -239,9 +239,7 @@ type RootFieldName<TData> =
     ? Exclude<Extract<keyof TData, string>, "__typename">
     : string;
 
-export type GetInputExtraProps = FabrixComponentChildrenExtraProps & {
-  resolver?: Resolver;
-};
+export type GetInputExtraProps = FabrixComponentChildrenExtraProps & {};
 export type GetOutputExtraProps = FabrixComponentChildrenExtraProps;
 
 export type ChildComponentsExtraProps = Partial<DirectiveAttributes> & {
@@ -734,9 +732,7 @@ export const getInputComponentFn =
     const [extraProps, fieldsRenderer] = args;
     const field = operation.fields[0];
     const formContext = useForm({
-      resolver:
-        extraProps?.resolver ??
-        ajvResolver(buildAjvSchema(field.configs.outputFields)),
+      resolver: ajvResolver(buildAjvSchema(field.configs.outputFields)),
     });
 
     return (
