@@ -4,7 +4,6 @@ import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
 import { FormRenderer } from "@renderers/form";
 import { FabrixContext, FabrixContextType } from "@context";
-import { ChildComponentsRendererProps } from "@renderers/shared";
 import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
 import { getOutputFields, viewFieldMerger } from "@readers/field";
@@ -15,6 +14,7 @@ import {
 } from "@readers/form";
 import { AnyVariables, OperationResult, useMutation } from "urql";
 import { FieldValues, FormProvider, Resolver, useForm } from "react-hook-form";
+import { DirectiveAttributes } from "@registry";
 import {
   buildRootDocument,
   FieldVariables,
@@ -225,6 +225,9 @@ export type FabrixComponentProps<
    */
   query: GeneralDocumentType<TData, TVariables>;
 
+  /**
+   * The children to render the query
+   */
   children?: (props: FabrixComponentChildrenProps<TData>) => ReactNode;
 };
 
@@ -239,37 +242,145 @@ export type GetInputExtraProps = FabrixComponentChildrenExtraProps & {
 };
 export type GetOutputExtraProps = FabrixComponentChildrenExtraProps;
 
-type GetActionFn<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TData = any,
-  TVariables extends AnyVariables = AnyVariables,
-> =
-  | (() => React.ReactNode)
-  | ((props: {
-      type: "handler";
-    }) => () => Promise<void> | Promise<OperationResult<TData, TVariables>>);
+export type ChildComponentsExtraProps = Partial<DirectiveAttributes> & {
+  key?: string;
+};
 
-export type GetInputFieldsRenderer<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TData = any,
-  TVariables extends AnyVariables = AnyVariables,
-> = (
-  props: ChildComponentsRendererProps & {
-    getAction: GetActionFn<TData, TVariables>;
-  },
+export type GetInputFieldsRendererProps = {
+  /**
+   * Get the field by name
+   *
+   * @example
+   * ```tsx
+   * <FabrixComponent query={appQuery}>
+   *   {({ getComponent }) => (
+   *     <>
+   *       {getComponent("getEmployee", {}, ({ getField }) => (
+   *         <>
+   *           {getField("displayName")}
+   *           {getField("email")}
+   *         </>
+   *       ))}
+   *     </>
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  getField: (
+    /**
+     * The name of the field
+     */
+    name: string,
+    extraProps?: ChildComponentsExtraProps,
+  ) => {
+    value: unknown;
+    onChange: (value: unknown) => void;
+  };
+
+  /**
+   * Get the field component by name
+   *
+   * @example
+   * ```tsx
+   * <FabrixComponent query={appQuery}>
+   *   {({ getInput }) => (
+   *     getInput({}, ({ Field }) => (
+   *       <Field name="displayName" />
+   *       <Field name="email" />
+   *     ))
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  Field: (props: { name: string }) => React.ReactNode;
+
+  /**
+   * Get the action handler for the query
+   */
+  getAction: () => {
+    onClick: () => Promise<void>;
+  };
+
+  /**
+   * Get the action component
+   *
+   * The behaviour of the action component is to execute the query with the input
+   *
+   * @example
+   * ```tsx
+   * <FabrixComponent query={appQuery}>
+   *   {({ getInput }) => (
+   *     getInput("input", ({ Action, Field }) => (
+   *       <Field name="input.name" />
+   *       <Field name="input.email" />
+   *       <Action />
+   *     ))
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  Action: () => React.ReactNode;
+};
+export type GetInputFieldsRenderer = (
+  props: GetInputFieldsRendererProps,
 ) => ReactNode;
-export type GetInputFn<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TData = any,
-  TVariables extends AnyVariables = AnyVariables,
-> = (
+
+export type GetInputFn = (
   extraProps?: GetInputExtraProps,
-  fieldsRenderer?: GetInputFieldsRenderer<TData, TVariables>,
+  fieldsRenderer?: GetInputFieldsRenderer,
 ) => React.ReactNode;
 
+export type GetOutputFieldsRendererProps = {
+  /**
+   * Get the field by name
+   *
+   * @example
+   * ```tsx
+   * <FabrixComponent query={appQuery}>
+   *   {({ getComponent }) => (
+   *     <>
+   *       {getComponent("getEmployee", {}, ({ getField }) => (
+   *         <>
+   *           {getField("displayName")}
+   *           {getField("email")}
+   *         </>
+   *       ))}
+   *     </>
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  getField: (
+    /**
+     * The name of the field
+     */
+    name: string,
+    extraProps?: ChildComponentsExtraProps,
+  ) => {
+    value: unknown;
+  };
+
+  /**
+   * Get the field component by name
+   *
+   * @example
+   * ```tsx
+   * <FabrixComponent query={appQuery}>
+   *   {({ getInput }) => (
+   *     getInput({}, ({ Field }) => (
+   *       <Field name="displayName" />
+   *       <Field name="email" />
+   *     ))
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  Field: (props: { name: string }) => React.ReactNode;
+};
 export type GetOutputFieldsRenderer = (
-  props: ChildComponentsRendererProps,
+  props: GetOutputFieldsRendererProps,
 ) => React.ReactNode;
+
 export type GetOutputFn<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
@@ -282,7 +393,6 @@ export type GetOutputFn<
 export type FabrixComponentChildrenProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
-  TVariables extends AnyVariables = AnyVariables,
 > = {
   /**
    * The data fetched from the query
@@ -300,7 +410,7 @@ export type FabrixComponentChildrenProps<
    * </FabrixComponent>
    * ```
    */
-  getInput: GetInputFn<TData, TVariables>;
+  getInput: GetInputFn;
 
   /**
    * Get the component by root field name
@@ -552,13 +662,9 @@ export type ExecuteQueryResult<
   TVariables extends AnyVariables = AnyVariables,
 > = Promise<void> | Promise<OperationResult<TData, TVariables>>;
 
-type InputComponentRendererFnProps<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TData = any,
-  TVariables extends AnyVariables = AnyVariables,
-> = RendererFnCommonProps & {
+type InputComponentRendererFnProps = RendererFnCommonProps & {
   executeQuery: () => Promise<void>;
-  fieldsRenderer?: GetInputFieldsRenderer<TData, TVariables>;
+  fieldsRenderer?: GetInputFieldsRenderer;
 };
 type InputComponentFnProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -614,15 +720,13 @@ export const getInputComponentFn =
     TVariables extends AnyVariables = AnyVariables,
   >(
     props: FabrixComponentProps<TData, TVariables>,
-    rendererFn: (
-      props: InputComponentRendererFnProps<TData, TVariables>,
-    ) => React.ReactNode,
+    rendererFn: (props: InputComponentRendererFnProps) => React.ReactNode,
   ) =>
   (
     operation: Operation,
     componentProps: InputComponentFnProps<TData, TVariables>,
   ) =>
-  (...args: Parameters<GetInputFn<TData, TVariables>>): React.ReactNode => {
+  (...args: Parameters<GetInputFn>): React.ReactNode => {
     const [extraProps, fieldsRenderer] = args;
     const field = operation.fields[0];
     const formContext = useForm({

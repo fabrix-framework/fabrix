@@ -3,80 +3,71 @@ import { defaultFieldType } from "@renderers/typename";
 import { FabrixContextType } from "@context";
 import {
   buildClassName,
-  ChildComponentsExtraProps,
   CommonFabrixComponentRendererProps,
   FieldConfigByType,
   getFieldConfigByKey,
   Loader,
 } from "@renderers/shared";
-import { GetInputFieldsRenderer } from "@renderer";
-import { AnyVariables } from "urql";
+import { ChildComponentsExtraProps, GetInputFieldsRenderer } from "@renderer";
 
 export type ViewFields = FieldConfigByType<"form">["configs"]["outputFields"];
 export type FormField = ViewFields[number];
-type FormRendererProps<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TData = any,
-  TVariables extends AnyVariables = AnyVariables,
-> = CommonFabrixComponentRendererProps<ViewFields> & {
+type FormRendererProps = CommonFabrixComponentRendererProps<ViewFields> & {
   executeQuery: () => Promise<void>;
-  fieldsRenderer?: GetInputFieldsRenderer<TData, TVariables>;
+  fieldsRenderer?: GetInputFieldsRenderer;
 };
 
-export const FormRenderer = <
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TData = any,
-  TVariables extends AnyVariables = AnyVariables,
->({
+export const FormRenderer = ({
   context,
   rootField,
   executeQuery,
   fieldsRenderer,
   className,
-}: FormRendererProps<TData, TVariables>) => {
-  const renderFieldInternal = (
-    name: string,
-    extraProps?: ChildComponentsExtraProps,
-  ) => {
-    const field = getFieldConfigByKey(rootField.fields, name);
-    if (!field) {
-      return null;
-    }
+}: FormRendererProps) => {
+  const field = {
+    handler: {
+      // TODO: inject value here
+      value: null,
+      onChange: () => void 0,
+    },
+    component: (name: string, extraProps?: ChildComponentsExtraProps) => {
+      const field = getFieldConfigByKey(rootField.fields, name);
+      if (!field) {
+        return null;
+      }
 
-    return renderField({
-      indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
-      extraClassName: extraProps?.className,
-      field: {
-        ...field,
-        ...extraProps,
-      },
-      context,
-    });
-  };
-
-  const renderActionInternal = () => {
-    // TODO: implement getAction
-    return <button onClick={() => executeQuery()}>Submit</button>;
-  };
-
-  const renderFields = useCallback(() => {
-    if (fieldsRenderer) {
-      return fieldsRenderer({
-        getAction: renderActionInternal,
-        getField: renderFieldInternal,
+      return renderField({
+        indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
+        extraClassName: extraProps?.className,
+        field: {
+          ...field,
+          ...extraProps,
+        },
+        context,
       });
-    }
+    },
+  };
 
-    return rootField.fields
-      .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
-      .flatMap((field, fieldIndex) =>
-        renderField({
-          indexKey: `${rootField.name}-${fieldIndex}`,
-          field,
-          context,
-        }),
-      );
-  }, [context, rootField.name, fieldsRenderer]);
+  const action = {
+    handler: {
+      onClick: executeQuery,
+    },
+    component: () => <button onClick={() => executeQuery()}>Submit</button>,
+  };
+
+  const renderFields = useCallback(
+    () =>
+      rootField.fields
+        .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
+        .flatMap((field, fieldIndex) =>
+          renderField({
+            indexKey: `${rootField.name}-${fieldIndex}`,
+            field,
+            context,
+          }),
+        ),
+    [context, rootField.name, fieldsRenderer],
+  );
 
   if (context.schemaLoader.status === "loading") {
     return <Loader />;
@@ -91,9 +82,17 @@ export const FormRenderer = <
     name: rootField.name,
     className: `fabrix form col-row ${className ?? ""}`,
     customProps: {},
+    children:
+      fieldsRenderer &&
+      fieldsRenderer({
+        Action: action.component,
+        getAction: () => action.handler,
+        Field: (props: { name: string }) => field.component(props.name),
+        getField: () => field.handler,
+      }),
     renderFields,
-    renderField: renderFieldInternal,
-    renderAction: renderActionInternal,
+    renderField: field.component,
+    getAction: () => action.handler,
   });
 };
 

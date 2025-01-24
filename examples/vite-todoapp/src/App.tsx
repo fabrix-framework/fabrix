@@ -1,9 +1,17 @@
-import { Heading, Stack } from "@chakra-ui/react";
+import { Heading, Stack, HStack } from "@chakra-ui/react";
 import { FabrixComponent, gql } from "@fabrix-framework/fabrix";
 import { css } from "@emotion/css";
 
 const containerClassName = css`
   padding: 15px 0;
+`;
+
+const createTODOQuery = gql`
+  mutation createTodo($input: TodoInput!) {
+    addTodo(input: $input) {
+      id
+    }
+  }
 `;
 
 function App() {
@@ -14,14 +22,20 @@ function App() {
       </Heading>
       <FabrixComponent
         containerClassName={containerClassName}
-        query={gql`
-          mutation createTodo($input: TodoInput!) {
-            addTodo(input: $input) {
-              id
-            }
-          }
-        `}
-      />
+        query={createTODOQuery}
+      >
+        {({ getInput }) =>
+          getInput({}, ({ Action, Field }) => (
+            <Stack>
+              <p>hello</p>
+              <HStack>
+                <Field name="input.name" />
+                <Action />
+              </HStack>
+            </Stack>
+          ))
+        }
+      </FabrixComponent>
       <FabrixComponent
         containerClassName={containerClassName}
         query={gql`

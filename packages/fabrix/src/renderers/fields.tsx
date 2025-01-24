@@ -1,7 +1,11 @@
-import { createElement, useCallback, useMemo } from "react";
+import { createElement, useMemo } from "react";
 import { FabrixContextType } from "@context";
 import { Value } from "@fetcher";
 import { get } from "es-toolkit/compat";
+import {
+  ChildComponentsExtraProps,
+  GetOutputFieldsRendererProps,
+} from "@renderer";
 import {
   assertObjectValue,
   buildClassName,
@@ -9,7 +13,6 @@ import {
   FieldConfigByType,
   getFieldConfigByKey,
   Loader,
-  ChildComponentsRendererProps,
 } from "./shared";
 import { getTableMode, renderTable } from "./table";
 import {
@@ -22,7 +25,7 @@ export type ViewFields = FieldConfigByType<"view">["configs"]["outputFields"];
 type ViewField = ViewFields[number];
 type ViewRendererProps = CommonFabrixComponentRendererProps<ViewFields> & {
   data: Value | undefined;
-  fieldsRenderer?: (props: ChildComponentsRendererProps) => React.ReactNode;
+  fieldsRenderer?: (props: GetOutputFieldsRendererProps) => React.ReactNode;
 };
 
 export const ViewRenderer = (props: ViewRendererProps) => {
@@ -30,38 +33,48 @@ export const ViewRenderer = (props: ViewRendererProps) => {
 
   // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
   const tableType = useMemo(() => getTableMode(rootField.fields), [rootField]);
-  const renderFields = useCallback(() => {
-    const schema = context.schemaLoader;
-    if (schema.status === "loading") {
-      return <Loader />;
-    }
 
-    const typenameExtractor = buildTypenameExtractor({
-      targetValue: props.data,
-      schemaSet: schema.schemaSet,
-    });
+  const schema = context.schemaLoader;
+  if (schema.status === "loading") {
+    return <Loader />;
+  }
 
+  const typenameExtractor = buildTypenameExtractor({
+    targetValue: props.data,
+    schemaSet: schema.schemaSet,
+  });
+
+  const field = {
+    handler: {
+      // TODO: inject value here
+      value: null,
+    },
+    component: (name: string, extraProps?: ChildComponentsExtraProps) => {
+      const field = getFieldConfigByKey(rootField.fields, name);
+      if (!field) {
+        return null;
+      }
+
+      return renderField({
+        context,
+        data: props.data,
+        extraClassName: extraProps?.className,
+        indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
+        subFields: getSubFields(typenameExtractor, rootField.fields, name),
+        field: {
+          ...field,
+          ...extraProps,
+        },
+        fieldType: typenameExtractor.getFieldTypeByPath(field.field),
+      });
+    },
+  };
+
+  const renderFields = () => {
     if (fieldsRenderer) {
       return fieldsRenderer({
-        getField: (name, extraProps) => {
-          const field = getFieldConfigByKey(rootField.fields, name);
-          if (!field) {
-            return null;
-          }
-
-          return renderField({
-            context,
-            data: props.data,
-            extraClassName: extraProps?.className,
-            indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
-            subFields: getSubFields(typenameExtractor, rootField.fields, name),
-            field: {
-              ...field,
-              ...extraProps,
-            },
-            fieldType: typenameExtractor.getFieldTypeByPath(field.field),
-          });
-        },
+        Field: ({ name }) => field.component(name),
+        getField: () => field.handler,
       });
     }
 
@@ -89,7 +102,7 @@ export const ViewRenderer = (props: ViewRendererProps) => {
         {fieldsComponent}
       </div>
     );
-  }, [fieldsRenderer, rootField, getSubFields]);
+  };
 
   if (fetching) {
     return <Loader />;

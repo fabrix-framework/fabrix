@@ -1,39 +1,7 @@
 import { DocumentNode } from "graphql";
-import { DirectiveAttributes } from "@registry";
 import { FabrixContextType } from "@context";
 import { FieldConfigWithMeta } from "@readers/shared";
 import { FieldConfig } from "@renderer";
-
-export type ChildComponentsExtraProps = Partial<DirectiveAttributes> & {
-  key?: string;
-};
-export type ChildComponentsRendererProps = {
-  /**
-   * Get the field by name
-   *
-   * ```tsx
-   * <FabrixComponent query={appQuery}>
-   *   {({ getComponent }) => (
-   *     <>
-   *       {getComponent("getEmployee", {}, ({ getField }) => (
-   *         <>
-   *           {getField("displayName")}
-   *           {getField("email")}
-   *         </>
-   *       ))}
-   *     </>
-   *   )}
-   * </FabrixComponent>
-   * ```
-   */
-  getField: (
-    /**
-     * The name of the field
-     */
-    name: string,
-    extraProps?: ChildComponentsExtraProps,
-  ) => React.ReactNode;
-};
 
 export type DocumentResolver = () => string | DocumentNode;
 export type RendererQuery = {

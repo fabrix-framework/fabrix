@@ -10,10 +10,19 @@ import { useController } from "@fabrix-framework/fabrix/rhf";
 import { LabelledHeading } from "./shared";
 
 export const ChakraForm = (props: FormComponentProps) => {
+  const Action = () => (
+    <button
+      onClick={() => {
+        props.getAction();
+      }}
+    >
+      Submit
+    </button>
+  );
+
   return (
     <Box className={props.className} rowGap={"20px"}>
-      {props.renderFields()}
-      {props.renderAction()}
+      {props.children ? props.children : [props.renderFields(), <Action />]}
     </Box>
   );
 };

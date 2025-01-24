@@ -1,5 +1,5 @@
 import { ComponentType } from "react";
-import { FabrixComponentProps } from "@renderer";
+import { FabrixComponentProps, GetInputFieldsRendererProps } from "@renderer";
 import { ViewFieldSchema } from "@directive/schema";
 import { FieldType } from "@renderers/typename";
 import { FabrixCustomComponent } from "@customRenderer";
@@ -67,9 +67,10 @@ export type FormFieldComponentProps<UP extends UserProps = UserProps> =
 export type FormComponentProps<P = unknown> = CustomProps<P> & {
   name: string;
   className?: string;
+  children: React.ReactNode;
   renderFields: () => React.ReactNode;
   renderField: (name: string) => React.ReactNode;
-  renderAction: () => React.ReactNode;
+  getAction: GetInputFieldsRendererProps["getAction"];
 };
 
 export type TableComponentHeader = Field & {
