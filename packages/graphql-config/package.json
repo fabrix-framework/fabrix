@@ -4,6 +4,9 @@
   "type": "module",
   "version": "0.3.0",
   "description": "GraphQL configuration for fabrix",
+  "publishConfig": {
+    "provenance": true
+  },
   "homepage": "https://fabrix-framework.github.io/docs/",
   "repository": {
     "type": "git",
