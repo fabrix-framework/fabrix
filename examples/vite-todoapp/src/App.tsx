@@ -1,4 +1,4 @@
-import { Heading, Stack, HStack } from "@chakra-ui/react";
+import { Heading, Stack, Grid, GridItem } from "@chakra-ui/react";
 import { FabrixComponent, gql } from "@fabrix-framework/fabrix";
 
 const createTODOQuery = gql`
@@ -18,13 +18,23 @@ function App() {
       <FabrixComponent query={createTODOQuery}>
         {({ getInput }) =>
           getInput({}, ({ Action, Field }) => (
-            <Stack>
-              <p>hello</p>
-              <HStack>
-                <Field name="input.name" />
-                <Field name="input.priority" />
-                <Action />
-              </HStack>
+            <Stack gridColumn={"1/12"}>
+              <Grid
+                templateColumns={"repeat(6, 1fr)"}
+                gap={3}
+                autoFlow={"column"}
+              >
+                <GridItem colSpan={4}>
+                  <Field name="input.name" extraProps={{ label: "タスク名" }} />
+                </GridItem>
+                <GridItem colSpan={2}>
+                  <Field
+                    name="input.priority"
+                    extraProps={{ label: "優先度" }}
+                  />
+                </GridItem>
+              </Grid>
+              <Action />
             </Stack>
           ))
         }
