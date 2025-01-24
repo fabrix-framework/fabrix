@@ -80,6 +80,9 @@ const MultiSelectFormField = (
   const { className } = props.attributes;
   const { field } = useController({
     name: props.name,
+    rules: {
+      required: props.isRequired,
+    },
   });
   const values = props.type.meta.values.map((value) => ({
     value,
@@ -107,6 +110,9 @@ const SelectFormField = (
   const { className } = props.attributes;
   const { field } = useController({
     name: props.name,
+    rules: {
+      required: props.isRequired,
+    },
   });
   const values = props.type.meta.values.map((value) => ({
     value,
@@ -133,6 +139,9 @@ const TextFormField = (props: FormFieldComponentProps) => {
   const { field } = useController({
     name: props.name,
     defaultValue: props.value ?? "",
+    rules: {
+      required: props.isRequired,
+    },
   });
 
   return (
@@ -149,6 +158,9 @@ const NumberFormField = (props: FormFieldComponentProps) => {
   const { field } = useController({
     name: props.name,
     defaultValue: props.value ?? "",
+    rules: {
+      required: props.isRequired,
+    },
   });
 
   return (
@@ -171,6 +183,9 @@ const BooleanFormField = (props: FormFieldComponentProps) => {
   const { className } = props.attributes;
   const { field } = useController({
     name: props.name,
+    rules: {
+      required: props.isRequired,
+    },
   });
 
   return (
