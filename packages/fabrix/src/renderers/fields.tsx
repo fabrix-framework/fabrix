@@ -73,6 +73,7 @@ export const ViewRenderer = (props: ViewRendererProps) => {
   const renderFields = () => {
     if (fieldsRenderer) {
       return fieldsRenderer({
+        data: props.data,
         Field: ({ name }) => field.component(name),
         getField: () => field.handler,
       });

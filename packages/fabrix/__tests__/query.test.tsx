@@ -230,10 +230,12 @@ describe("collection", () => {
           }
         `}
       >
-        {({ data }) => (
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          <div role="result-size">{data.users.size}</div>
-        )}
+        {({ getOutput }) =>
+          getOutput("users", {}, ({ data }) => (
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            <div role="result-size">{data.size}</div>
+          ))
+        }
       </FabrixComponent>,
       async () => {
         const result = await screen.findByRole("result-size");

@@ -17,9 +17,9 @@ export const findForm = async () => {
       const submit = within(form).getByRole("button");
       await user.click(submit);
     },
-    getAlert: (label: string) => {
+    findAlert: async (label: string) => {
       const field = within(form).getByLabelText(`field:${label}`);
-      return within(field).queryByRole("alert");
+      return within(field).findByRole("alert");
     },
   };
 };

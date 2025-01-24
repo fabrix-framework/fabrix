@@ -15,6 +15,8 @@ import {
 import { AnyVariables, OperationResult, useMutation } from "urql";
 import { FieldValues, FormProvider, Resolver, useForm } from "react-hook-form";
 import { DirectiveAttributes } from "@registry";
+import { ajvResolver } from "@renderers/form/ajvResolver";
+import { buildAjvSchema } from "@renderers/form/validation";
 import {
   buildRootDocument,
   FieldVariables,
@@ -330,7 +332,15 @@ export type GetInputFn = (
   fieldsRenderer?: GetInputFieldsRenderer,
 ) => React.ReactNode;
 
-export type GetOutputFieldsRendererProps = {
+export type GetOutputFieldsRendererProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+> = {
+  /**
+   * The data fetched from the query
+   */
+  data: TData;
+
   /**
    * Get the field by name
    *
@@ -394,11 +404,6 @@ export type FabrixComponentChildrenProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
 > = {
-  /**
-   * The data fetched from the query
-   */
-  data: TData;
-
   /**
    * Get the input component by the variable name
    *
@@ -618,7 +623,6 @@ export const getComponentRendererFn = <
 
     if (props.children) {
       return props.children({
-        data: dataFetch.data ?? ({} as TData),
         getInput: inputComponent,
         getOutput: outputComponent,
       });
@@ -730,7 +734,9 @@ export const getInputComponentFn =
     const [extraProps, fieldsRenderer] = args;
     const field = operation.fields[0];
     const formContext = useForm({
-      resolver: extraProps?.resolver, // ajvResolver(buildAjvSchema(rootField.fields)),
+      resolver:
+        extraProps?.resolver ??
+        ajvResolver(buildAjvSchema(field.configs.outputFields)),
     });
 
     return (

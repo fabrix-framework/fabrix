@@ -60,14 +60,20 @@ const tableView = (props: TableComponentProps) => {
   );
 };
 
-const formView = (props: FormComponentProps) => {
-  return <div role="form">{props.renderFields()}</div>;
-};
+const formView = (props: FormComponentProps) => (
+  <div role="form">
+    {props.renderFields()}
+    <button onClick={() => props.getAction()}>Submit</button>
+  </div>
+);
 
 const formFieldView = (props: FormFieldComponentProps) => {
   const { field, formState } = useController({
     name: props.name,
     defaultValue: "",
+    rules: {
+      required: props.isRequired,
+    },
   });
   const error = formState.errors[props.name];
   const isNumber =
