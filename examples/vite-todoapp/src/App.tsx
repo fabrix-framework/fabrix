@@ -30,6 +30,7 @@ function App() {
               <p>hello</p>
               <HStack>
                 <Field name="input.name" />
+                <Field name="input.priority" />
                 <Action />
               </HStack>
             </Stack>
