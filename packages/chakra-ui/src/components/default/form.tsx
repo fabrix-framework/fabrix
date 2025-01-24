@@ -11,13 +11,15 @@ import { get } from "es-toolkit/compat";
 import { LabelledHeading } from "./shared";
 
 export const ChakraForm = (props: FormComponentProps) => {
+  const action = props.getAction();
+
   return (
     <Box className={props.className} rowGap={"20px"}>
       {props.children
         ? props.children
         : [
             props.renderFields(),
-            <button onClick={() => props.getAction()}>Submit</button>,
+            <button onClick={action.onClick}>Submit</button>,
           ]}
     </Box>
   );

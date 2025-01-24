@@ -9,7 +9,7 @@ import { useContext } from "react";
 
 export const CustomComponentTableRenderer = (
   props: FabrixComponentProps & {
-    fieldConfig: FieldConfigByType<"view">;
+    fieldConfig: FieldConfigByType<"generic">;
     component: ComponentRendererProps<TableComponentEntry>;
     data: Value;
   },

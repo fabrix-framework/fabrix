@@ -38,7 +38,7 @@ export const FabrixCustomComponent = (
 
             switch (componentEntry.type) {
               case "table": {
-                ensureFieldType(field, "view");
+                ensureFieldType(field, "generic");
                 return (
                   <CustomComponentTableRenderer
                     {...props}
