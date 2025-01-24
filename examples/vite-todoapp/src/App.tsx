@@ -8,12 +8,7 @@ const containerClassName = css`
 
 const createTODOQuery = gql`
   mutation createTodo($input: TodoInput!) {
-    addTodo(input: $input)
-      @fabrixForm(
-        input: [
-          { field: "input.name", constraint: { minLength: 3, maxLength: 5 } }
-        ]
-      ) {
+    addTodo(input: $input) {
       id
     }
   }

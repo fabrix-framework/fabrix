@@ -151,7 +151,6 @@ const NumberFormField = (props: FormFieldComponentProps) => {
   const { className } = props.attributes;
   const { field } = useController({
     name: props.name,
-    defaultValue: props.value ?? "",
     rules: {
       required: props.isRequired,
     },

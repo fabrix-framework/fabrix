@@ -727,9 +727,16 @@ export const getInputComponentFn =
   (...args: Parameters<GetInputFn>): React.ReactNode => {
     const [extraProps, fieldsRenderer] = args;
     const field = operation.fields[0];
-    const schema = buildAjvSchema(field.configs.outputFields);
+    const buildSchema = () => {
+      if (field.type === "form") {
+        return buildAjvSchema(field.configs.outputFields);
+      } else if (field.type === "generic") {
+        return buildAjvSchema(field.configs.inputFields);
+      }
+    };
+    const schema = buildSchema();
     const formContext = useForm({
-      resolver: ajvResolver(schema),
+      resolver: schema && ajvResolver(schema),
     });
 
     return (
