@@ -288,7 +288,10 @@ export type GetInputFieldsRendererProps = {
    * </FabrixComponent>
    * ```
    */
-  Field: (props: { name: string }) => React.ReactNode;
+  Field: (props: {
+    name: string;
+    extraProps?: ChildComponentsExtraProps;
+  }) => React.ReactNode;
 
   /**
    * Get the action handler for the query

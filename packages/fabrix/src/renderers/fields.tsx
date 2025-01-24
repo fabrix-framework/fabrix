@@ -64,6 +64,10 @@ export const ViewRenderer = (props: ViewRendererProps) => {
         field: {
           ...field,
           ...extraProps,
+          config: {
+            ...field.config,
+            ...extraProps,
+          },
         },
         fieldType: typenameExtractor.getFieldTypeByPath(field.field),
       });

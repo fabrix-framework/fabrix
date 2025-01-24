@@ -42,6 +42,10 @@ export const FormRenderer = ({
         field: {
           ...field,
           ...extraProps,
+          config: {
+            ...field.config,
+            ...extraProps,
+          },
         },
         context,
       });
@@ -87,7 +91,10 @@ export const FormRenderer = ({
       fieldsRenderer({
         Action: action.component,
         getAction: () => action.handler,
-        Field: (props: { name: string }) => field.component(props.name),
+        Field: (props: {
+          name: string;
+          extraProps?: ChildComponentsExtraProps;
+        }) => field.component(props.name, props.extraProps),
         getField: () => field.handler,
       }),
     renderFields,

@@ -1,10 +1,5 @@
 import { Heading, Stack, HStack } from "@chakra-ui/react";
 import { FabrixComponent, gql } from "@fabrix-framework/fabrix";
-import { css } from "@emotion/css";
-
-const containerClassName = css`
-  padding: 15px 0;
-`;
 
 const createTODOQuery = gql`
   mutation createTodo($input: TodoInput!) {
@@ -20,10 +15,7 @@ function App() {
       <Heading textAlign="center" size="md">
         Fabrix TODO app example
       </Heading>
-      <FabrixComponent
-        containerClassName={containerClassName}
-        query={createTODOQuery}
-      >
+      <FabrixComponent query={createTODOQuery}>
         {({ getInput }) =>
           getInput({}, ({ Action, Field }) => (
             <Stack>
@@ -38,7 +30,6 @@ function App() {
         }
       </FabrixComponent>
       <FabrixComponent
-        containerClassName={containerClassName}
         query={gql`
           query todos {
             allTodos @fabrixView {
