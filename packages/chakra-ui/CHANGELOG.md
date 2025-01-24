@@ -1,5 +1,18 @@
 # @fabrix-framework/chakra-ui
 
+## 0.5.0
+
+### Minor Changes
+
+- [#144](https://github.com/fabrix-framework/fabrix/pull/144) [`c19ff4e`](https://github.com/fabrix-framework/fabrix/commit/c19ff4eff372b1b74f07859af663dac07e0b929c) Thanks [@IzumiSy](https://github.com/IzumiSy)! - Add provenance
+
+- [#156](https://github.com/fabrix-framework/fabrix/pull/156) [`4a4baa7`](https://github.com/fabrix-framework/fabrix/commit/4a4baa76c0394579c90b0cc0b809d898efdc5ed2) Thanks [@IzumiSy](https://github.com/IzumiSy)! - Fix missing required rule
+
+### Patch Changes
+
+- Updated dependencies [[`c19ff4e`](https://github.com/fabrix-framework/fabrix/commit/c19ff4eff372b1b74f07859af663dac07e0b929c), [`7c104b0`](https://github.com/fabrix-framework/fabrix/commit/7c104b0ccd4850585f08847ae60ea8b36ffc62cd), [`d474f8c`](https://github.com/fabrix-framework/fabrix/commit/d474f8cd9ab684167b1b2efec5b494752b951bee)]:
+  - @fabrix-framework/fabrix@0.5.0
+
 ## 0.4.0
 
 ### Minor Changes

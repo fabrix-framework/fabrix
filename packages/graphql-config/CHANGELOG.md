@@ -1,5 +1,11 @@
 # @fabrix-framework/graphql-config
 
+## 0.4.0
+
+### Minor Changes
+
+- [#144](https://github.com/fabrix-framework/fabrix/pull/144) [`c19ff4e`](https://github.com/fabrix-framework/fabrix/commit/c19ff4eff372b1b74f07859af663dac07e0b929c) Thanks [@IzumiSy](https://github.com/IzumiSy)! - Add provenance
+
 ## 0.3.0
 
 ### Minor Changes
