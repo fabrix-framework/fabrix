@@ -353,6 +353,9 @@ importers:
       '@fabrix-framework/prettier-config':
         specifier: workspace:*
         version: link:../../shared/prettier
+      '@types/node':
+        specifier: ^22.7.5
+        version: 22.10.5
       '@types/react':
         specifier: ^19.0.7
         version: 19.0.7
@@ -385,7 +388,13 @@ importers:
         version: 10.0.1(eslint@9.18.0(jiti@2.4.2))
       eslint-plugin-import:
         specifier: ^2.29.1
+<<<<<<< HEAD
         version: 2.31.0(eslint@9.18.0(jiti@2.4.2))
+||||||| parent of 78f6f04 (Add tsup.config.ts)
+        version: 2.31.0(eslint@9.18.0)
+=======
+        version: 2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0)
+>>>>>>> 78f6f04 (Add tsup.config.ts)
       typescript:
         specifier: ^5
         version: 5.7.3
@@ -9300,16 +9309,35 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+<<<<<<< HEAD
   eslint-module-utils@2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0(jiti@2.4.2)):
+||||||| parent of 78f6f04 (Add tsup.config.ts)
+  eslint-module-utils@2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
+=======
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
+>>>>>>> 78f6f04 (Add tsup.config.ts)
     dependencies:
       debug: 3.2.7
     optionalDependencies:
+<<<<<<< HEAD
       eslint: 9.18.0(jiti@2.4.2)
+||||||| parent of 78f6f04 (Add tsup.config.ts)
+      eslint: 9.18.0
+=======
+      '@typescript-eslint/parser': 8.19.1(eslint@9.18.0)(typescript@5.7.3)
+      eslint: 9.18.0
+>>>>>>> 78f6f04 (Add tsup.config.ts)
       eslint-import-resolver-node: 0.3.9
     transitivePeerDependencies:
       - supports-color
 
+<<<<<<< HEAD
   eslint-plugin-import@2.31.0(eslint@9.18.0(jiti@2.4.2)):
+||||||| parent of 78f6f04 (Add tsup.config.ts)
+  eslint-plugin-import@2.31.0(eslint@9.18.0):
+=======
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0):
+>>>>>>> 78f6f04 (Add tsup.config.ts)
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -9320,7 +9348,13 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.18.0(jiti@2.4.2)
       eslint-import-resolver-node: 0.3.9
+<<<<<<< HEAD
       eslint-module-utils: 2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0(jiti@2.4.2))
+||||||| parent of 78f6f04 (Add tsup.config.ts)
+      eslint-module-utils: 2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
+=======
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
+>>>>>>> 78f6f04 (Add tsup.config.ts)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -9331,6 +9365,8 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.8
       tsconfig-paths: 3.15.0
+    optionalDependencies:
+      '@typescript-eslint/parser': 8.19.1(eslint@9.18.0)(typescript@5.7.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
