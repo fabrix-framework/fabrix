@@ -18,6 +18,7 @@ jobs:
           - fabrix
           - graphql-config
           - chakra-ui
+          - unstyled
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
