@@ -30,7 +30,6 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "dependencies": {},
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
@@ -38,6 +37,7 @@
   "devDependencies": {
     "@fabrix-framework/eslint-config": "workspace:*",
     "@fabrix-framework/prettier-config": "workspace:*",
+    "@types/node": "^22.7.5",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "eslint": "^9.18.0",
