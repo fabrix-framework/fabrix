@@ -326,6 +326,40 @@ importers:
         specifier: ^3.0.2
         version: 3.0.2(@types/node@22.10.5)(happy-dom@16.5.3)(msw@2.7.0(@types/node@22.10.5)(typescript@5.7.3))
 
+  packages/unstyled:
+    dependencies:
+      react:
+        specifier: '>=18'
+        version: 19.0.0
+      react-dom:
+        specifier: '>=18'
+        version: 19.0.0(react@19.0.0)
+    devDependencies:
+      '@fabrix-framework/eslint-config':
+        specifier: workspace:*
+        version: link:../../shared/eslint
+      '@fabrix-framework/prettier-config':
+        specifier: workspace:*
+        version: link:../../shared/prettier
+      '@types/react':
+        specifier: ^19.0.7
+        version: 19.0.7
+      '@types/react-dom':
+        specifier: ^19.0.3
+        version: 19.0.3(@types/react@19.0.7)
+      eslint:
+        specifier: ^9.18.0
+        version: 9.18.0
+      prettier:
+        specifier: ^3.4.2
+        version: 3.4.2
+      tsup:
+        specifier: ^8.3.5
+        version: 8.3.5(@swc/core@1.10.6(@swc/helpers@0.5.15))(postcss@8.5.1)(tsx@4.19.2)(typescript@5.7.3)
+      typescript:
+        specifier: ^5.7.3
+        version: 5.7.3
+
   shared/eslint:
     dependencies:
       '@eslint/compat':
@@ -339,7 +373,7 @@ importers:
         version: 9.1.0(eslint@9.18.0)
       eslint-plugin-import:
         specifier: ^2.29.1
-        version: 2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0)
+        version: 2.31.0(eslint@9.18.0)
       typescript:
         specifier: ^5
         version: 5.7.3
@@ -7228,17 +7262,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
+  eslint-module-utils@2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.19.1(eslint@9.18.0)(typescript@5.7.3)
       eslint: 9.18.0
       eslint-import-resolver-node: 0.3.9
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0):
+  eslint-plugin-import@2.31.0(eslint@9.18.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -7249,7 +7282,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.18.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
+      eslint-module-utils: 2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -7260,8 +7293,6 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.8
       tsconfig-paths: 3.15.0
-    optionalDependencies:
-      '@typescript-eslint/parser': 8.19.1(eslint@9.18.0)(typescript@5.7.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
