@@ -340,12 +340,21 @@ importers:
 
   packages/unstyled:
     dependencies:
+      '@fabrix-framework/fabrix':
+        specifier: workspace:*
+        version: link:../fabrix
+      es-toolkit:
+        specifier: ^1.30.1
+        version: 1.31.0
       react:
         specifier: '>=18'
         version: 19.0.0
       react-dom:
         specifier: '>=18'
         version: 19.0.0(react@19.0.0)
+      react-hook-form:
+        specifier: ^7.53.1
+        version: 7.54.2(react@19.0.0)
     devDependencies:
       '@fabrix-framework/eslint-config':
         specifier: workspace:*
@@ -389,12 +398,18 @@ importers:
       eslint-plugin-import:
         specifier: ^2.29.1
 <<<<<<< HEAD
+<<<<<<< HEAD
         version: 2.31.0(eslint@9.18.0(jiti@2.4.2))
 ||||||| parent of 78f6f04 (Add tsup.config.ts)
         version: 2.31.0(eslint@9.18.0)
 =======
         version: 2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0)
 >>>>>>> 78f6f04 (Add tsup.config.ts)
+||||||| parent of a5c6f32 (Expose UnstyledRegistry)
+        version: 2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0)
+=======
+        version: 2.31.0(eslint@9.18.0)
+>>>>>>> a5c6f32 (Expose UnstyledRegistry)
       typescript:
         specifier: ^5
         version: 5.7.3
@@ -9310,21 +9325,32 @@ snapshots:
       - supports-color
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   eslint-module-utils@2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0(jiti@2.4.2)):
 ||||||| parent of 78f6f04 (Add tsup.config.ts)
   eslint-module-utils@2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
 =======
   eslint-module-utils@2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
 >>>>>>> 78f6f04 (Add tsup.config.ts)
+||||||| parent of a5c6f32 (Expose UnstyledRegistry)
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
+=======
+  eslint-module-utils@2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
+>>>>>>> a5c6f32 (Expose UnstyledRegistry)
     dependencies:
       debug: 3.2.7
     optionalDependencies:
+<<<<<<< HEAD
 <<<<<<< HEAD
       eslint: 9.18.0(jiti@2.4.2)
 ||||||| parent of 78f6f04 (Add tsup.config.ts)
       eslint: 9.18.0
 =======
       '@typescript-eslint/parser': 8.19.1(eslint@9.18.0)(typescript@5.7.3)
+||||||| parent of a5c6f32 (Expose UnstyledRegistry)
+      '@typescript-eslint/parser': 8.19.1(eslint@9.18.0)(typescript@5.7.3)
+=======
+>>>>>>> a5c6f32 (Expose UnstyledRegistry)
       eslint: 9.18.0
 >>>>>>> 78f6f04 (Add tsup.config.ts)
       eslint-import-resolver-node: 0.3.9
@@ -9332,12 +9358,18 @@ snapshots:
       - supports-color
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   eslint-plugin-import@2.31.0(eslint@9.18.0(jiti@2.4.2)):
 ||||||| parent of 78f6f04 (Add tsup.config.ts)
   eslint-plugin-import@2.31.0(eslint@9.18.0):
 =======
   eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0):
 >>>>>>> 78f6f04 (Add tsup.config.ts)
+||||||| parent of a5c6f32 (Expose UnstyledRegistry)
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0):
+=======
+  eslint-plugin-import@2.31.0(eslint@9.18.0):
+>>>>>>> a5c6f32 (Expose UnstyledRegistry)
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -9349,12 +9381,18 @@ snapshots:
       eslint: 9.18.0(jiti@2.4.2)
       eslint-import-resolver-node: 0.3.9
 <<<<<<< HEAD
+<<<<<<< HEAD
       eslint-module-utils: 2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0(jiti@2.4.2))
 ||||||| parent of 78f6f04 (Add tsup.config.ts)
       eslint-module-utils: 2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
 =======
       eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
 >>>>>>> 78f6f04 (Add tsup.config.ts)
+||||||| parent of a5c6f32 (Expose UnstyledRegistry)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
+=======
+      eslint-module-utils: 2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
+>>>>>>> a5c6f32 (Expose UnstyledRegistry)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -9365,8 +9403,6 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.8
       tsconfig-paths: 3.15.0
-    optionalDependencies:
-      '@typescript-eslint/parser': 8.19.1(eslint@9.18.0)(typescript@5.7.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
