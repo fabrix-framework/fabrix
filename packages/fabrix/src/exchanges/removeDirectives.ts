@@ -11,6 +11,7 @@ const removeDirectivesFromQuery = (
       if (directivesToRemove.includes(node.name.value)) {
         return null;
       }
+      return;
     },
   });
 
