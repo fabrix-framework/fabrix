@@ -44,7 +44,7 @@ const convertToAjvProperty = (field: FormField) => {
   }
 };
 
-type SchemaType = JSONSchemaType<unknown> & {
+type SchemaType = {
   type: "object";
   properties: Record<string, unknown>;
   required: Array<string>;
@@ -57,7 +57,6 @@ export const buildAjvSchema = (fields: FormFields) => {
     properties: {},
     required: [],
     additionalProperties: true,
-    oneOf: [],
   };
 
   fields.forEach((field) => {
