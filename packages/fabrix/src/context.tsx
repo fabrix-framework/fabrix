@@ -51,13 +51,11 @@ export const useFabrixContext = () => {
 
     const opSchema = context.schemaLoader.schemaSet.operationSchema;
     return opSchema?.definitions.find((def) => {
-      if (
+      return (
         def.kind === Kind.OPERATION_DEFINITION &&
         def.operation === opType &&
         def.name?.value === name
-      ) {
-        return true;
-      }
+      );
     });
   };
 

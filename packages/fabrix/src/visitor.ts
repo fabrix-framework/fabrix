@@ -177,6 +177,8 @@ export const buildDirectiveConfig = (directive: DirectiveNode) => {
       case Kind.STRING:
       case Kind.BOOLEAN:
         return valueNode.value;
+      default:
+        return;
     }
   };
 

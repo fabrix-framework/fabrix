@@ -29,6 +29,7 @@ const addTypenameField = (query: DocumentNode) => {
         if (selection.kind === Kind.FIELD) {
           return selection.name.value === "__typename";
         }
+        return false;
       });
 
       if (!hasTypename) {
