@@ -134,8 +134,8 @@ importers:
         specifier: ^8.20.6
         version: 8.20.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       chakra-react-select:
-        specifier: ^6.0.0
-        version: 6.0.0(@chakra-ui/react@3.2.5(@emotion/react@11.14.0(@types/react@19.0.7)(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.7)(next-themes@0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+        specifier: ^6.0.1
+        version: 6.0.1(@chakra-ui/react@3.2.5(@emotion/react@11.14.0(@types/react@19.0.7)(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.7)(next-themes@0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       chroma-js:
         specifier: ^3.0.0
         version: 3.1.2
@@ -339,7 +339,7 @@ importers:
         version: 9.1.0(eslint@9.18.0)
       eslint-plugin-import:
         specifier: ^2.29.1
-        version: 2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0)
+        version: 2.31.0(eslint@9.18.0)
       typescript:
         specifier: ^5
         version: 5.7.3
@@ -549,6 +549,10 @@ packages:
 
   '@babel/runtime@7.26.0':
     resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/runtime@7.26.7':
+    resolution: {integrity: sha512-AOPI3D+a8dXnja+iwsUqGRjr1BbZIe771sXdapOtYI531gSqpi92vXivKcq2asu/DFpdl1ceFAKZyRzK2PCVcQ==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.25.9':
@@ -1175,14 +1179,17 @@ packages:
     resolution: {integrity: sha512-85+k0AxaZSTowL0gXp8zYWDIrWclTbRPg/pm/V0dSFZ6W6D4lhcG3uuZl4zLsEKfEvs69xDbLN2cHQudwp95JA==}
     engines: {node: '>=18.0.0', npm: '>=9.0.0'}
 
-  '@floating-ui/core@1.6.7':
-    resolution: {integrity: sha512-yDzVT/Lm101nQ5TCVeK65LtdN7Tj4Qpr9RTXJ2vPFLqtLxwOrpoxAHAJI8J3yYWUc40J0BDBheaitK5SJmno2g==}
+  '@floating-ui/core@1.6.9':
+    resolution: {integrity: sha512-uMXCuQ3BItDUbAMhIXw7UPXRfAlOAvZzdK9BWpE60MCn+Svt3aLn9jsPTi/WNGlRUu2uI0v5S7JiIUsbsvh3fw==}
 
   '@floating-ui/dom@1.6.12':
     resolution: {integrity: sha512-NP83c0HjokcGVEMeoStg317VD9W7eDlGK7457dMBANbKA6GJZdc7rjujdgqzTaz93jkGgc5P/jeWbaCHnMNc+w==}
 
-  '@floating-ui/utils@0.2.8':
-    resolution: {integrity: sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==}
+  '@floating-ui/dom@1.6.13':
+    resolution: {integrity: sha512-umqzocjDgNRGTuO7Q8CU32dkHkECqI8ZdMZ5Swb6QAM0t5rnlrN3lGo1hdpscRd3WS8T6DKYK4ephgIH9iRh3w==}
+
+  '@floating-ui/utils@0.2.9':
+    resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
   '@graphql-tools/merge@8.4.2':
     resolution: {integrity: sha512-XbrHAaj8yDuINph+sAfuq3QCZ/tKblrTLOpirK0+CAgNlZUCHs0Fa+xtMUURgwCVThLle1AF7svJCxFizygLsw==}
@@ -1664,8 +1671,10 @@ packages:
     peerDependencies:
       '@types/react': ^19.0.0
 
-  '@types/react-transition-group@4.4.11':
-    resolution: {integrity: sha512-RM05tAniPZ5DZPzzNFP+DmrcOdD0efDUxMy3145oljWSl3x9ZV5vhme98gTxFrj2lhXvmGNnUiuDyJgY9IKkNA==}
+  '@types/react-transition-group@4.4.12':
+    resolution: {integrity: sha512-8TV6R3h2j7a91c+1DXdJi3Syo69zzIZbz7Lg5tORM5LEJG7X/E6a1V3drRyBRZq7/utz7A+c4OgYLiLcYGHG6w==}
+    peerDependencies:
+      '@types/react': '*'
 
   '@types/react@19.0.7':
     resolution: {integrity: sha512-MoFsEJKkAtZCrC1r6CM8U22GzhG7u2Wir8ons/aCKH6MBdD1ibV24zOSSkdZVUKqN5i396zG5VKLYZ3yaUZdLA==}
@@ -2201,8 +2210,8 @@ packages:
     resolution: {integrity: sha512-aGtmf24DW6MLHHG5gCx4zaI3uBq3KRtxeVs0DjFH6Z0rDNbsvTxFASFvdj79pxjxZ8/5u3PIiN3IwEIQkiiuPw==}
     engines: {node: '>=12'}
 
-  chakra-react-select@6.0.0:
-    resolution: {integrity: sha512-sHEL/dc5bPaR992983oY+jtt4i0OnLD7kEB++pUjh4LbMi34AIIfOEVxT4QlQao2ZTRhUr9Y5Qvme1BySMSweA==}
+  chakra-react-select@6.0.1:
+    resolution: {integrity: sha512-OlffkDXFXf5OiLimOoWE0E0an0B6Grpk3T5mY1shFXSf/P1Da5amtK5nVyjGSjrGcP42ZIcADJNTIdfkWPg9pA==}
     peerDependencies:
       '@chakra-ui/react': 3.x
       next-themes: 0.x
@@ -3646,8 +3655,8 @@ packages:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
     engines: {node: '>=0.10.0'}
 
-  react-select@5.9.0:
-    resolution: {integrity: sha512-nwRKGanVHGjdccsnzhFte/PULziueZxGD8LL2WojON78Mvnq7LdAMEtu2frrwld1fr3geixg3iiMBIc/LLAZpw==}
+  react-select@5.10.0:
+    resolution: {integrity: sha512-k96gw+i6N3ExgDwPIg0lUPmexl1ygPe6u5BdQFNBhkpbwroIgCNXdubtIzHfThYXYYTubwOBafoMnn7ruEP1xA==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -4699,6 +4708,10 @@ snapshots:
     dependencies:
       regenerator-runtime: 0.14.1
 
+  '@babel/runtime@7.26.7':
+    dependencies:
+      regenerator-runtime: 0.14.1
+
   '@babel/template@7.25.9':
     dependencies:
       '@babel/code-frame': 7.26.2
@@ -5272,16 +5285,21 @@ snapshots:
 
   '@faker-js/faker@9.4.0': {}
 
-  '@floating-ui/core@1.6.7':
+  '@floating-ui/core@1.6.9':
     dependencies:
-      '@floating-ui/utils': 0.2.8
+      '@floating-ui/utils': 0.2.9
 
   '@floating-ui/dom@1.6.12':
     dependencies:
-      '@floating-ui/core': 1.6.7
-      '@floating-ui/utils': 0.2.8
+      '@floating-ui/core': 1.6.9
+      '@floating-ui/utils': 0.2.9
 
-  '@floating-ui/utils@0.2.8': {}
+  '@floating-ui/dom@1.6.13':
+    dependencies:
+      '@floating-ui/core': 1.6.9
+      '@floating-ui/utils': 0.2.9
+
+  '@floating-ui/utils@0.2.9': {}
 
   '@graphql-tools/merge@8.4.2(graphql@16.10.0)':
     dependencies:
@@ -5422,7 +5440,7 @@ snapshots:
 
   '@manypkg/find-root@1.1.0':
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       '@types/node': 12.20.55
       find-up: 4.1.0
       fs-extra: 8.1.0
@@ -5621,7 +5639,7 @@ snapshots:
   '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.26.2
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -5736,7 +5754,7 @@ snapshots:
     dependencies:
       '@types/react': 19.0.7
 
-  '@types/react-transition-group@4.4.11':
+  '@types/react-transition-group@4.4.12(@types/react@19.0.7)':
     dependencies:
       '@types/react': 19.0.7
 
@@ -6674,12 +6692,12 @@ snapshots:
       loupe: 3.1.2
       pathval: 2.0.0
 
-  chakra-react-select@6.0.0(@chakra-ui/react@3.2.5(@emotion/react@11.14.0(@types/react@19.0.7)(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.7)(next-themes@0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  chakra-react-select@6.0.1(@chakra-ui/react@3.2.5(@emotion/react@11.14.0(@types/react@19.0.7)(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/react@19.0.7)(next-themes@0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       '@chakra-ui/react': 3.2.5(@emotion/react@11.14.0(@types/react@19.0.7)(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       next-themes: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
-      react-select: 5.9.0(@types/react@19.0.7)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      react-select: 5.10.0(@types/react@19.0.7)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
     transitivePeerDependencies:
       - '@types/react'
       - react-dom
@@ -6872,7 +6890,7 @@ snapshots:
 
   dom-helpers@5.2.1:
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       csstype: 3.1.3
 
   dotenv@8.6.0: {}
@@ -7228,17 +7246,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
+  eslint-module-utils@2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.19.1(eslint@9.18.0)(typescript@5.7.3)
       eslint: 9.18.0
       eslint-import-resolver-node: 0.3.9
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint@9.18.0):
+  eslint-plugin-import@2.31.0(eslint@9.18.0):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.8
@@ -7249,7 +7266,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.18.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.19.1(eslint@9.18.0)(typescript@5.7.3))(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
+      eslint-module-utils: 2.12.0(eslint-import-resolver-node@0.3.9)(eslint@9.18.0)
       hasown: 2.0.2
       is-core-module: 2.15.1
       is-glob: 4.0.3
@@ -7260,8 +7277,6 @@ snapshots:
       semver: 6.3.1
       string.prototype.trimend: 1.0.8
       tsconfig-paths: 3.15.0
-    optionalDependencies:
-      '@typescript-eslint/parser': 8.19.1(eslint@9.18.0)(typescript@5.7.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -8343,13 +8358,13 @@ snapshots:
 
   react-refresh@0.14.2: {}
 
-  react-select@5.9.0(@types/react@19.0.7)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+  react-select@5.10.0(@types/react@19.0.7)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
-      '@babel/runtime': 7.25.7
-      '@emotion/cache': 11.13.5
+      '@babel/runtime': 7.26.7
+      '@emotion/cache': 11.14.0
       '@emotion/react': 11.14.0(@types/react@19.0.7)(react@19.0.0)
-      '@floating-ui/dom': 1.6.12
-      '@types/react-transition-group': 4.4.11
+      '@floating-ui/dom': 1.6.13
+      '@types/react-transition-group': 4.4.12(@types/react@19.0.7)
       memoize-one: 6.0.0
       prop-types: 15.8.1
       react: 19.0.0
@@ -8362,7 +8377,7 @@ snapshots:
 
   react-transition-group@4.4.5(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
-      '@babel/runtime': 7.26.0
+      '@babel/runtime': 7.26.7
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
