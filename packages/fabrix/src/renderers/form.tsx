@@ -9,21 +9,26 @@ import {
   Loader,
 } from "@renderers/shared";
 import { ChildComponentsExtraProps, GetInputFieldsRenderer } from "@renderer";
+import { FieldValues, useFormContext, UseFormReturn } from "react-hook-form";
+import { AnyVariables } from "urql";
 
 export type ViewFields = FieldConfigByType<"form">["configs"]["outputFields"];
 export type FormField = ViewFields[number];
-type FormRendererProps = CommonFabrixComponentRendererProps<ViewFields> & {
-  executeQuery: () => Promise<void>;
-  fieldsRenderer?: GetInputFieldsRenderer;
-};
+type FormRendererProps<TVariables extends AnyVariables = AnyVariables> =
+  CommonFabrixComponentRendererProps<ViewFields> & {
+    executeQuery: () => Promise<void>;
+    fieldsRenderer?: GetInputFieldsRenderer<TVariables>;
+  };
 
-export const FormRenderer = ({
+export const FormRenderer = <TVariables extends AnyVariables = AnyVariables>({
   context,
   rootField,
   executeQuery,
   fieldsRenderer,
   className,
-}: FormRendererProps) => {
+}: FormRendererProps<TVariables>) => {
+  const formContext = useFormContext();
+
   const field = {
     handler: {
       // TODO: inject value here
@@ -89,6 +94,9 @@ export const FormRenderer = ({
     children:
       fieldsRenderer &&
       fieldsRenderer({
+        formContext: formContext as unknown as UseFormReturn<
+          TVariables extends FieldValues ? TVariables : FieldValues
+        >,
         Action: action.component,
         getAction: () => action.handler,
         Field: (props: {

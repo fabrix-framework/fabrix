@@ -9,7 +9,13 @@ import { mergeFieldConfigs } from "@readers/shared";
 import { getOutputFields, viewFieldMerger } from "@readers/field";
 import { formFieldMerger, getInputFields } from "@readers/form";
 import { AnyVariables, OperationResult, useMutation } from "urql";
-import { FieldValues, FormProvider, useForm } from "react-hook-form";
+import {
+  FieldPath,
+  FieldValues,
+  FormProvider,
+  useForm,
+  UseFormReturn,
+} from "react-hook-form";
 import { DirectiveAttributes } from "@registry";
 import { ajvResolver } from "@renderers/form/ajvResolver";
 import { buildAjvSchema } from "@renderers/form/validation";
@@ -205,8 +211,7 @@ type FabrixComponentCommonProps<
 export type FabrixComponentProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TVariables = Record<string, any>,
+  TVariables extends AnyVariables = AnyVariables,
 > = FabrixComponentCommonProps<TVariables> & {
   /**
    * The query to render.
@@ -226,11 +231,13 @@ export type FabrixComponentProps<
   /**
    * The children to render the query
    */
-  children?: (props: FabrixComponentChildrenProps<TData>) => ReactNode;
+  children?: (
+    props: FabrixComponentChildrenProps<TData, TVariables>,
+  ) => ReactNode;
 };
 
 type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
-type RootFieldName<TData> =
+export type RootFieldName<TData> =
   TData extends Record<string, unknown>
     ? Exclude<Extract<keyof TData, string>, "__typename">
     : string;
@@ -242,7 +249,16 @@ export type ChildComponentsExtraProps = Partial<DirectiveAttributes> & {
   key?: string;
 };
 
-export type GetInputFieldsRendererProps = {
+export type GetInputFieldsRendererProps<
+  TVariables extends AnyVariables = AnyVariables,
+> = {
+  /**
+   * Direct access to the control object from react-hook-form
+   */
+  formContext: UseFormReturn<
+    TVariables extends FieldValues ? TVariables : Record<string, unknown>
+  >;
+
   /**
    * Get the field by name
    *
@@ -266,7 +282,7 @@ export type GetInputFieldsRendererProps = {
     /**
      * The name of the field
      */
-    name: string,
+    name: TVariables extends FieldValues ? FieldPath<TVariables> : string,
     extraProps?: ChildComponentsExtraProps,
   ) => {
     value: unknown;
@@ -289,7 +305,7 @@ export type GetInputFieldsRendererProps = {
    * ```
    */
   Field: (props: {
-    name: string;
+    name: TVariables extends FieldValues ? FieldPath<TVariables> : string;
     extraProps?: ChildComponentsExtraProps;
   }) => React.ReactNode;
 
@@ -320,13 +336,13 @@ export type GetInputFieldsRendererProps = {
    */
   Action: () => React.ReactNode;
 };
-export type GetInputFieldsRenderer = (
-  props: GetInputFieldsRendererProps,
-) => ReactNode;
+export type GetInputFieldsRenderer<
+  TVariables extends AnyVariables = AnyVariables,
+> = (props: GetInputFieldsRendererProps<TVariables>) => ReactNode;
 
-export type GetInputFn = (
+export type GetInputFn<TVariables extends AnyVariables = AnyVariables> = (
   extraProps?: GetInputExtraProps,
-  fieldsRenderer?: GetInputFieldsRenderer,
+  fieldsRenderer?: GetInputFieldsRenderer<TVariables>,
 ) => React.ReactNode;
 
 export type GetOutputFieldsRendererProps<
@@ -336,7 +352,9 @@ export type GetOutputFieldsRendererProps<
   /**
    * The data fetched from the query
    */
-  data: TData;
+  data: TData extends Record<string, unknown>
+    ? TData[RootFieldName<TData>]
+    : Record<string, unknown>;
 
   /**
    * Get the field by name
@@ -384,9 +402,10 @@ export type GetOutputFieldsRendererProps<
    */
   Field: (props: { name: string }) => React.ReactNode;
 };
-export type GetOutputFieldsRenderer = (
-  props: GetOutputFieldsRendererProps,
-) => React.ReactNode;
+export type GetOutputFieldsRenderer<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+> = (props: GetOutputFieldsRendererProps<TData>) => React.ReactNode;
 
 export type GetOutputFn<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -394,12 +413,13 @@ export type GetOutputFn<
 > = (
   rootFieldName: RootFieldName<TData>,
   extraProps?: GetOutputExtraProps,
-  fieldsRenderer?: GetOutputFieldsRenderer,
+  fieldsRenderer?: GetOutputFieldsRenderer<TData>,
 ) => React.ReactNode;
 
 export type FabrixComponentChildrenProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
+  TVariables extends AnyVariables = AnyVariables,
 > = {
   /**
    * Get the input component by the variable name
@@ -412,7 +432,7 @@ export type FabrixComponentChildrenProps<
    * </FabrixComponent>
    * ```
    */
-  getInput: GetInputFn;
+  getInput: GetInputFn<TVariables>;
 
   /**
    * Get the component by root field name
@@ -560,7 +580,7 @@ export const getComponentRendererFn = <
     getInputComponent: ReturnType<
       typeof getInputComponentFn<TData, TVariables>
     >;
-    getOutputComponent: ReturnType<typeof getOutputComponentFn>;
+    getOutputComponent: ReturnType<typeof getOutputComponentFn<TData>>;
   },
 ) => {
   const initialField = operation.fields[0];
@@ -616,7 +636,7 @@ export const getComponentRendererFn = <
         {inputComponent({
           key: `fabrix-${operation.name}-input-${field.name}`,
         })}
-        {outputComponent(field.name, {
+        {outputComponent(field.name as RootFieldName<TData>, {
           key: `fabrix-${operation.name}-output-${field.name}`,
         })}
       </div>
@@ -649,9 +669,11 @@ export type ExecuteQueryResult<
   TVariables extends AnyVariables = AnyVariables,
 > = Promise<void> | Promise<OperationResult<TData, TVariables>>;
 
-type InputComponentRendererFnProps = RendererFnCommonProps & {
+type InputComponentRendererFnProps<
+  TVariables extends AnyVariables = AnyVariables,
+> = RendererFnCommonProps & {
   executeQuery: () => Promise<void>;
-  fieldsRenderer?: GetInputFieldsRenderer;
+  fieldsRenderer?: GetInputFieldsRenderer<TVariables>;
 };
 type InputComponentFnProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -664,9 +686,14 @@ type InputComponentFnProps<
 };
 
 export const getOutputComponentFn =
-  (rendererFn: (props: OutputComponentRendererFnProps) => React.ReactNode) =>
+  <
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TData = any,
+  >(
+    rendererFn: (props: OutputComponentRendererFnProps) => React.ReactNode,
+  ) =>
   (operation: Operation, componentProps: OutputComponentFnProps) =>
-  (...args: Parameters<GetOutputFn>): React.ReactNode => {
+  (...args: Parameters<GetOutputFn<TData>>): React.ReactNode => {
     const [name, extraProps, fieldsRenderer] = args;
     const field = operation.fields.find((f) => f.name === name);
     if (!field) {
@@ -699,13 +726,15 @@ export const getInputComponentFn =
     TData = any,
     TVariables extends AnyVariables = AnyVariables,
   >(
-    rendererFn: (props: InputComponentRendererFnProps) => React.ReactNode,
+    rendererFn: (
+      props: InputComponentRendererFnProps<TVariables>,
+    ) => React.ReactNode,
   ) =>
   (
     operation: Operation,
     componentProps: InputComponentFnProps<TData, TVariables>,
   ) =>
-  (...args: Parameters<GetInputFn>): React.ReactNode => {
+  (...args: Parameters<GetInputFn<TVariables>>): React.ReactNode => {
     const [extraProps, fieldsRenderer] = args;
     const field = operation.fields[0];
     const buildSchema = () => {

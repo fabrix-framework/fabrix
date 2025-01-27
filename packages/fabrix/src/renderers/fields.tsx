@@ -5,6 +5,7 @@ import { get } from "es-toolkit/compat";
 import {
   ChildComponentsExtraProps,
   GetOutputFieldsRendererProps,
+  RootFieldName,
 } from "@renderer";
 import {
   assertObjectValue,
@@ -23,12 +24,22 @@ import {
 
 export type ViewFields = FieldConfigByType<"view">["configs"]["outputFields"];
 type ViewField = ViewFields[number];
-type ViewRendererProps = CommonFabrixComponentRendererProps<ViewFields> & {
+type ViewRendererProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+> = CommonFabrixComponentRendererProps<ViewFields> & {
   data: Value | undefined;
-  fieldsRenderer?: (props: GetOutputFieldsRendererProps) => React.ReactNode;
+  fieldsRenderer?: (
+    props: GetOutputFieldsRendererProps<TData>,
+  ) => React.ReactNode;
 };
 
-export const ViewRenderer = (props: ViewRendererProps) => {
+export const ViewRenderer = <
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+>(
+  props: ViewRendererProps<TData>,
+) => {
   const { context, rootField, fieldsRenderer, className, fetching } = props;
 
   // If the query is the one that can be rendered as a table, we will render the table component instead of the fields.
@@ -99,7 +110,9 @@ export const ViewRenderer = (props: ViewRendererProps) => {
 
   if (fieldsRenderer) {
     return fieldsRenderer({
-      data: props.data,
+      data: props.data as TData extends Record<string, unknown>
+        ? TData[RootFieldName<TData>]
+        : Record<string, unknown>,
       Field: ({ name }) => field.component(name),
       getField: () => field.handler,
     });
