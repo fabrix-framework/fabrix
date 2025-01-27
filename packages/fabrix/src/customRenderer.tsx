@@ -32,7 +32,7 @@ export const FabrixCustomComponent = (
       {getComponentRendererFn(props, operation, () => {
         return {
           getInputComponent: () => () => null,
-          getOutputComponent: getOutputComponentFn(props, (renderFnProps) => {
+          getOutputComponent: getOutputComponentFn((renderFnProps) => {
             const { field, data } = renderFnProps;
             const componentEntry = props.component.entry;
 
