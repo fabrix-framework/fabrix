@@ -4,7 +4,7 @@ import { FabrixComponent, gql } from "@fabrix-framework/fabrix";
 const NewTodoForm = () => (
   <FabrixComponent
     query={gql`
-      mutation createTodo($input: TodoInput!) {
+      mutation ($input: TodoInput!) {
         addTodo(input: $input) {
           id
         }
@@ -32,7 +32,7 @@ const NewTodoForm = () => (
 const TodoList = () => (
   <FabrixComponent
     query={gql`
-      query todos {
+      query {
         allTodos {
           collection {
             id
