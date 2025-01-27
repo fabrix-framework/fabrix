@@ -482,77 +482,65 @@ export const FabrixComponent = <
   }
 
   return (
-    <div className="fabrix-wrapper">
+    <div className={`fabrix-wrapper ${props.containerClassName ?? ""}`}>
       {getComponentRendererFn(props, operation, (field: FieldConfig) => {
         switch (field.type) {
           case "form": {
             return {
-              getInputComponent: getInputComponentFn(
-                props,
-                (rendererFnProps) => (
-                  <FormRenderer
-                    {...buildCommonProps(rendererFnProps)}
-                    context={context}
-                    executeQuery={rendererFnProps.executeQuery}
-                    fieldsRenderer={rendererFnProps.fieldsRenderer}
-                  />
-                ),
-              ),
-              getOutputComponent: getOutputComponentFn(props, () => void 0),
+              getInputComponent: getInputComponentFn((rendererFnProps) => (
+                <FormRenderer
+                  {...buildCommonProps(rendererFnProps)}
+                  context={context}
+                  executeQuery={rendererFnProps.executeQuery}
+                  fieldsRenderer={rendererFnProps.fieldsRenderer}
+                />
+              )),
+              getOutputComponent: getOutputComponentFn(() => void 0),
             };
           }
 
           case "view": {
             return {
-              getInputComponent: getInputComponentFn(props, () => void 0),
-              getOutputComponent: getOutputComponentFn(
-                props,
-                (rendererFnProps) => (
-                  <ViewRenderer
-                    {...buildCommonProps(rendererFnProps)}
-                    context={context}
-                    data={rendererFnProps.data}
-                    fieldsRenderer={rendererFnProps.fieldsRenderer}
-                  />
-                ),
-              ),
+              getInputComponent: getInputComponentFn(() => void 0),
+              getOutputComponent: getOutputComponentFn((rendererFnProps) => (
+                <ViewRenderer
+                  {...buildCommonProps(rendererFnProps)}
+                  context={context}
+                  data={rendererFnProps.data}
+                  fieldsRenderer={rendererFnProps.fieldsRenderer}
+                />
+              )),
             };
           }
 
           case "generic": {
             return {
-              getInputComponent: getInputComponentFn(
-                props,
-                (rendererFnProps) => {
-                  const commonProps = buildCommonProps(rendererFnProps);
+              getInputComponent: getInputComponentFn((rendererFnProps) => {
+                const commonProps = buildCommonProps(rendererFnProps);
 
-                  return (
-                    <FormRenderer
-                      {...{
-                        ...commonProps,
-                        rootField: {
-                          ...commonProps.rootField,
-                          fields: rendererFnProps.field.configs.inputFields,
-                        },
-                      }}
-                      context={context}
-                      executeQuery={rendererFnProps.executeQuery}
-                      fieldsRenderer={rendererFnProps.fieldsRenderer}
-                    />
-                  );
-                },
-              ),
-              getOutputComponent: getOutputComponentFn(
-                props,
-                (rendererFnProps) => (
-                  <ViewRenderer
-                    {...buildCommonProps(rendererFnProps)}
+                return (
+                  <FormRenderer
+                    {...{
+                      ...commonProps,
+                      rootField: {
+                        ...commonProps.rootField,
+                        fields: rendererFnProps.field.configs.inputFields,
+                      },
+                    }}
                     context={context}
-                    data={rendererFnProps.data}
+                    executeQuery={rendererFnProps.executeQuery}
                     fieldsRenderer={rendererFnProps.fieldsRenderer}
                   />
-                ),
-              ),
+                );
+              }),
+              getOutputComponent: getOutputComponentFn((rendererFnProps) => (
+                <ViewRenderer
+                  {...buildCommonProps(rendererFnProps)}
+                  context={context}
+                  data={rendererFnProps.data}
+                  fieldsRenderer={rendererFnProps.fieldsRenderer}
+                />
+              )),
             };
           }
         }
@@ -572,9 +560,7 @@ export const getComponentRendererFn = <
     getInputComponent: ReturnType<
       typeof getInputComponentFn<TData, TVariables>
     >;
-    getOutputComponent: ReturnType<
-      typeof getOutputComponentFn<TData, TVariables>
-    >;
+    getOutputComponent: ReturnType<typeof getOutputComponentFn>;
   },
 ) => {
   const initialField = operation.fields[0];
@@ -678,14 +664,7 @@ type InputComponentFnProps<
 };
 
 export const getOutputComponentFn =
-  <
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    TData = any,
-    TVariables extends AnyVariables = AnyVariables,
-  >(
-    props: FabrixComponentProps<TData, TVariables>,
-    rendererFn: (props: OutputComponentRendererFnProps) => React.ReactNode,
-  ) =>
+  (rendererFn: (props: OutputComponentRendererFnProps) => React.ReactNode) =>
   (operation: Operation, componentProps: OutputComponentFnProps) =>
   (...args: Parameters<GetOutputFn>): React.ReactNode => {
     const [name, extraProps, fieldsRenderer] = args;
@@ -697,7 +676,7 @@ export const getOutputComponentFn =
     return (
       <div
         key={extraProps?.key}
-        className={`fabrix-output-container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
+        className={`fabrix-output-container ${extraProps?.className ?? ""}`}
       >
         {rendererFn({
           field,
@@ -720,7 +699,6 @@ export const getInputComponentFn =
     TData = any,
     TVariables extends AnyVariables = AnyVariables,
   >(
-    props: FabrixComponentProps<TData, TVariables>,
     rendererFn: (props: InputComponentRendererFnProps) => React.ReactNode,
   ) =>
   (
@@ -745,7 +723,7 @@ export const getInputComponentFn =
     return (
       <div
         key={extraProps?.key}
-        className={`fabrix-input-container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
+        className={`fabrix-input-container ${extraProps?.className ?? ""}`}
       >
         <FormProvider {...formContext}>
           {rendererFn({

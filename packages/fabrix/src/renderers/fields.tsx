@@ -74,47 +74,40 @@ export const ViewRenderer = (props: ViewRendererProps) => {
     },
   };
 
-  const renderFields = () => {
-    if (fieldsRenderer) {
-      return fieldsRenderer({
+  const fieldsComponent = rootField.fields
+    .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
+    .flatMap((field, fieldIndex) => {
+      const name = field.field.getName();
+      if (name.startsWith("_")) {
+        // Ignore __typename
+        return [];
+      }
+
+      return renderField({
+        context,
         data: props.data,
-        Field: ({ name }) => field.component(name),
-        getField: () => field.handler,
+        indexKey: `${rootField.name}-${fieldIndex}`,
+        subFields: getSubFields(typenameExtractor, rootField.fields, name),
+        field,
+        fieldType: typenameExtractor.getFieldTypeByPath(field.field),
       });
-    }
-
-    const fieldsComponent = rootField.fields
-      .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
-      .flatMap((field, fieldIndex) => {
-        const name = field.field.getName();
-        if (name.startsWith("_")) {
-          // Ignore __typename
-          return [];
-        }
-
-        return renderField({
-          context,
-          data: props.data,
-          indexKey: `${rootField.name}-${fieldIndex}`,
-          subFields: getSubFields(typenameExtractor, rootField.fields, name),
-          field,
-          fieldType: typenameExtractor.getFieldTypeByPath(field.field),
-        });
-      });
-
-    return (
-      <div className={`fabrix fields col-row ${className ?? ""}`}>
-        {fieldsComponent}
-      </div>
-    );
-  };
+    });
 
   if (fetching) {
     return <Loader />;
   }
 
-  return tableType !== null
-    ? renderTable(
+  if (fieldsRenderer) {
+    return fieldsRenderer({
+      data: props.data,
+      Field: ({ name }) => field.component(name),
+      getField: () => field.handler,
+    });
+  }
+
+  return tableType !== null ? (
+    <div className={`fabrix fields ${className ?? ""}`}>
+      {renderTable(
         context,
         {
           name: rootField.name,
@@ -122,8 +115,13 @@ export const ViewRenderer = (props: ViewRendererProps) => {
           fields: rootField.fields,
         },
         tableType,
-      )
-    : renderFields();
+      )}
+    </div>
+  ) : (
+    <div className={`fabrix fields col-row ${className ?? ""}`}>
+      {fieldsComponent}
+    </div>
+  );
 };
 
 /**

@@ -85,14 +85,12 @@ export const renderTableElement = (props: {
   const { component, tableMode } = props;
   const basePath = tableMode == "standard" ? "collection" : "edges.node";
   const subFields = getSubFields(typenameExtractor, fields, basePath);
-  const element = createElement(component, {
+  return createElement(component, {
     name,
     headers: buildHeaders(props.context, subFields, basePath),
     values: getTableValues(rootValue, tableMode),
     customProps: props.customProps,
   });
-
-  return <div className={"fabrix table"}>{element}</div>;
 };
 
 export const buildHeaders = (
