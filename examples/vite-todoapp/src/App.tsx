@@ -51,9 +51,12 @@ const TodoList = () => (
       }
     `)}
   >
-    {({ getOutput }) =>
-      getOutput("allTodos", {}, ({ data }) => <div>{JSON.stringify(data)}</div>)
-    }
+    {({ getOutput }) => (
+      <Stack>
+        <Heading size="sm">TODO List</Heading>
+        {getOutput("allTodos")}
+      </Stack>
+    )}
   </FabrixComponent>
 );
 
