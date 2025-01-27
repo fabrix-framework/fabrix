@@ -1,5 +1,11 @@
 # @fabrix-framework/fabrix
 
+## 0.6.0
+
+### Minor Changes
+
+- [#159](https://github.com/fabrix-framework/fabrix/pull/159) [`2434e76`](https://github.com/fabrix-framework/fabrix/commit/2434e760b2be6c51b46d3d70cb675ad3007097e5) Thanks [@IzumiSy](https://github.com/IzumiSy)! - Update tsconfig.json
+
 ## 0.5.0
 
 ### Minor Changes
