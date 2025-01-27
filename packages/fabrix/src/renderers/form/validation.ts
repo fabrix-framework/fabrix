@@ -1,4 +1,5 @@
 import { FormField, FormFields } from "@renderers/form";
+import { JSONSchemaType } from "ajv";
 
 const convertToAjvProperty = (field: FormField) => {
   switch (field.meta?.fieldType?.type) {
@@ -31,27 +32,64 @@ const convertToAjvProperty = (field: FormField) => {
             type: "boolean",
           } as const;
       }
+    case "Enum": {
+      return {
+        type: "string",
+        enum: field.meta.fieldType.meta.values,
+      } as const;
+    }
     default:
       // TODO: handle other types (e.g. object, array)
       return null;
   }
 };
 
-export const buildAjvSchema = (fields: FormFields) => {
-  const visibleFields = fields.filter((field) => !field.config.hidden);
-  const requiredFields = visibleFields.filter(
-    (field) => field.meta?.isRequired,
-  );
+type SchemaType = {
+  type: "object";
+  properties: Record<string, unknown>;
+  required: Array<string>;
+  additionalProperties: true;
+};
 
-  return {
+export const buildAjvSchema = (fields: FormFields) => {
+  const schema: SchemaType = {
     type: "object",
-    properties: visibleFields.reduce((acc, field) => {
-      const property = convertToAjvProperty(field);
-      return property === null
-        ? acc
-        : { ...acc, [field.field.asKey()]: property };
-    }, {}),
-    required: requiredFields.map((field) => field.field.asKey()),
+    properties: {},
+    required: [],
     additionalProperties: true,
-  } as const;
+  };
+
+  fields.forEach((field) => {
+    const path = field.field.asKey().split(".");
+    const current = path.slice(0, -1).reduce<SchemaType>((acc, key) => {
+      if (!acc.properties[key]) {
+        acc.properties[key] = {
+          type: "object",
+          properties: {},
+          required: [],
+          additionalProperties: true,
+        };
+      }
+      return acc.properties[key] as SchemaType;
+    }, schema);
+
+    const lastKey = path[path.length - 1];
+    const property = convertToAjvProperty(field);
+
+    if (property !== null) {
+      if (path.length === 1) {
+        schema.properties[lastKey] = property;
+        if (field.meta?.isRequired) {
+          schema.required.push(lastKey);
+        }
+      } else {
+        current.properties[lastKey] = property;
+        if (field.meta?.isRequired) {
+          current.required.push(lastKey);
+        }
+      }
+    }
+  });
+
+  return schema as unknown as JSONSchemaType<Record<string, unknown>>;
 };
