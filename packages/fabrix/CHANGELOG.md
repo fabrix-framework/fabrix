@@ -1,5 +1,11 @@
 # @fabrix-framework/fabrix
 
+## 0.7.0
+
+### Minor Changes
+
+- [#166](https://github.com/fabrix-framework/fabrix/pull/166) [`d433fe0`](https://github.com/fabrix-framework/fabrix/commit/d433fe055915eea357efc1df4acfd277b1e78ec4) Thanks [@IzumiSy](https://github.com/IzumiSy)! - Support constraints for nested object field in fabrixForm directive API
+
 ## 0.6.0
 
 ### Minor Changes
