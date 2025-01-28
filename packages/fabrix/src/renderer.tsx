@@ -742,6 +742,8 @@ export const getInputComponentFn =
         return buildAjvSchema(field.configs.outputFields);
       } else if (field.type === "generic") {
         return buildAjvSchema(field.configs.inputFields);
+      } else {
+        throw new Error(`Unsupported field type: ${field.type}`);
       }
     };
     const schema = buildSchema();
