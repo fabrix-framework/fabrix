@@ -1,5 +1,12 @@
 # @fabrix-framework/chakra-ui
 
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`d433fe0`](https://github.com/fabrix-framework/fabrix/commit/d433fe055915eea357efc1df4acfd277b1e78ec4)]:
+  - @fabrix-framework/fabrix@0.7.0
+
 ## 0.6.0
 
 ### Minor Changes
