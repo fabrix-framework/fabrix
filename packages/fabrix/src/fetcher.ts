@@ -11,7 +11,7 @@ export const useDataFetch = <
   variables: TVariables | undefined;
   pause?: boolean;
 }) => {
-  const [{ data, fetching, error }] = useQuery<TData>({
+  const [{ data, fetching, error }, executeQuery] = useQuery<TData>({
     query: props.query,
     variables: props.variables as AnyVariables,
     pause: props.pause,
@@ -21,6 +21,7 @@ export const useDataFetch = <
     fetching,
     error,
     data,
+    refetch: executeQuery,
   };
 };
 

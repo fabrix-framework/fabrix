@@ -1,7 +1,7 @@
-import { FabrixContext, FabrixContextType } from "@context";
+import { FabrixContextType } from "@context";
 import { Value } from "@fetcher";
 import { TableComponentEntry } from "@registry";
-import { useContext, createElement } from "react";
+import { createElement } from "react";
 import { RootField, SubFields, ViewFields, getSubFields } from "./fields";
 import { Loader } from "./shared";
 import { buildTypenameExtractor } from "./typename";
@@ -51,6 +51,7 @@ export const renderTable = (
   }
 
   return renderTableElement({
+    context,
     component,
     customProps: {},
     rootField,
@@ -59,19 +60,19 @@ export const renderTable = (
 };
 
 export const renderTableElement = (props: {
+  context: FabrixContextType;
   component: TableComponentEntry["component"];
   customProps: unknown;
   rootField: RootField;
   tableMode: TableMode;
 }) => {
-  const context = useContext(FabrixContext);
   const { name, data, fields } = props.rootField;
   const rootValue = data;
   if (!rootValue) {
     return;
   }
 
-  const schema = context.schemaLoader;
+  const schema = props.context.schemaLoader;
   if (schema.status === "loading") {
     return <Loader />;
   }
@@ -84,14 +85,12 @@ export const renderTableElement = (props: {
   const { component, tableMode } = props;
   const basePath = tableMode == "standard" ? "collection" : "edges.node";
   const subFields = getSubFields(typenameExtractor, fields, basePath);
-  const element = createElement(component, {
+  return createElement(component, {
     name,
-    headers: buildHeaders(context, subFields, basePath),
+    headers: buildHeaders(props.context, subFields, basePath),
     values: getTableValues(rootValue, tableMode),
     customProps: props.customProps,
   });
-
-  return <div className={"fabrix table"}>{element}</div>;
 };
 
 export const buildHeaders = (

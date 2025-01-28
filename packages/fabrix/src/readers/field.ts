@@ -6,7 +6,7 @@ import { deepmerge } from "deepmerge-ts";
 /**
  * Infer the field configuration from the fields
  */
-export const buildDefaultViewFieldConfigs = (fields: Fields) =>
+export const getOutputFields = (fields: Fields) =>
   fields.unwrap().flatMap((field) => {
     const config = viewFieldSchema.parse({
       index: 0,
