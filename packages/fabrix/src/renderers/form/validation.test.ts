@@ -12,114 +12,173 @@ describe("buildAjvSchema", () => {
     });
   });
 
-  it("should return a schema with a single string field", () => {
-    expect(
-      buildAjvSchema([
+  const id = {
+    input: {
+      meta: {
+        fieldType: { type: "Scalar", name: "ID" },
+        isRequired: true,
+      },
+      constraint: null,
+      config: {
+        hidden: false,
+        gridCol: 12,
+      },
+    },
+    expected: {
+      id: {
+        type: "string",
+      },
+    },
+  } as const;
+
+  const name = {
+    input: {
+      meta: {
+        fieldType: { type: "Scalar", name: "String" },
+        isRequired: true,
+      },
+      constraint: { minLength: 3, maxLength: 5 },
+      config: {
+        hidden: false,
+        gridCol: 12,
+      },
+    },
+    expected: {
+      name: {
+        type: "string",
+        minLength: 3,
+        maxLength: 5,
+      },
+    },
+  } as const;
+
+  const age = {
+    input: {
+      meta: {
+        fieldType: { type: "Scalar", name: "Int" },
+        isRequired: false,
+      },
+      constraint: { min: 0, max: 65 },
+      config: {
+        hidden: false,
+        gridCol: 12,
+      },
+    },
+    expected: {
+      age: {
+        type: "number",
+        minimum: 0,
+        maximum: 65,
+      },
+    },
+  } as const;
+
+  it.each([
+    [
+      "fields - no level",
+      [
         {
           field: new Path(["name"]),
-          meta: {
-            fieldType: { type: "Scalar", name: "String" },
-            isRequired: true,
-          },
-          constraint: { minLength: 3, maxLength: 5 },
-          config: {
-            hidden: false,
-            gridCol: 12,
-          },
+          ...name.input,
         },
-      ]),
-    ).toEqual({
-      type: "object",
-      properties: {
-        name: {
-          type: "string",
-          minLength: 3,
-          maxLength: 5,
+        {
+          field: new Path(["age"]),
+          ...age.input,
         },
+      ],
+      {
+        type: "object",
+        properties: {
+          ...name.expected,
+          ...age.expected,
+        },
+        required: ["name"],
+        additionalProperties: true,
       },
-      required: ["name"],
-      additionalProperties: true,
-    });
-  });
+    ],
 
-  it("should return a valid schema with nested fields (2 level)", () => {
-    expect(
-      buildAjvSchema([
+    [
+      "containing some nested fields - 2 level",
+      [
+        {
+          field: new Path(["id"]),
+          ...id.input,
+        },
         {
           field: new Path(["input", "name"]),
-          meta: {
-            fieldType: { type: "Scalar", name: "String" },
-            isRequired: true,
-          },
-          constraint: { minLength: 3, maxLength: 5 },
-          config: {
-            hidden: false,
-            gridCol: 12,
-          },
+          ...name.input,
         },
-      ]),
-    ).toEqual({
-      type: "object",
-      properties: {
-        input: {
-          type: "object",
-          properties: {
-            name: {
-              type: "string",
-              minLength: 3,
-              maxLength: 5,
-            },
-          },
-          required: ["name"],
-          additionalProperties: true,
-        },
-      },
-      required: [],
-      additionalProperties: true,
-    });
-  });
-
-  it("should return a valid schema with nested fields (3 level)", () => {
-    expect(
-      buildAjvSchema([
         {
-          field: new Path(["input", "name", "first"]),
-          meta: {
-            fieldType: { type: "Scalar", name: "String" },
-            isRequired: true,
-          },
-          constraint: { minLength: 3, maxLength: 5 },
-          config: {
-            hidden: false,
-            gridCol: 12,
-          },
+          field: new Path(["input", "age"]),
+          ...age.input,
         },
-      ]),
-    ).toEqual({
-      type: "object",
-      properties: {
-        input: {
-          type: "object",
-          properties: {
-            name: {
-              type: "object",
-              properties: {
-                first: {
-                  type: "string",
-                  minLength: 3,
-                  maxLength: 5,
-                },
-              },
-              required: ["first"],
-              additionalProperties: true,
+      ],
+      {
+        type: "object",
+        properties: {
+          ...id.expected,
+          input: {
+            type: "object",
+            properties: {
+              ...name.expected,
+              ...age.expected,
             },
+            required: ["name"],
+            additionalProperties: true,
           },
-          required: [],
-          additionalProperties: true,
         },
+        required: ["id"],
+        additionalProperties: true,
       },
-      required: [],
-      additionalProperties: true,
-    });
+    ],
+
+    [
+      "containing nested fields - 3 level",
+      [
+        {
+          field: new Path(["id"]),
+          ...id.input,
+        },
+        {
+          field: new Path(["input", "id"]),
+          ...id.input,
+        },
+        {
+          field: new Path(["input", "nested", "name"]),
+          ...name.input,
+        },
+        {
+          field: new Path(["input", "nested", "age"]),
+          ...age.input,
+        },
+      ],
+      {
+        type: "object",
+        properties: {
+          ...id.expected,
+          input: {
+            type: "object",
+            properties: {
+              ...id.expected,
+              nested: {
+                type: "object",
+                properties: {
+                  ...name.expected,
+                  ...age.expected,
+                },
+                required: ["name"],
+                additionalProperties: true,
+              },
+            },
+            required: ["id"],
+            additionalProperties: true,
+          },
+        },
+        required: ["id"],
+        additionalProperties: true,
+      },
+    ],
+  ])("should return a schema (%s)", (_, input, expected) => {
+    expect(buildAjvSchema(input)).toEqual(expected);
   });
 });
