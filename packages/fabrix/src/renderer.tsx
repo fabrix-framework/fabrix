@@ -14,6 +14,7 @@ import {
   FieldValues,
   FormProvider,
   useForm,
+  UseFormRegisterReturn,
   UseFormReturn,
 } from "react-hook-form";
 import { DirectiveAttributes } from "@registry";
@@ -236,18 +237,16 @@ export type FabrixComponentProps<
   ) => ReactNode;
 };
 
-type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
 export type RootFieldName<TData> =
   TData extends Record<string, unknown>
     ? Exclude<Extract<keyof TData, string>, "__typename">
     : string;
 
-export type GetInputExtraProps = FabrixComponentChildrenExtraProps & {};
-export type GetOutputExtraProps = FabrixComponentChildrenExtraProps;
-
 export type ChildComponentsExtraProps = Partial<DirectiveAttributes> & {
   key?: string;
 };
+export type GetInputExtraProps = ChildComponentsExtraProps;
+export type GetOutputExtraProps = ChildComponentsExtraProps;
 
 export type GetInputFieldsRendererProps<
   TVariables extends AnyVariables = AnyVariables,
@@ -283,11 +282,8 @@ export type GetInputFieldsRendererProps<
      * The name of the field
      */
     name: TVariables extends FieldValues ? FieldPath<TVariables> : string,
-    extraProps?: ChildComponentsExtraProps,
-  ) => {
-    value: unknown;
-    onChange: (value: unknown) => void;
-  };
+    extraProps?: GetInputExtraProps,
+  ) => UseFormRegisterReturn;
 
   /**
    * Get the field component by name
@@ -306,35 +302,28 @@ export type GetInputFieldsRendererProps<
    */
   Field: (props: {
     name: TVariables extends FieldValues ? FieldPath<TVariables> : string;
-    extraProps?: ChildComponentsExtraProps;
+    extraProps?: GetInputExtraProps;
   }) => React.ReactNode;
 
   /**
    * Get the action handler for the query
-   */
-  getAction: () => {
-    onClick: () => Promise<void>;
-  };
-
-  /**
-   * Get the action component
-   *
-   * The behaviour of the action component is to execute the query with the input
    *
    * @example
    * ```tsx
    * <FabrixComponent query={appQuery}>
    *   {({ getInput }) => (
-   *     getInput("input", ({ Action, Field }) => (
+   *     getInput({}, ({ getAction, Field }) => (
    *       <Field name="input.name" />
    *       <Field name="input.email" />
-   *       <Action />
+   *       <Button {...getAction()}>Submit</Button>
    *     ))
    *   )}
    * </FabrixComponent>
    * ```
    */
-  Action: () => React.ReactNode;
+  getAction: () => {
+    onClick: () => Promise<void>;
+  };
 };
 export type GetInputFieldsRenderer<
   TVariables extends AnyVariables = AnyVariables,
@@ -345,6 +334,23 @@ export type GetInputFn<TVariables extends AnyVariables = AnyVariables> = (
   fieldsRenderer?: GetInputFieldsRenderer<TVariables>,
 ) => React.ReactNode;
 
+/*
+ * An utility type to get the data right under the root field
+ */
+type DataAtTheRoot<TData> =
+  TData extends Record<string, unknown>
+    ? TData[RootFieldName<TData>]
+    : Record<string, unknown>;
+
+type FieldPathsWithoutTypename<T> = Exclude<
+  FieldPath<
+    NonNullable<T> extends FieldValues
+      ? NonNullable<T>
+      : Record<string, unknown>
+  >,
+  "__typename"
+>;
+
 export type GetOutputFieldsRendererProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
@@ -352,38 +358,7 @@ export type GetOutputFieldsRendererProps<
   /**
    * The data fetched from the query
    */
-  data: TData extends Record<string, unknown>
-    ? TData[RootFieldName<TData>]
-    : Record<string, unknown>;
-
-  /**
-   * Get the field by name
-   *
-   * @example
-   * ```tsx
-   * <FabrixComponent query={appQuery}>
-   *   {({ getComponent }) => (
-   *     <>
-   *       {getComponent("getEmployee", {}, ({ getField }) => (
-   *         <>
-   *           {getField("displayName")}
-   *           {getField("email")}
-   *         </>
-   *       ))}
-   *     </>
-   *   )}
-   * </FabrixComponent>
-   * ```
-   */
-  getField: (
-    /**
-     * The name of the field
-     */
-    name: string,
-    extraProps?: ChildComponentsExtraProps,
-  ) => {
-    value: unknown;
-  };
+  data: DataAtTheRoot<TData>;
 
   /**
    * Get the field component by name
@@ -400,8 +375,12 @@ export type GetOutputFieldsRendererProps<
    * </FabrixComponent>
    * ```
    */
-  Field: (props: { name: string }) => React.ReactNode;
+  Field: (props: {
+    name: FieldPathsWithoutTypename<DataAtTheRoot<TData>>;
+    extraProps?: GetOutputExtraProps;
+  }) => React.ReactNode;
 };
+
 export type GetOutputFieldsRenderer<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,

@@ -30,11 +30,9 @@ export const FormRenderer = <TVariables extends AnyVariables = AnyVariables>({
   const formContext = useFormContext();
 
   const field = {
-    handler: {
-      // TODO: inject value here
-      value: null,
-      onChange: () => void 0,
-    },
+    handler: (name: string) => ({
+      ...formContext.register(name),
+    }),
     component: (name: string, extraProps?: ChildComponentsExtraProps) => {
       const field = getFieldConfigByKey(rootField.fields, name);
       if (!field) {
@@ -97,13 +95,12 @@ export const FormRenderer = <TVariables extends AnyVariables = AnyVariables>({
         formContext: formContext as unknown as UseFormReturn<
           TVariables extends FieldValues ? TVariables : FieldValues
         >,
-        Action: action.component,
         getAction: () => action.handler,
         Field: (props: {
           name: string;
           extraProps?: ChildComponentsExtraProps;
         }) => field.component(props.name, props.extraProps),
-        getField: () => field.handler,
+        getField: (name: string) => field.handler(name),
       }),
     renderFields,
     renderField: field.component,

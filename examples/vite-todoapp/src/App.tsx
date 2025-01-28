@@ -1,4 +1,4 @@
-import { Heading, Stack, Grid, GridItem } from "@chakra-ui/react";
+import { Heading, Stack, Grid, GridItem, Button } from "@chakra-ui/react";
 import { FabrixComponent } from "@fabrix-framework/fabrix";
 import { graphql } from "./graphql";
 
@@ -13,7 +13,7 @@ const NewTodoForm = () => (
     `)}
   >
     {({ getInput }) =>
-      getInput({}, ({ Action, Field }) => {
+      getInput({}, ({ getAction, Field }) => {
         return (
           <Stack gridColumn={"1/12"}>
             <Grid
@@ -28,7 +28,7 @@ const NewTodoForm = () => (
                 <Field name="input.priority" extraProps={{ label: "優先度" }} />
               </GridItem>
             </Grid>
-            <Action />
+            <Button {...getAction()}>Submit</Button>
           </Stack>
         );
       })

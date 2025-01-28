@@ -56,10 +56,6 @@ export const ViewRenderer = <
   });
 
   const field = {
-    handler: {
-      // TODO: inject value here
-      value: null,
-    },
     component: (name: string, extraProps?: ChildComponentsExtraProps) => {
       const field = getFieldConfigByKey(rootField.fields, name);
       if (!field) {
@@ -114,7 +110,6 @@ export const ViewRenderer = <
         ? TData[RootFieldName<TData>]
         : Record<string, unknown>,
       Field: ({ name }) => field.component(name),
-      getField: () => field.handler,
     });
   }
 
