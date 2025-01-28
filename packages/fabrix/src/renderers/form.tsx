@@ -9,7 +9,7 @@ import {
   Loader,
 } from "@renderers/shared";
 import { ChildComponentsExtraProps, GetInputFieldsRenderer } from "@renderer";
-import { FieldValues, useFormContext, UseFormReturn } from "react-hook-form";
+import { FieldValues, Path, useFormContext } from "react-hook-form";
 import { AnyVariables } from "urql";
 
 export type ViewFields = FieldConfigByType<"form">["configs"]["outputFields"];
@@ -27,10 +27,13 @@ export const FormRenderer = <TVariables extends AnyVariables = AnyVariables>({
   fieldsRenderer,
   className,
 }: FormRendererProps<TVariables>) => {
-  const formContext = useFormContext();
+  const formContext =
+    useFormContext<TVariables extends FieldValues ? TVariables : FieldValues>();
 
   const field = {
-    handler: (name: string) => ({
+    handler: (
+      name: Path<TVariables extends FieldValues ? TVariables : FieldValues>,
+    ) => ({
       ...formContext.register(name),
     }),
     component: (name: string, extraProps?: ChildComponentsExtraProps) => {
@@ -57,6 +60,10 @@ export const FormRenderer = <TVariables extends AnyVariables = AnyVariables>({
 
   const action = {
     handler: {
+      getState: useCallback(
+        () => formContext.formState,
+        [formContext.formState],
+      ),
       onClick: executeQuery,
     },
     component: () => <button onClick={() => executeQuery()}>Submit</button>,
@@ -92,15 +99,15 @@ export const FormRenderer = <TVariables extends AnyVariables = AnyVariables>({
     children:
       fieldsRenderer &&
       fieldsRenderer({
-        formContext: formContext as unknown as UseFormReturn<
-          TVariables extends FieldValues ? TVariables : FieldValues
-        >,
+        formContext,
         getAction: () => action.handler,
         Field: (props: {
           name: string;
           extraProps?: ChildComponentsExtraProps;
         }) => field.component(props.name, props.extraProps),
-        getField: (name: string) => field.handler(name),
+        getField: (
+          name: Path<TVariables extends FieldValues ? TVariables : FieldValues>,
+        ) => field.handler(name),
       }),
     renderFields,
     renderField: field.component,

@@ -13,6 +13,8 @@ import {
   FieldPath,
   FieldValues,
   FormProvider,
+  FormState,
+  Path,
   useForm,
   UseFormRegisterReturn,
   UseFormReturn,
@@ -281,7 +283,7 @@ export type GetInputFieldsRendererProps<
     /**
      * The name of the field
      */
-    name: TVariables extends FieldValues ? FieldPath<TVariables> : string,
+    name: Path<TVariables extends FieldValues ? TVariables : FieldValues>,
     extraProps?: GetInputExtraProps,
   ) => UseFormRegisterReturn;
 
@@ -301,7 +303,7 @@ export type GetInputFieldsRendererProps<
    * ```
    */
   Field: (props: {
-    name: TVariables extends FieldValues ? FieldPath<TVariables> : string;
+    name: Path<TVariables extends FieldValues ? TVariables : FieldValues>;
     extraProps?: GetInputExtraProps;
   }) => React.ReactNode;
 
@@ -322,6 +324,9 @@ export type GetInputFieldsRendererProps<
    * ```
    */
   getAction: () => {
+    getState: () => FormState<
+      TVariables extends FieldValues ? TVariables : FieldValues
+    >;
     onClick: () => Promise<void>;
   };
 };
