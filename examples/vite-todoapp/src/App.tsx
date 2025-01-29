@@ -1,6 +1,7 @@
 import { Heading, Stack } from "@chakra-ui/react";
-import { FabrixComponent, gql } from "@fabrix-framework/fabrix";
+import { FabrixComponent } from "@fabrix-framework/fabrix";
 import { css } from "@emotion/css";
+import { graphql } from "./graphql";
 
 const containerClassName = css`
   padding: 15px 0;
@@ -14,29 +15,17 @@ function App() {
       </Heading>
       <FabrixComponent
         containerClassName={containerClassName}
-        query={gql`
+        query={graphql(`
           mutation createTodo($input: TodoInput!) {
-            addTodo(input: $input)
-              @fabrixForm(
-                input: [
-                  { field: "id", config: { hidden: true } }
-                  { field: "hasDone", config: { hidden: true } }
-                  {
-                    field: "name"
-                    config: { gridCol: 9 }
-                    constraint: { maxLength: 50 }
-                  }
-                  { field: "priority", config: { gridCol: 3 } }
-                ]
-              ) {
+            addTodo(input: $input) {
               id
             }
           }
-        `}
+        `)}
       />
       <FabrixComponent
         containerClassName={containerClassName}
-        query={gql`
+        query={graphql(`
           query todos {
             allTodos
               @fabrixView(
@@ -69,7 +58,7 @@ function App() {
               }
             }
           }
-        `}
+        `)}
       />
     </Stack>
   );
