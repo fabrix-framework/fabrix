@@ -117,4 +117,52 @@ describe("children props", () => {
       },
     );
   });
+
+  it("should render the form populated with initial values", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          mutation createUser($input: CreateUserInput!) {
+            createUser(input: $input) {
+              id
+            }
+          }
+        `}
+      >
+        {({ getInput }) =>
+          getInput(
+            {
+              defaultValues: {
+                input: {
+                  name: "John Doe",
+                  category: "ADMIN",
+                },
+              },
+            },
+            ({ Field, getAction }) => (
+              <form role="form" {...getAction()}>
+                <Field name="input.name" extraProps={{ label: "Name" }} />
+                <Field
+                  name="input.category"
+                  extraProps={{ label: "Category" }}
+                />
+                <button type="submit">Send</button>
+              </form>
+            ),
+          )
+        }
+      </FabrixComponent>,
+      async () => {
+        const form = await screen.findByRole("form");
+        const formFields = await within(form).findAllByRole("group");
+
+        expect(await within(formFields[0]).findByLabelText("Name")).toHaveValue(
+          "John Doe",
+        );
+        expect(
+          await within(formFields[1]).findByLabelText("Category"),
+        ).toHaveValue("ADMIN");
+      },
+    );
+  });
 });
