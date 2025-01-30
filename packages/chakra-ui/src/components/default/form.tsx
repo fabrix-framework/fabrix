@@ -15,12 +15,8 @@ export const ChakraForm = (props: FormComponentProps) => {
 
   return (
     <Box className={props.className} rowGap={"20px"}>
-      {props.children
-        ? props.children
-        : [
-            props.renderFields(),
-            <button onClick={action.onClick}>Submit</button>,
-          ]}
+      {props.renderFields()}
+      <button onClick={action.onClick}>Submit</button>
     </Box>
   );
 };
