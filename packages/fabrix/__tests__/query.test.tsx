@@ -25,8 +25,12 @@ describe("query", () => {
         `}
       />,
       async () => {
-        const fields = await screen.findAllByRole("region");
-        const textContents = fields.map((field) => field.textContent);
+        const output = await screen.findByRole("region", {
+          name: /fabrix-output/,
+        });
+        const textContents = within(output)
+          .getAllByRole("region")
+          .map((field) => field.textContent);
 
         const user = users[0];
         expect(textContents).toEqual([
@@ -113,6 +117,37 @@ describe("collection", () => {
 });
 
 describe("directive", () => {
+  it("should render only the table when the directive is given", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          query getUsers {
+            users @fabrixView {
+              collection {
+                id
+                name
+                email
+              }
+            }
+          }
+        `}
+      />,
+      () => {
+        expect(
+          screen.queryByRole("region", {
+            name: /fabrix-input/,
+          }),
+        ).not.toBeInTheDocument();
+
+        expect(
+          screen.queryByRole("region", {
+            name: /fabrix-output/,
+          }),
+        ).toBeInTheDocument();
+      },
+    );
+  });
+
   it("should render the table with customized labels", async () => {
     await testWithUnmount(
       <FabrixComponent
@@ -262,12 +297,11 @@ describe("children props", () => {
         ]);
 
         const form = await screen.findByRole("form");
-        const button = await within(form).findByRole("button");
 
+        const button = await within(form).findByRole("button");
         expect(within(button).getByText("Refetch")).toBeInTheDocument();
 
         const formFields = await within(form).findAllByRole("group");
-
         expect(
           await within(formFields[0]).findByLabelText("First size to get"),
         ).toBeInTheDocument();

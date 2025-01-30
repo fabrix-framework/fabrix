@@ -495,13 +495,13 @@ export const FabrixComponent = <
                   fieldsRenderer={rendererFnProps.fieldsRenderer}
                 />
               )),
-              getOutputComponent: getOutputComponentFn(() => void 0),
+              getOutputComponent: getOutputComponentFn(null),
             };
           }
 
           case "view": {
             return {
-              getInputComponent: getInputComponentFn(() => void 0),
+              getInputComponent: getInputComponentFn(null),
               getOutputComponent: getOutputComponentFn((rendererFnProps) => (
                 <ViewRenderer
                   {...buildCommonProps(rendererFnProps)}
@@ -670,34 +670,43 @@ export const getOutputComponentFn =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     TData = any,
   >(
-    rendererFn: (props: OutputComponentRendererFnProps) => React.ReactNode,
+    rendererFn:
+      | ((props: OutputComponentRendererFnProps) => React.ReactNode)
+      | null,
   ) =>
-  (operation: Operation, componentProps: OutputComponentFnProps) =>
-  (...args: Parameters<GetOutputFn<TData>>): React.ReactNode => {
-    const [name, extraProps, fieldsRenderer] = args;
-    const field = operation.fields.find((f) => f.name === name);
-    if (!field) {
-      throw new Error(`No root field found for name: ${name}`);
+  (operation: Operation, componentProps: OutputComponentFnProps) => {
+    if (!rendererFn) {
+      return () => null;
     }
 
-    return (
-      <div
-        key={extraProps?.key}
-        className={`fabrix-output-container ${extraProps?.className ?? ""}`}
-      >
-        {rendererFn({
-          field,
-          fetching: componentProps.fetching,
-          error: componentProps.error,
-          data: componentProps.data
-            ? name in componentProps.data
-              ? componentProps.data[name]
-              : {}
-            : {},
-          fieldsRenderer,
-        })}
-      </div>
-    );
+    return (...args: Parameters<GetOutputFn<TData>>): React.ReactNode => {
+      const [name, extraProps, fieldsRenderer] = args;
+      const field = operation.fields.find((f) => f.name === name);
+      if (!field) {
+        throw new Error(`No root field found for name: ${name}`);
+      }
+
+      return (
+        <div
+          key={extraProps?.key}
+          role="region"
+          aria-label="fabrix-output"
+          className={extraProps?.className}
+        >
+          {rendererFn({
+            field,
+            fetching: componentProps.fetching,
+            error: componentProps.error,
+            data: componentProps.data
+              ? name in componentProps.data
+                ? componentProps.data[name]
+                : {}
+              : {},
+            fieldsRenderer,
+          })}
+        </div>
+      );
+    };
   };
 
 export const getInputComponentFn =
@@ -706,48 +715,55 @@ export const getInputComponentFn =
     TData = any,
     TVariables extends AnyVariables = AnyVariables,
   >(
-    rendererFn: (
-      props: InputComponentRendererFnProps<TVariables>,
-    ) => React.ReactNode,
+    rendererFn:
+      | ((props: InputComponentRendererFnProps<TVariables>) => React.ReactNode)
+      | null,
   ) =>
   (
     operation: Operation,
     componentProps: InputComponentFnProps<TData, TVariables>,
-  ) =>
-  (...args: Parameters<GetInputFn<TVariables>>): React.ReactNode => {
-    const [extraProps, fieldsRenderer] = args;
-    const field = operation.fields[0];
-    const buildSchema = () => {
-      if (field.type === "form") {
-        return buildAjvSchema(field.configs.outputFields);
-      } else if (field.type === "generic") {
-        return buildAjvSchema(field.configs.inputFields);
-      } else {
-        return;
-      }
-    };
-    const schema = buildSchema();
-    const formContext = useForm({
-      resolver: schema && ajvResolver(schema),
-    });
+  ) => {
+    if (!rendererFn) {
+      return () => null;
+    }
 
-    return (
-      <div
-        key={extraProps?.key}
-        className={`fabrix-input-container ${extraProps?.className ?? ""}`}
-      >
-        <FormProvider {...formContext}>
-          {rendererFn({
-            field,
-            fetching: componentProps.fetching,
-            error: componentProps.error,
-            executeQuery: () =>
-              formContext.handleSubmit(async (data) =>
-                componentProps.executeQueryWithInput(data),
-              )(),
-            fieldsRenderer,
-          })}
-        </FormProvider>
-      </div>
-    );
+    return (...args: Parameters<GetInputFn<TVariables>>): React.ReactNode => {
+      const [extraProps, fieldsRenderer] = args;
+      const field = operation.fields[0];
+      const buildSchema = () => {
+        if (field.type === "form") {
+          return buildAjvSchema(field.configs.outputFields);
+        } else if (field.type === "generic") {
+          return buildAjvSchema(field.configs.inputFields);
+        } else {
+          return;
+        }
+      };
+      const schema = buildSchema();
+      const formContext = useForm({
+        resolver: schema && ajvResolver(schema),
+      });
+
+      return (
+        <div
+          key={extraProps?.key}
+          role="region"
+          aria-label="fabrix-input"
+          className={extraProps?.className}
+        >
+          <FormProvider {...formContext}>
+            {rendererFn({
+              field,
+              fetching: componentProps.fetching,
+              error: componentProps.error,
+              executeQuery: () =>
+                formContext.handleSubmit(async (data) =>
+                  componentProps.executeQueryWithInput(data),
+                )(),
+              fieldsRenderer,
+            })}
+          </FormProvider>
+        </div>
+      );
+    };
   };
