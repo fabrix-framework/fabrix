@@ -21,6 +21,7 @@ import {
 import { DirectiveAttributes } from "@registry";
 import { ajvResolver } from "@renderers/form/ajvResolver";
 import { buildAjvSchema } from "@renderers/form/validation";
+import { PartialDeep } from "type-fest";
 import {
   buildRootDocument,
   FieldVariables,
@@ -246,8 +247,16 @@ export type RootFieldName<TData> =
 export type ChildComponentsExtraProps = Partial<DirectiveAttributes> & {
   key?: string;
 };
-export type GetInputExtraProps = ChildComponentsExtraProps;
-export type GetOutputExtraProps = ChildComponentsExtraProps;
+
+type InputOutputExtraProps = {
+  key?: string;
+  className?: string;
+};
+type GetInputExtraProps<TVariables extends AnyVariables = AnyVariables> =
+  InputOutputExtraProps & {
+    defaultValues?: PartialDeep<TVariables>;
+  };
+type GetOutputExtraProps = InputOutputExtraProps;
 
 export type GetInputFieldsRendererProps<
   TVariables extends AnyVariables = AnyVariables,
@@ -283,7 +292,7 @@ export type GetInputFieldsRendererProps<
      * The name of the field
      */
     name: Path<TVariables extends FieldValues ? TVariables : FieldValues>,
-    extraProps?: GetInputExtraProps,
+    extraProps?: ChildComponentsExtraProps,
   ) => UseFormRegisterReturn;
 
   /**
@@ -303,7 +312,7 @@ export type GetInputFieldsRendererProps<
    */
   Field: (props: {
     name: Path<TVariables extends FieldValues ? TVariables : FieldValues>;
-    extraProps?: GetInputExtraProps;
+    extraProps?: ChildComponentsExtraProps;
   }) => React.ReactNode;
 
   /**
@@ -331,7 +340,7 @@ export type GetInputFieldsRenderer<
 > = (props: GetInputFieldsRendererProps<TVariables>) => ReactNode;
 
 export type GetInputFn<TVariables extends AnyVariables = AnyVariables> = (
-  extraProps?: GetInputExtraProps,
+  extraProps?: GetInputExtraProps<TVariables>,
   fieldsRenderer?: GetInputFieldsRenderer<TVariables>,
 ) => React.ReactNode;
 
@@ -378,7 +387,7 @@ export type GetOutputFieldsRendererProps<
    */
   Field: (props: {
     name: FieldPathsWithoutTypename<DataAtTheRoot<TData>>;
-    extraProps?: GetOutputExtraProps;
+    extraProps?: ChildComponentsExtraProps;
   }) => React.ReactNode;
 };
 
@@ -738,8 +747,11 @@ export const getInputComponentFn =
         }
       };
       const schema = buildSchema();
+
+      const a = extraProps?.defaultValues;
       const formContext = useForm({
         resolver: schema && ajvResolver(schema),
+        defaultValues: () => Promise.resolve(a ?? {}),
       });
 
       return (
