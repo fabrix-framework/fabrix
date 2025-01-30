@@ -1,4 +1,4 @@
-import { createElement, useCallback } from "react";
+import { createElement, FormEvent, useCallback } from "react";
 import { defaultFieldType } from "@renderers/typename";
 import { FabrixContextType } from "@context";
 import {
@@ -60,7 +60,10 @@ export const FormRenderer = <TVariables extends AnyVariables = AnyVariables>({
 
   const action = {
     handler: {
-      onClick: executeQuery,
+      onSubmit: async (e: FormEvent) => {
+        e.preventDefault();
+        await executeQuery();
+      },
     },
     component: () => <button onClick={() => executeQuery()}>Submit</button>,
   };

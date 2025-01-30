@@ -1,5 +1,5 @@
 import { DirectiveNode, DocumentNode, OperationTypeNode } from "graphql";
-import React, { ReactNode, useContext, useMemo } from "react";
+import React, { FormEvent, ReactNode, useContext, useMemo } from "react";
 import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
 import { FormRenderer } from "@renderers/form";
@@ -323,7 +323,7 @@ export type GetInputFieldsRendererProps<
    * ```
    */
   getAction: () => {
-    onClick: () => Promise<void>;
+    onSubmit: (e: FormEvent) => Promise<void>;
   };
 };
 export type GetInputFieldsRenderer<
@@ -574,12 +574,12 @@ export const getComponentRendererFn = <
       variables: props.variables,
       pause: operation.type !== OperationTypeNode.QUERY,
     });
-
     const [mutationResult, runMutation] = useMutation<TData, TVariables>(
       operation.document,
     );
     const executeQuery = (input: Record<string, unknown>) => {
       if (operation.type === OperationTypeNode.QUERY) {
+        // Re-executing query ignores the cache and fetches the data from the server again
         return Promise.resolve(
           dataFetch.refetch({
             requestPolicy: "network-only",
@@ -611,16 +611,14 @@ export const getComponentRendererFn = <
       });
     }
 
-    return operation.fields.map((field) => (
-      <div key={field.name} className="fabrix-component">
-        {inputComponent({
-          key: `fabrix-${operation.name}-input-${field.name}`,
-        })}
-        {outputComponent(field.name as RootFieldName<TData>, {
-          key: `fabrix-${operation.name}-output-${field.name}`,
-        })}
-      </div>
-    ));
+    return operation.fields.map((field) => [
+      inputComponent({
+        key: `fabrix-${operation.name}-input-${field.name}`,
+      }),
+      outputComponent(field.name as RootFieldName<TData>, {
+        key: `fabrix-${operation.name}-output-${field.name}`,
+      }),
+    ]);
   };
 };
 
@@ -690,7 +688,7 @@ export const getOutputComponentFn =
         <div
           key={extraProps?.key}
           role="region"
-          aria-label="fabrix-output"
+          aria-label="fabrix-component-output"
           className={extraProps?.className}
         >
           {rendererFn({
@@ -748,7 +746,7 @@ export const getInputComponentFn =
         <div
           key={extraProps?.key}
           role="region"
-          aria-label="fabrix-input"
+          aria-label="fabrix-component-input"
           className={extraProps?.className}
         >
           <FormProvider {...formContext}>

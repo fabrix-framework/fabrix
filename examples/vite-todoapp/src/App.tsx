@@ -1,4 +1,4 @@
-import { Heading, Stack } from "@chakra-ui/react";
+import { Button, Heading, Stack } from "@chakra-ui/react";
 import { FabrixComponent } from "@fabrix-framework/fabrix";
 import { css } from "@emotion/css";
 import { graphql } from "./graphql";
@@ -22,7 +22,17 @@ function App() {
             }
           }
         `)}
-      />
+      >
+        {({ getInput }) =>
+          getInput({}, ({ Field, getAction }) => (
+            <form {...getAction()}>
+              <Field name="input.name" />
+              <Field name="input.priority" />
+              <Button type="submit">Add</Button>
+            </form>
+          ))
+        }
+      </FabrixComponent>
       <FabrixComponent
         containerClassName={containerClassName}
         query={graphql(`
