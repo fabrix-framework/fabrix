@@ -41,13 +41,13 @@ describe("directive", () => {
       () => {
         expect(
           screen.queryByRole("region", {
-            name: /fabrix-input/,
+            name: /fabrix-component-input/,
           }),
         ).toBeInTheDocument();
 
         expect(
           screen.queryByRole("region", {
-            name: /fabrix-output/,
+            name: /fabrix-component-output/,
           }),
         ).not.toBeInTheDocument();
       },
@@ -93,11 +93,11 @@ describe("children props", () => {
       >
         {({ getInput }) =>
           getInput({}, ({ Field, getAction }) => (
-            <div role="form">
+            <form role="form" {...getAction()}>
               <Field name="input.name" extraProps={{ label: "Name" }} />
               <Field name="input.category" extraProps={{ label: "Category" }} />
-              <button {...getAction()}>Send</button>
-            </div>
+              <button type="submit">Send</button>
+            </form>
           ))
         }
       </FabrixComponent>,

@@ -61,13 +61,11 @@ const tableView = (props: TableComponentProps) => {
 };
 
 const formView = (props: FormComponentProps) => {
-  const action = props.getAction();
-
   return (
-    <div role="form">
+    <form role="form" {...props.getAction()}>
       {props.renderFields()}
-      <button onClick={action.onClick}>Submit</button>
-    </div>
+      <button type="submit">Submit</button>
+    </form>
   );
 };
 

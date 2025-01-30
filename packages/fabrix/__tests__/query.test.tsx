@@ -26,7 +26,7 @@ describe("query", () => {
       />,
       async () => {
         const output = await screen.findByRole("region", {
-          name: /fabrix-output/,
+          name: /fabrix-component-output/,
         });
         const textContents = within(output)
           .getAllByRole("region")
@@ -135,13 +135,13 @@ describe("directive", () => {
       () => {
         expect(
           screen.queryByRole("region", {
-            name: /fabrix-input/,
+            name: /fabrix-component-input/,
           }),
         ).not.toBeInTheDocument();
 
         expect(
           screen.queryByRole("region", {
-            name: /fabrix-output/,
+            name: /fabrix-component-output/,
           }),
         ).toBeInTheDocument();
       },
@@ -263,7 +263,7 @@ describe("children props", () => {
         {({ getOutput, getInput }) =>
           getInput({}, ({ getAction, Field }) => (
             <>
-              <div role="form">
+              <form role="form" {...getAction()}>
                 <Field
                   name="input.first"
                   extraProps={{ label: "First size to get" }}
@@ -272,8 +272,8 @@ describe("children props", () => {
                   name="input.query"
                   extraProps={{ label: "Search query" }}
                 />
-                <button {...getAction()}>Refetch</button>
-              </div>
+                <button type="submit">Refetch</button>
+              </form>
               <>
                 <p>User List</p>
                 {getOutput("userEdges")}
