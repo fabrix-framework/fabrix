@@ -3,7 +3,7 @@ import {
   FormComponentProps,
   FieldType,
 } from "@fabrix-framework/fabrix";
-import { Text, Input, Stack, Box } from "@chakra-ui/react";
+import { Text, Input, Stack, Box, Button } from "@chakra-ui/react";
 import { Switch } from "@components/ui/switch";
 import { Select } from "chakra-react-select";
 import { useController } from "@fabrix-framework/fabrix/rhf";
@@ -11,12 +11,12 @@ import { get } from "es-toolkit/compat";
 import { LabelledHeading } from "./shared";
 
 export const ChakraForm = (props: FormComponentProps) => {
-  const action = props.getAction();
-
   return (
     <Box className={props.className} rowGap={"20px"}>
-      {props.renderFields()}
-      <button onClick={action.onClick}>Submit</button>
+      <form {...props.getAction()}>
+        {props.renderFields()}
+        <Button type="submit">Submit</Button>
+      </form>
     </Box>
   );
 };
