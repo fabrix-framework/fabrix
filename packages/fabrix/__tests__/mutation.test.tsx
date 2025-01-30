@@ -24,7 +24,9 @@ describe("mutation", () => {
       },
     );
   });
+});
 
+describe("directive", () => {
   it("should render the form with customized labels", async () => {
     await testWithUnmount(
       <FabrixComponent

@@ -1,22 +1,24 @@
 import { FabrixContextType } from "@context";
 import {
   formFieldConstraintSchema,
-  FormFieldSchema,
   formFieldSchema,
+  FormFieldSchema,
 } from "@directive/schema";
 import { resolveFieldType } from "@renderers/typename";
 import { FieldVariables } from "@visitor";
 import { Path } from "@visitor/path";
 import { deepmerge } from "deepmerge-ts";
 import {
+  GraphQLEnumType,
   GraphQLInputObjectType,
-  GraphQLInputType,
   GraphQLNonNull,
+  GraphQLScalarType,
+  GraphQLType,
 } from "graphql";
 import { z } from "zod";
 import { FieldConfigWithMeta, FieldConfig } from "./shared";
 
-const buildFieldMeta = (type: GraphQLInputType) => ({
+const buildFieldMeta = (type: GraphQLType) => ({
   fieldType: resolveFieldType(
     type instanceof GraphQLNonNull ? type.ofType : type,
   ),
@@ -24,49 +26,6 @@ const buildFieldMeta = (type: GraphQLInputType) => ({
 });
 
 export type FieldMeta = ReturnType<typeof buildFieldMeta> | null;
-
-/**
- * Infer the field configuration from the input object type for the form
- */
-export const buildDefaultFormFieldConfigs = (
-  context: FabrixContextType,
-  fieldVariables: FieldVariables,
-) => {
-  if (!("input" in fieldVariables)) {
-    return [];
-  }
-
-  if (context.schemaLoader.status === "loading") {
-    return [];
-  }
-
-  const inputType = context.schemaLoader.schemaSet.serverSchema.getType(
-    fieldVariables.input.type,
-  );
-  if (!inputType) {
-    return [];
-  }
-
-  // Only support object type for "input" argument
-  if (!(inputType instanceof GraphQLInputObjectType)) {
-    return [];
-  }
-
-  const fields = inputType.getFields();
-  return Object.keys(fields).map((key, index) => {
-    const field = fields[key];
-    const path = new Path(key.split("."));
-
-    return {
-      field: path,
-      meta: buildFieldMeta(field.type),
-      config: formFieldSchema.parse({
-        index,
-        label: field.name,
-      }),
-    };
-  });
-};
 
 export type FormFieldExtra = {
   constraint?: z.infer<typeof formFieldConstraintSchema>;
@@ -97,3 +56,54 @@ export const formFieldMerger = (
     return null;
   }
 };
+
+/**
+ * Infer the field configuration from the input types for the form
+ */
+export const getInputFields = (
+  context: FabrixContextType,
+  fieldVariables: FieldVariables,
+) =>
+  Object.keys(fieldVariables).flatMap((name) => {
+    if (context.schemaLoader.status === "loading") {
+      return [];
+    }
+
+    const fieldType = fieldVariables[name].type;
+    const type = context.schemaLoader.schemaSet.serverSchema.getType(
+      fieldType.name,
+    );
+    const path = new Path([name]);
+
+    // handling variation of GraphQLNamedInputType
+    if (type instanceof GraphQLScalarType || type instanceof GraphQLEnumType) {
+      return [
+        {
+          field: path,
+          meta: {
+            fieldType: resolveFieldType(type),
+            isRequired: !fieldType.isNull,
+          },
+          config: formFieldSchema.parse({
+            label: path.asKey(),
+          }),
+        },
+      ];
+    } else if (type instanceof GraphQLInputObjectType) {
+      const fields = type.getFields();
+      return Object.keys(fields).map((key) => {
+        const field = fields[key];
+        const fieldPath = path.append(new Path(key.split(".")));
+
+        return {
+          field: fieldPath,
+          meta: buildFieldMeta(field.type),
+          config: formFieldSchema.parse({
+            label: fieldPath.asKey(),
+          }),
+        };
+      });
+    }
+
+    return [];
+  });

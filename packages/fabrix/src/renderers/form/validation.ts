@@ -1,4 +1,4 @@
-import { FormField, FormFields } from "@renderers/form";
+import { FormField, ViewFields } from "@renderers/form";
 import { JSONSchemaType } from "ajv";
 
 const convertToAjvProperty = (field: FormField) => {
@@ -51,7 +51,7 @@ type SchemaType = {
   additionalProperties: true;
 };
 
-export const buildAjvSchema = (fields: FormFields) => {
+export const buildAjvSchema = (fields: ViewFields) => {
   const schema: SchemaType = {
     type: "object",
     properties: {},
@@ -61,7 +61,7 @@ export const buildAjvSchema = (fields: FormFields) => {
 
   fields.forEach((field) => {
     const path = field.field.asKey().split(".");
-    const current = path.slice(0, -1).reduce<SchemaType>((acc, key) => {
+    const current = path.slice(0, -1).reduce((acc, key) => {
       if (!acc.properties[key]) {
         acc.properties[key] = {
           type: "object",

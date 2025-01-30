@@ -1,5 +1,5 @@
 import { ComponentType } from "react";
-import { FabrixComponentProps } from "@renderer";
+import { FabrixComponentProps, GetInputFieldsRendererProps } from "@renderer";
 import { ViewFieldSchema } from "@directive/schema";
 import { FieldType } from "@renderers/typename";
 import { FabrixCustomComponent } from "@customRenderer";
@@ -68,15 +68,8 @@ export type FormComponentProps<P = unknown> = CustomProps<P> & {
   name: string;
   className?: string;
   renderFields: () => React.ReactNode;
-  renderSubmit: (
-    renderer: (props: {
-      submit: () => void;
-      isSubmitting: boolean;
-    }) => React.ReactElement,
-  ) => React.ReactNode;
-  renderReset: (
-    renderer: (props: { reset: () => void }) => React.ReactNode,
-  ) => React.ReactNode;
+  renderField: (name: string) => React.ReactNode;
+  getAction: GetInputFieldsRendererProps["getAction"];
 };
 
 export type TableComponentHeader = Field & {

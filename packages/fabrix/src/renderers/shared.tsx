@@ -1,40 +1,7 @@
 import { DocumentNode } from "graphql";
-import { DirectiveAttributes } from "@registry";
 import { FabrixContextType } from "@context";
 import { FieldConfigWithMeta } from "@readers/shared";
 import { FieldConfig } from "@renderer";
-import { Value } from "@fetcher";
-
-type FabrixComponentFieldsRendererExtraProps = Partial<DirectiveAttributes> & {
-  key?: string;
-};
-export type FabrixComponentFieldsRenderer = (props: {
-  /**
-   * Get the field by name
-   *
-   * ```tsx
-   * <FabrixComponent query={appQuery}>
-   *   {({ getComponent }) => (
-   *     <>
-   *       {getComponent("getEmployee", {}, ({ getField }) => (
-   *         <>
-   *           {getField("displayName")}
-   *           {getField("email")}
-   *         </>
-   *       ))}
-   *     </>
-   *   )}
-   * </FabrixComponent>
-   * ```
-   */
-  getField: (
-    /**
-     * The name of the field
-     */
-    name: string,
-    extraProps?: FabrixComponentFieldsRendererExtraProps,
-  ) => React.ReactNode;
-}) => React.ReactNode;
 
 export type DocumentResolver = () => string | DocumentNode;
 export type RendererQuery = {
@@ -44,13 +11,13 @@ export type RendererQuery = {
 };
 export type CommonFabrixComponentRendererProps<F> = {
   context: FabrixContextType;
+  fetching: boolean;
+  error: Error | undefined;
   rootField: {
     name: string;
     fields: F;
-    data: Value;
     document: DocumentNode;
   };
-  componentFieldsRenderer?: FabrixComponentFieldsRenderer;
   className?: string;
 };
 

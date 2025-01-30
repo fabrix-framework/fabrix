@@ -43,10 +43,6 @@ describe("query", () => {
 });
 
 describe("collection", () => {
-  type FabrixComponentChildrenProps = Parameters<
-    typeof FabrixComponent
-  >[0]["children"];
-
   const collectionQuery = `
     query getUsers {
       users {
@@ -81,55 +77,42 @@ describe("collection", () => {
     }
   `;
 
-  const testPatterns = [
-    ["collection", collectionQuery, undefined],
-    ["edges", edgeQuery, undefined],
-    [
-      "getComponent",
-      collectionQuery,
-      ({ getComponent }) => getComponent("users"),
-    ],
-  ] satisfies [string, string, FabrixComponentChildrenProps][];
+  it.each([
+    ["collection", collectionQuery],
+    ["edges", edgeQuery],
+  ])("should render the table (%s)", async (_, query) => {
+    await testWithUnmount(<FabrixComponent query={query} />, async () => {
+      const table = await screen.findByRole("table");
+      const rowGroups = await within(table).findAllByRole("rowgroup");
 
-  it.each(testPatterns)(
-    "should render the table (%s)",
-    async (_, query, children) => {
-      await testWithUnmount(
-        <FabrixComponent query={query}>{children}</FabrixComponent>,
-        async () => {
-          const table = await screen.findByRole("table");
-          const rowGroups = await within(table).findAllByRole("rowgroup");
+      const headers = await within(rowGroups[0]).findAllByRole("columnheader");
+      const headerNames = headers.map((v) => v.textContent);
+      expect(headerNames).toEqual([
+        "id (Scalar:ID)",
+        "name (Scalar:String)",
+        "age (Scalar:Int)",
+        "category (Enum:UserCategory)",
+        "zip (Scalar:String)",
+      ]);
 
-          const headers = await within(rowGroups[0]).findAllByRole(
-            "columnheader",
-          );
-          const headerNames = headers.map((v) => v.textContent);
-          expect(headerNames).toEqual([
-            "id (Scalar:ID)",
-            "name (Scalar:String)",
-            "age (Scalar:Int)",
-            "category (Enum:UserCategory)",
-            "zip (Scalar:String)",
-          ]);
+      const cells = await within(rowGroups[1]).findAllByRole("cell");
+      expect(cells.map((v) => v.textContent)).toEqual([
+        users[0].id,
+        users[0].name,
+        users[0].age + "",
+        users[0].category,
+        users[0].address.zip,
+        users[1].id,
+        users[1].name,
+        users[1].age + "",
+        users[1].category,
+        users[1].address.zip,
+      ]);
+    });
+  });
+});
 
-          const cells = await within(rowGroups[1]).findAllByRole("cell");
-          expect(cells.map((v) => v.textContent)).toEqual([
-            users[0].id,
-            users[0].name,
-            users[0].age + "",
-            users[0].category,
-            users[0].address.zip,
-            users[1].id,
-            users[1].name,
-            users[1].age + "",
-            users[1].category,
-            users[1].address.zip,
-          ]);
-        },
-      );
-    },
-  );
-
+describe("directive", () => {
   it("should render the table with customized labels", async () => {
     await testWithUnmount(
       <FabrixComponent
@@ -222,8 +205,80 @@ describe("collection", () => {
       { components },
     );
   });
+});
 
-  it("should be able to access the response data for by an operation", async () => {
+describe("children props", () => {
+  it("should render the components by functions from children props", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          query getUsers($input: UsersQueryInput) {
+            userEdges(input: $input) {
+              edges {
+                node {
+                  id
+                  name
+                  age
+                }
+              }
+            }
+          }
+        `}
+      >
+        {({ getOutput, getInput }) =>
+          getInput({}, ({ getAction, Field }) => (
+            <>
+              <div role="form">
+                <Field
+                  name="input.first"
+                  extraProps={{ label: "First size to get" }}
+                />
+                <Field
+                  name="input.query"
+                  extraProps={{ label: "Search query" }}
+                />
+                <button {...getAction()}>Refetch</button>
+              </div>
+              <>
+                <p>User List</p>
+                {getOutput("userEdges")}
+              </>
+            </>
+          ))
+        }
+      </FabrixComponent>,
+      async () => {
+        const table = await screen.findByRole("table");
+        const rowGroups = await within(table).findAllByRole("rowgroup");
+        const cells = await within(rowGroups[1]).findAllByRole("cell");
+
+        expect(cells.map((v) => v.textContent)).toEqual([
+          users[0].id,
+          users[0].name,
+          users[0].age + "",
+          users[1].id,
+          users[1].name,
+          users[1].age + "",
+        ]);
+
+        const form = await screen.findByRole("form");
+        const button = await within(form).findByRole("button");
+
+        expect(within(button).getByText("Refetch")).toBeInTheDocument();
+
+        const formFields = await within(form).findAllByRole("group");
+
+        expect(
+          await within(formFields[0]).findByLabelText("First size to get"),
+        ).toBeInTheDocument();
+        expect(
+          await within(formFields[1]).findByLabelText("Search query"),
+        ).toBeInTheDocument();
+      },
+    );
+  });
+
+  it("should be able to access the response data by selection", async () => {
     await testWithUnmount(
       <FabrixComponent
         query={`
@@ -234,10 +289,12 @@ describe("collection", () => {
           }
         `}
       >
-        {({ data }) => (
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          <div role="result-size">{data.users.size}</div>
-        )}
+        {({ getOutput }) =>
+          getOutput("users", {}, ({ data }) => (
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            <div role="result-size">{data.size}</div>
+          ))
+        }
       </FabrixComponent>,
       async () => {
         const result = await screen.findByRole("result-size");

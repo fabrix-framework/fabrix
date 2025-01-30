@@ -1,10 +1,10 @@
-import { Value } from "@fetcher";
 import { CompositeComponentEntries } from "@registry";
 import {
   FabrixComponentProps,
   FieldConfig,
-  getComponentFn,
   getComponentRendererFn,
+  useOperation,
+  getOutputComponentFn,
 } from "@renderer";
 import { CustomComponentTableRenderer } from "@renderers/custom/table";
 
@@ -21,36 +21,50 @@ export const FabrixCustomComponent = (
     component: ComponentRendererProps;
   },
 ) => {
-  const renderComponent = getComponentRendererFn(
-    props,
-    getComponentFn(props, (fieldConfig: FieldConfig, data: Value) => {
-      const componentEntry = props.component.entry;
+  const { operations } = useOperation(props.query);
+  const operation = operations[0];
+  if (!operation) {
+    throw new Error(`No operation found`);
+  }
 
-      switch (componentEntry.type) {
-        case "table": {
-          ensureFieldType(fieldConfig, "view");
-          return (
-            <CustomComponentTableRenderer
-              {...props}
-              key={`table-${fieldConfig.name}`}
-              fieldConfig={fieldConfig}
-              data={data}
-              component={{
-                name: props.component.name,
-                entry: componentEntry,
-                customProps: props.component.customProps,
-              }}
-            />
-          );
-        }
-        default: {
-          throw new Error(`Unsupported component type: ${componentEntry.type}`);
-        }
-      }
-    }),
+  return (
+    <div className="fabrix wrapper">
+      {getComponentRendererFn(props, operation, () => {
+        return {
+          getInputComponent: () => () => null,
+          getOutputComponent: getOutputComponentFn((renderFnProps) => {
+            const { field, data } = renderFnProps;
+            const componentEntry = props.component.entry;
+
+            switch (componentEntry.type) {
+              case "table": {
+                ensureFieldType(field, "generic");
+                return (
+                  <CustomComponentTableRenderer
+                    {...props}
+                    key={`table-${field.name}`}
+                    fieldConfig={field}
+                    data={data}
+                    component={{
+                      name: props.component.name,
+                      entry: componentEntry,
+                      customProps: props.component.customProps,
+                    }}
+                  />
+                );
+              }
+              default: {
+                throw new Error(
+                  `Unsupported component type: ${componentEntry.type}`,
+                );
+              }
+            }
+          }),
+          getActionComponent: () => () => null,
+        };
+      })()}
+    </div>
   );
-
-  return <div className="fabrix wrapper">{renderComponent()}</div>;
 };
 
 function ensureFieldType<T extends FieldConfig["type"]>(

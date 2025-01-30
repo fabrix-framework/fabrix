@@ -1,6 +1,4 @@
 import { createElement, useCallback } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { useMutation } from "urql";
 import { defaultFieldType } from "@renderers/typename";
 import { FabrixContextType } from "@context";
 import {
@@ -10,61 +8,80 @@ import {
   getFieldConfigByKey,
   Loader,
 } from "@renderers/shared";
-import { buildAjvSchema } from "./form/validation";
-import { ajvResolver } from "./form/ajvResolver";
+import { ChildComponentsExtraProps, GetInputFieldsRenderer } from "@renderer";
+import { FieldValues, Path, useFormContext } from "react-hook-form";
+import { AnyVariables } from "urql";
 
-export type FormFields = FieldConfigByType<"form">["configs"]["fields"];
-export type FormField = FormFields[number];
+export type ViewFields = FieldConfigByType<"form">["configs"]["outputFields"];
+export type FormField = ViewFields[number];
+type FormRendererProps<TVariables extends AnyVariables = AnyVariables> =
+  CommonFabrixComponentRendererProps<ViewFields> & {
+    executeQuery: () => Promise<void>;
+    fieldsRenderer?: GetInputFieldsRenderer<TVariables>;
+  };
 
-export const FormRenderer = ({
+export const FormRenderer = <TVariables extends AnyVariables = AnyVariables>({
   context,
   rootField,
-  componentFieldsRenderer,
+  executeQuery,
+  fieldsRenderer,
   className,
-}: CommonFabrixComponentRendererProps<FormFields>) => {
-  const formContext = useForm({
-    resolver: ajvResolver(buildAjvSchema(rootField.fields)),
-  });
-  const [mutationResult, runMutation] = useMutation(rootField.document);
-  const runSubmit = formContext.handleSubmit(async (input) => {
-    // TODO: sending values should be specifiable by the user through something like `path`
-    await runMutation({ input });
+}: FormRendererProps<TVariables>) => {
+  const formContext =
+    useFormContext<TVariables extends FieldValues ? TVariables : FieldValues>();
 
-    formContext.reset();
-  });
+  const field = {
+    handler: (
+      name: Path<TVariables extends FieldValues ? TVariables : FieldValues>,
+    ) => ({
+      ...formContext.register(name),
+    }),
+    component: (name: string, extraProps?: ChildComponentsExtraProps) => {
+      const field = getFieldConfigByKey(rootField.fields, name);
+      if (!field) {
+        return null;
+      }
 
-  const renderFields = useCallback(() => {
-    if (componentFieldsRenderer) {
-      return componentFieldsRenderer({
-        getField: (name, extraProps) => {
-          const field = getFieldConfigByKey(rootField.fields, name);
-          if (!field) {
-            return null;
-          }
-
-          return renderField({
-            indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
-            extraClassName: extraProps?.className,
-            field: {
-              ...field,
-              ...extraProps,
-            },
-            context,
-          });
+      return renderField({
+        indexKey: extraProps?.key ?? `${rootField.name}-${name}`,
+        extraClassName: extraProps?.className,
+        field: {
+          ...field,
+          ...extraProps,
+          config: {
+            ...field.config,
+            ...extraProps,
+          },
         },
+        context,
       });
-    }
+    },
+  };
 
-    return rootField.fields
-      .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
-      .flatMap((field, fieldIndex) =>
-        renderField({
-          indexKey: `${rootField.name}-${fieldIndex}`,
-          field,
-          context,
-        }),
-      );
-  }, [context, rootField.name, componentFieldsRenderer]);
+  const action = {
+    handler: {
+      getState: useCallback(
+        () => formContext.formState,
+        [formContext.formState],
+      ),
+      onClick: executeQuery,
+    },
+    component: () => <button onClick={() => executeQuery()}>Submit</button>,
+  };
+
+  const renderFields = useCallback(
+    () =>
+      rootField.fields
+        .sort((a, b) => (a.config.index ?? 0) - (b.config.index ?? 0))
+        .flatMap((field, fieldIndex) =>
+          renderField({
+            indexKey: `${rootField.name}-${fieldIndex}`,
+            field,
+            context,
+          }),
+        ),
+    [context, rootField.name, fieldsRenderer],
+  );
 
   if (context.schemaLoader.status === "loading") {
     return <Loader />;
@@ -75,20 +92,27 @@ export const FormRenderer = ({
     return;
   }
 
+  if (fieldsRenderer) {
+    return fieldsRenderer({
+      formContext,
+      getAction: () => action.handler,
+      Field: (props: {
+        name: string;
+        extraProps?: ChildComponentsExtraProps;
+      }) => field.component(props.name, props.extraProps),
+      getField: (
+        name: Path<TVariables extends FieldValues ? TVariables : FieldValues>,
+      ) => field.handler(name),
+    });
+  }
+
   return createElement(component, {
     name: rootField.name,
-    renderFields: () => {
-      return <FormProvider {...formContext}>{renderFields()}</FormProvider>;
-    },
-    renderSubmit: (submitRenderer) =>
-      submitRenderer({
-        submit: runSubmit,
-        isSubmitting: mutationResult.fetching,
-      }),
-    renderReset: (resetRenderer) =>
-      resetRenderer({ reset: () => formContext.reset() }),
     className: `fabrix form col-row ${className ?? ""}`,
     customProps: {},
+    renderFields,
+    renderField: field.component,
+    getAction: () => action.handler,
   });
 };
 
