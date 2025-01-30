@@ -324,9 +324,6 @@ export type GetInputFieldsRendererProps<
    * ```
    */
   getAction: () => {
-    getState: () => FormState<
-      TVariables extends FieldValues ? TVariables : FieldValues
-    >;
     onClick: () => Promise<void>;
   };
 };

@@ -60,10 +60,6 @@ export const FormRenderer = <TVariables extends AnyVariables = AnyVariables>({
 
   const action = {
     handler: {
-      getState: useCallback(
-        () => formContext.formState,
-        [formContext.formState],
-      ),
       onClick: executeQuery,
     },
     component: () => <button onClick={() => executeQuery()}>Submit</button>,
