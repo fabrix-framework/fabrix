@@ -13,6 +13,7 @@
     "@chakra-ui/react": "^3.2.5",
     "@emotion/css": "^11.13.5",
     "@emotion/react": "^11.14.0",
+    "@fabrix-framework/unstyled": "workspace:*",
     "@fabrix-framework/chakra-ui": "workspace:*",
     "@fabrix-framework/fabrix": "workspace:*",
     "graphql": "^16.9.0",
