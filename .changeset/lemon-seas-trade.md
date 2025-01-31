@@ -154,6 +154,26 @@ const WatchingField = (props: {
 }
 ```
 
-## Backward compatibility
+## Backward incompatibility
 
-TBW
+The previous behaviour of `FabrixComponent` is that only the component for the result was rendered in `Query` and only the form for `Mutation` on the contrary. 
+However, from this relelase, `FabrixComponent` will render both the form and the result of the component regardless of operation type.
+
+If you would like to maintain the previous behaviour, use directives to guide the query render only the specific component that you want.
+
+```tsx
+/*
+ * `@fabrixForm` directive does not 
+ */
+<FabrixComponent 
+  query={gql`
+    mutation updateTodo($id: ID!, $input: CreateTodoInput!) {
+      updateTodo(id: $id, input: $input) @fabrixForm {
+        id 
+      } 
+    } 
+  `}
+/>
+```
+
+`fabrixView` also works for `Query` operation in the same way.
