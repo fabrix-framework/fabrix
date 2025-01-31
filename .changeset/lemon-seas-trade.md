@@ -46,11 +46,13 @@ This is useful in the case like the view that has the form to get the search par
 
 ## More customizable, layoutable form 
 
+Here is the complex example to create an update form to show the customizability and layoutability.
+
 ```tsx
 <FabrixComponent 
   query={gql`
-    mutation createTodo($input: CreateTodoInput!) {
-      createTodo(input: $input) {
+    mutation updateTodo($id: ID!, $input: CreateTodoInput!) {
+      updateTodo(id: $id, input: $input) {
         id 
       } 
     } 
@@ -67,6 +69,7 @@ This is useful in the case like the view that has the form to get the search par
        * The data structure should be matched with the variables of query/mutation. 
        */
       defaultValues: {
+        id: "user-id",
         input: {
           name: "John Doe"
         }
@@ -98,6 +101,8 @@ This is useful in the case like the view that has the form to get the search par
   }
 </FabrixComponent>
 ```
+
+Additionally, for more page-by-page customization for the form, `getInput` functions offers more functions in its render props, mostly powered by react-hook-form that fabrix internal uses.
 
 ### Field-level handler
 
