@@ -2,15 +2,18 @@
 "@fabrix-framework/fabrix": minor
 ---
 
-More flexibility to render the view within `FabrixComponent`.
+This update contains the breaking changes specifically on functions that the children prop in `FabrixComponent` passes down to bring more flexibility in rendering the view.
 
-Now, you can use JSX expressions to place form components using the functions passed down through the children props.
+See [#168](https://github.com/fabrix-framework/fabrix/issues/168) for more about the motivation about this change.
 
-## Query with forms 
+## Input and Output 
 
-Before this release, fabrix does not have any way to render forms for `Query` operation, but from this relelase, `Query` operation also is able to render the form along with the result.
+The newly introduced functions in the children prop is `getInput` and `getOutput`.
 
-This is useful in the case like the view that has the form to get the search parameters for the query.
+* `getInput` is a function that plays a role as a form renderer, and also an accessor of the form context and form field control. Input fields are inferred from variable definitions in the corresponding GraphQL operation.
+* `getOutput` is a function that works as a result renderer (the behaviour of it depends on the component registered in the component registry), and also a direct accessor of the query data. Output fields are inferred from selected fields in the corresponding GraphQL operation.
+
+Here is the example implementation that renders the form to get the search condition for `Query` operation alongside the result component like tables.
 
 ```tsx
 <FabrixComponent 
@@ -37,10 +40,36 @@ This is useful in the case like the view that has the form to get the search par
 
        {/*
          * `getOuput` renders the result of the mutation
+         * This example assumes that `getTodos` is rendered as a table component.
          */}
        {getOutput("getTodos")}
      </>
   )}
+</FabrixComponent>
+```
+
+The important point to mention is that `getOutput` and `getInput` work in the same way both for `Query` and `Mutation` by this update. 
+
+### `data` accessor
+
+With this update, `data` accessor is accessible through `getOuput` function, since the data is tied from the query result (output).
+
+```tsx
+<FabrixComponent 
+  query={gql`
+    query getTodo {
+      getTodo {
+        name
+        priority 
+      }
+    }
+  `}
+>
+  {({ getOutput }) =>
+    getOutput("getTodo", ({ data }) => (
+      <div>Todo name: {data.name}</div>
+    ))
+  }
 </FabrixComponent>
 ```
 
