@@ -61,7 +61,17 @@ This is useful in the case like the view that has the form to get the search par
      * `getInput` is a function to render form view which can acess functions to build forms.
      * `Field` and `getAction` are the key functions (see their explanation below)
      */
-    getInput({}, ({ Field, getAction }) => (
+    getInput({
+      /*
+       * If the form is the one to update resource, set `defaultValues` here to prefill the form fields.
+       * The data structure should be matched with the variables of query/mutation. 
+       */
+      defaultValues: {
+        input: {
+          name: "John Doe"
+        }
+      }
+    }, ({ Field, getAction }) => (
       {/*
         * `getAction` is expcted to be passed as an descructive props to `form` element.
         * It is an object that contains `onSubmit` function as a member that kicks off the query execution.
