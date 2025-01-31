@@ -376,8 +376,8 @@ export type GetOutputFieldsRendererProps<
    * @example
    * ```tsx
    * <FabrixComponent query={appQuery}>
-   *   {({ getInput }) => (
-   *     getInput({}, ({ Field }) => (
+   *   {({ getOutput }) => (
+   *     getOutput("user", ({ Field }) => (
    *       <Field name="displayName" />
    *       <Field name="email" />
    *     ))
