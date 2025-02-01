@@ -39,7 +39,7 @@ const tableView = (props: TableComponentProps) => {
   });
 
   return (
-    <table>
+    <table className={props.className}>
       <thead>
         <tr>
           {headers.map((header) => (
@@ -78,7 +78,11 @@ const FormFieldWrapper = (
     }
   >,
 ) => (
-  <div role="group" aria-label={props.name}>
+  <div
+    role="group"
+    aria-label={props.name}
+    className={props.attributes.className}
+  >
     <label htmlFor={props.name}>{props.attributes.label}</label>
     {props.children}
     {props.error && <div role="alert">{props.error.message?.toString()}</div>}
