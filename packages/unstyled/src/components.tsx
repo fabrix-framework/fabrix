@@ -6,7 +6,7 @@ import {
   TableComponentProps,
 } from "@fabrix-framework/fabrix";
 import { ReactNode } from "react";
-import { useController } from "react-hook-form";
+import { FieldErrors, useController } from "react-hook-form";
 import { get } from "es-toolkit/compat";
 
 const fieldView = (props: FieldComponentProps) => {
@@ -71,29 +71,38 @@ const formView = (props: FormComponentProps) => {
   );
 };
 
-const formFieldView = (props: FormFieldComponentProps) => {
-  const getDefaultValue = () => {
-    if (props.type?.type === "Scalar" && props.type.name === "Boolean") {
-      return false;
+const FormFieldWrapper = (
+  props: React.PropsWithChildren<
+    FormFieldComponentProps & {
+      error?: FieldErrors[string];
     }
-    return "";
-  };
+  >,
+) => (
+  <div role="group" aria-label={props.name}>
+    <label htmlFor={props.name}>{props.attributes.label}</label>
+    {props.children}
+    {props.error && <div role="alert">{props.error.message?.toString()}</div>}
+  </div>
+);
 
+const formFieldView = (props: FormFieldComponentProps) => {
   const { field, formState } = useController({
     name: props.name,
-    defaultValue: getDefaultValue(),
+    defaultValue: () => {
+      if (props.type?.type === "Scalar" && props.type.name === "Boolean") {
+        return false;
+      }
+      return "";
+    },
   });
   const error = formState.errors[props.name];
 
   switch (props.type?.type) {
     case "Enum": {
       return (
-        <div role="group" aria-label={props.name}>
-          <label htmlFor={props.name}>{props.attributes.label}</label>
+        <FormFieldWrapper {...props} error={error}>
           <select
             {...field}
-            name={props.name}
-            id={props.name}
             onChange={(e) => {
               field.onChange(e.target.value);
             }}
@@ -104,52 +113,64 @@ const formFieldView = (props: FormFieldComponentProps) => {
               </option>
             ))}
           </select>
-          {error && <div role="alert">{error?.message?.toString()}</div>}
-        </div>
+        </FormFieldWrapper>
       );
     }
 
     case "Scalar": {
-      if (props.type.name === "Boolean") {
-        return (
-          <div role="group" aria-label={props.name}>
-            <label htmlFor={props.name}>{props.attributes.label}</label>
-            <input
-              {...field}
-              name={props.name}
-              id={props.name}
-              type="checkbox"
-              onChange={(e) => {
-                field.onChange(e.target.checked);
-              }}
-            />
-            {error && <div role="alert">{error?.message?.toString()}</div>}
-          </div>
-        );
+      switch (props.type.name) {
+        case "Boolean": {
+          return (
+            <FormFieldWrapper {...props}>
+              <input
+                {...field}
+                type="checkbox"
+                onChange={(e) => {
+                  field.onChange(e.target.checked);
+                }}
+              />
+            </FormFieldWrapper>
+          );
+        }
+
+        case "Int":
+        case "Float": {
+          return (
+            <FormFieldWrapper {...props}>
+              <input
+                {...field}
+                onChange={(e) => {
+                  field.onChange(parseFloat(e.target.value));
+                }}
+              />
+            </FormFieldWrapper>
+          );
+        }
+
+        case "Date": {
+          return (
+            <FormFieldWrapper {...props}>
+              <input {...field} type="date" />
+            </FormFieldWrapper>
+          );
+        }
+
+        case "DateTime": {
+          return (
+            <FormFieldWrapper {...props}>
+              <input {...field} type="datetime-local" />
+            </FormFieldWrapper>
+          );
+        }
+
+        default: {
+          return (
+            <FormFieldWrapper {...props}>
+              <input {...field} />
+            </FormFieldWrapper>
+          );
+        }
       }
-
-      const isNumber =
-        props.type?.type === "Scalar" &&
-        (props.type.name === "Int" || props.type.name === "Float");
-
-      return (
-        <div role="group" aria-label={props.name}>
-          <label htmlFor={props.name}>{props.attributes.label}</label>
-          <input
-            {...field}
-            name={props.name}
-            id={props.name}
-            onChange={(e) => {
-              if (e.target.value && isNumber) {
-                field.onChange(parseFloat(e.target.value));
-              } else {
-                field.onChange(e.target.value);
-              }
-            }}
-          />
-          {error && <div role="alert">{error?.message?.toString()}</div>}
-        </div>
-      );
     }
 
     default:
