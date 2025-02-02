@@ -332,8 +332,8 @@ importers:
         specifier: ^5.7.3
         version: 5.7.3
       vite-string-plugin:
-        specifier: ^1.3.4
-        version: 1.3.4
+        specifier: ^1.4.3
+        version: 1.4.3
       vitest:
         specifier: ^3.0.2
         version: 3.0.2(@types/node@22.10.5)(happy-dom@16.5.3)(msw@2.7.0(@types/node@22.10.5)(typescript@5.7.3))
@@ -5280,8 +5280,8 @@ packages:
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
-  vite-string-plugin@1.3.4:
-    resolution: {integrity: sha512-mHvcooHgZ0nVbHtj9o+c5dzD2/nclr/SOG023EFYF/zRnO8bxB63bV9WUA9X+njlgLpOwCJ3LI2IdihKoi0gZQ==}
+  vite-string-plugin@1.4.3:
+    resolution: {integrity: sha512-srlSRDwWxjG4MwHOmeXA9H8b69VjR3PfQRv2hCkHsotnGbJOLY3gggClSmNTeKUJpnURckgTFeVVVdCXX/Gwpg==}
 
   vite-tsconfig-paths@5.1.4:
     resolution: {integrity: sha512-cYj0LRuLV2c2sMqhqhGpaO3LretdtMn/BVX4cPLanIZuwwrkVl+lK84E/miEXkCHWXuq65rhNN4rXsBcOB3S4w==}
@@ -11489,7 +11489,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-string-plugin@1.3.4: {}
+  vite-string-plugin@1.4.3: {}
 
   vite-tsconfig-paths@5.1.4(typescript@5.7.3)(vite@5.4.8(@types/node@22.10.5)):
     dependencies:
