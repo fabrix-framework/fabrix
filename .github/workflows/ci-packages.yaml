@@ -5,6 +5,7 @@ on:
     paths:
       - 'packages/**'
       - '.github/workflows/ci-packages.yaml'
+      - '.github/actions/ci/action.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
