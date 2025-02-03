@@ -1,11 +1,6 @@
 name: Lint
 description: Run linter and type-checker and test
 
-inputs:
-  filter:
-    description: 'The package to lint'
-    required: true
-
 runs:
   using: composite
   steps:
@@ -22,7 +17,7 @@ runs:
       run: pnpm install
       shell: bash
     - name: Launch Turbo Remote Cache Server
-      uses: dtinth/setup-github-actions-caching-for-turbo@v1.1.0
+      uses: dtinth/setup-github-actions-caching-for-turbo@v1.3.0
     - name: Run lint / test / type-check
-      run: npx turbo run lint test type-check --filter="./${{ inputs.filter }}"
+      run: npx turbo run lint test type-check
       shell: bash
