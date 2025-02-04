@@ -1,5 +1,13 @@
 # @fabrix-framework/graphql-config
 
+## 0.4.1
+
+### Patch Changes
+
+- [#176](https://github.com/fabrix-framework/fabrix/pull/176) [`e77f632`](https://github.com/fabrix-framework/fabrix/commit/e77f6326abe9b358870bf4a982c01cb6be3fe0bd) Thanks [@toiroakr](https://github.com/toiroakr)! - Use turbo cache on CI
+
+- [#177](https://github.com/fabrix-framework/fabrix/pull/177) [`9450a34`](https://github.com/fabrix-framework/fabrix/commit/9450a34231b7ac4b88be88f84f9357d969887e67) Thanks [@toiroakr](https://github.com/toiroakr)! - Add path to GitHub Actions' trigger.
+
 ## 0.4.0
 
 ### Minor Changes

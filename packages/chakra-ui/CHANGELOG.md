@@ -1,5 +1,16 @@
 # @fabrix-framework/chakra-ui
 
+## 0.6.1
+
+### Patch Changes
+
+- [#176](https://github.com/fabrix-framework/fabrix/pull/176) [`e77f632`](https://github.com/fabrix-framework/fabrix/commit/e77f6326abe9b358870bf4a982c01cb6be3fe0bd) Thanks [@toiroakr](https://github.com/toiroakr)! - Use turbo cache on CI
+
+- [#177](https://github.com/fabrix-framework/fabrix/pull/177) [`9450a34`](https://github.com/fabrix-framework/fabrix/commit/9450a34231b7ac4b88be88f84f9357d969887e67) Thanks [@toiroakr](https://github.com/toiroakr)! - Add path to GitHub Actions' trigger.
+
+- Updated dependencies [[`d433fe0`](https://github.com/fabrix-framework/fabrix/commit/d433fe055915eea357efc1df4acfd277b1e78ec4), [`e77f632`](https://github.com/fabrix-framework/fabrix/commit/e77f6326abe9b358870bf4a982c01cb6be3fe0bd), [`9450a34`](https://github.com/fabrix-framework/fabrix/commit/9450a34231b7ac4b88be88f84f9357d969887e67), [`b577afa`](https://github.com/fabrix-framework/fabrix/commit/b577afae84a5704ba85d28105f90c68e0e1c15f8)]:
+  - @fabrix-framework/fabrix@0.7.0
+
 ## 0.6.0
 
 ### Minor Changes
