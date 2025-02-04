@@ -3,72 +3,77 @@ import { buildSchema, graphql as executeGraphql } from "graphql";
 import { ObjMap } from "graphql/jsutils/ObjMap";
 import { users } from "./data";
 
-export const mockSchema = buildSchema(`
-# Relay Node
-interface Node {
-  id: ID!
-}
+export const mockSchema = buildSchema(/* GraphQL */ `
+  # Relay Node
+  interface Node {
+    id: ID!
+  }
 
-# Relay PageInfo
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-  endCursor: String
-}
+  # Relay PageInfo
+  type PageInfo {
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    startCursor: String
+    endCursor: String
+  }
 
-type User implements Node {
-  id: ID!
-  name: String!
-  email: String!
-  age: Int!
-  category: UserCategory!
-  address: UserAddress!
-}
+  type User implements Node {
+    id: ID!
+    name: String!
+    email: String!
+    age: Int!
+    category: UserCategory!
+    address: UserAddress!
+  }
 
-type UsersResult {
-  collection: [User!]!
-  size: Int!
-}
+  type UsersResult {
+    collection: [User!]!
+    size: Int!
+  }
 
-type UserEdge {
-  node: User!
-  cursor: String!
-}
+  type UserEdge {
+    node: User!
+    cursor: String!
+  }
 
-type UsersConnection {
-  edges: [UserEdge!]!
-  pageInfo: PageInfo!
-}
+  type UsersConnection {
+    edges: [UserEdge!]!
+    pageInfo: PageInfo!
+  }
 
-type Query {
-  firstUser: User
-  users: UsersResult
-  userEdges: UsersConnection
-}
+  input UsersQueryInput {
+    query: String
+    first: Int
+  }
 
-type UserAddress {
-  city: String
-  street: String
-  zip: String!
-}
+  type Query {
+    firstUser: User
+    users(input: UsersQueryInput): UsersResult
+    userEdges(input: UsersQueryInput): UsersConnection
+  }
 
-enum UserCategory {
-  ADMIN
-  USER
-}
+  type UserAddress {
+    city: String
+    street: String
+    zip: String!
+  }
 
-input CreateUserInput {
-  id: ID
-  name: String!
-  email: String
-  age: Int!
-  category: UserCategory
-}
+  enum UserCategory {
+    ADMIN
+    USER
+  }
 
-type Mutation {
-  createUser(input: CreateUserInput!): User
-}
+  input CreateUserInput {
+    id: ID
+    name: String!
+    email: String
+    age: Int!
+    category: UserCategory
+  }
+
+  type Mutation {
+    createUser(input: CreateUserInput!): User
+  }
 `);
 
 const resolvers = {

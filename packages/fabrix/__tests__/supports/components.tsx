@@ -62,12 +62,10 @@ const tableView = (props: TableComponentProps) => {
 
 const formView = (props: FormComponentProps) => {
   return (
-    <div role="form">
+    <form role="form" {...props.getAction()}>
       {props.renderFields()}
-      {props.renderSubmit(({ submit }) => (
-        <button onClick={() => submit()}>Submit</button>
-      ))}
-    </div>
+      <button type="submit">Submit</button>
+    </form>
   );
 };
 
@@ -75,8 +73,11 @@ const formFieldView = (props: FormFieldComponentProps) => {
   const { field, formState } = useController({
     name: props.name,
     defaultValue: "",
+    rules: {
+      required: props.isRequired,
+    },
   });
-  const error = formState.errors[props.name];
+  const error = get(formState.errors, props.name);
   const isNumber =
     props.type?.type === "Scalar" &&
     (props.type.name === "Int" || props.type.name === "Float");
@@ -86,7 +87,6 @@ const formFieldView = (props: FormFieldComponentProps) => {
       <label htmlFor={props.name}>{props.attributes.label}</label>
       <input
         {...field}
-        name={props.name}
         id={props.name}
         onChange={(e) => {
           if (e.target.value && isNumber) {

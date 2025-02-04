@@ -37,11 +37,12 @@
     "chakra-react-select": "^6.0.1",
     "chroma-js": "^3.0.0",
     "create-color": "^2.0.6",
+    "es-toolkit": "^1.30.1",
     "zod": "^3.23.8"
   },
   "peerDependencies": {
-    "@emotion/react": "^11",
     "@chakra-ui/react": "^3",
+    "@emotion/react": "^11",
     "react": ">=18",
     "react-dom": ">=18"
   },

@@ -3,9 +3,7 @@ import {
   GraphQLEnumType,
   GraphQLList,
   GraphQLNonNull,
-  GraphQLNullableType,
   GraphQLObjectType,
-  GraphQLOutputType,
   GraphQLScalarType,
   GraphQLType,
 } from "graphql";
@@ -199,9 +197,7 @@ export const defaultFieldType = {
   name: "String",
 };
 
-export const resolveFieldType = (
-  field: GraphQLOutputType | GraphQLNullableType,
-): FieldType => {
+export const resolveFieldType = (field: GraphQLType): FieldType => {
   if (field instanceof GraphQLScalarType) {
     return newScalarTypeField(field);
   } else if (field instanceof GraphQLEnumType) {

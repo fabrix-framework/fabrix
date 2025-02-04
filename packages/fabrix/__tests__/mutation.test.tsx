@@ -24,6 +24,35 @@ describe("mutation", () => {
       },
     );
   });
+});
+
+describe("directive", () => {
+  it("should render only the form when the directive is given", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          mutation createUser($input: CreateUserInput!) {
+            createUser(input: $input) @fabrixForm {
+              id
+            }
+          }
+        `}
+      />,
+      () => {
+        expect(
+          screen.queryByRole("region", {
+            name: /fabrix-component-input/,
+          }),
+        ).toBeInTheDocument();
+
+        expect(
+          screen.queryByRole("region", {
+            name: /fabrix-component-output/,
+          }),
+        ).not.toBeInTheDocument();
+      },
+    );
+  });
 
   it("should render the form with customized labels", async () => {
     await testWithUnmount(
@@ -45,6 +74,94 @@ describe("mutation", () => {
 
         expect(within(form).queryByLabelText("id")).not.toBeInTheDocument();
         expect(within(form).getByLabelText("UserName")).toBeInTheDocument();
+      },
+    );
+  });
+});
+
+describe("children props", () => {
+  it("should render the form with children props", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          mutation createUser($input: CreateUserInput!) {
+            createUser(input: $input) {
+              id
+            }
+          }
+        `}
+      >
+        {({ getInput }) =>
+          getInput({}, ({ Field, getAction }) => (
+            <form role="form" {...getAction()}>
+              <Field name="input.name" extraProps={{ label: "Name" }} />
+              <Field name="input.category" extraProps={{ label: "Category" }} />
+              <button type="submit">Send</button>
+            </form>
+          ))
+        }
+      </FabrixComponent>,
+      async () => {
+        const form = await screen.findByRole("form");
+
+        const button = await within(form).findByRole("button");
+        expect(within(button).getByText("Send")).toBeInTheDocument();
+
+        const formFields = await within(form).findAllByRole("group");
+        expect(
+          await within(formFields[0]).findByLabelText("Name"),
+        ).toBeInTheDocument();
+        expect(
+          await within(formFields[1]).findByLabelText("Category"),
+        ).toBeInTheDocument();
+      },
+    );
+  });
+
+  it("should render the form populated with initial values", async () => {
+    await testWithUnmount(
+      <FabrixComponent
+        query={`
+          mutation createUser($input: CreateUserInput!) {
+            createUser(input: $input) {
+              id
+            }
+          }
+        `}
+      >
+        {({ getInput }) =>
+          getInput(
+            {
+              defaultValues: {
+                input: {
+                  name: "John Doe",
+                  category: "ADMIN",
+                },
+              },
+            },
+            ({ Field, getAction }) => (
+              <form role="form" {...getAction()}>
+                <Field name="input.name" extraProps={{ label: "Name" }} />
+                <Field
+                  name="input.category"
+                  extraProps={{ label: "Category" }}
+                />
+                <button type="submit">Send</button>
+              </form>
+            ),
+          )
+        }
+      </FabrixComponent>,
+      async () => {
+        const form = await screen.findByRole("form");
+        const formFields = await within(form).findAllByRole("group");
+
+        expect(await within(formFields[0]).findByLabelText("Name")).toHaveValue(
+          "John Doe",
+        );
+        expect(
+          await within(formFields[1]).findByLabelText("Category"),
+        ).toHaveValue("ADMIN");
       },
     );
   });

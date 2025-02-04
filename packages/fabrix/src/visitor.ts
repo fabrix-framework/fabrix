@@ -15,7 +15,11 @@ import {
 export type FieldVariables = Record<
   string,
   {
-    type: string;
+    type: {
+      name: string;
+      isNull: boolean;
+      isList: boolean;
+    };
   }
 >;
 
@@ -51,14 +55,22 @@ export const buildRootDocument = <
 const buildQueryStructure = (ast: DocumentNode) => {
   const operationStructure = {} as S;
 
-  const extractTypeNode = (node: TypeNode) => {
+  const extractVariableTypeNode = (
+    node: TypeNode,
+    isNull: boolean = false,
+    isList: boolean = false,
+  ) => {
     switch (node.kind) {
       case Kind.NON_NULL_TYPE:
-        return extractTypeNode(node.type);
+        return extractVariableTypeNode(node.type, false, isList);
       case Kind.LIST_TYPE:
-        return extractTypeNode(node.type);
+        return extractVariableTypeNode(node.type, isNull, true);
       case Kind.NAMED_TYPE:
-        return node.name.value;
+        return {
+          name: node.name.value,
+          isNull,
+          isList,
+        };
       default:
         return null;
     }
@@ -85,7 +97,7 @@ const buildQueryStructure = (ast: DocumentNode) => {
       operationStructure.fields = new Fields();
     },
     VariableDefinition: (node) => {
-      const nodeType = extractTypeNode(node.type);
+      const nodeType = extractVariableTypeNode(node.type);
       if (!nodeType) {
         return;
       }

@@ -1,14 +1,27 @@
 import { DirectiveNode, DocumentNode, OperationTypeNode } from "graphql";
-import { ReactNode, useContext, useMemo } from "react";
+import React, { FormEvent, ReactNode, useContext, useMemo } from "react";
 import { findDirective, parseDirectiveArguments } from "@directive";
 import { ViewRenderer } from "@renderers/fields";
 import { FormRenderer } from "@renderers/form";
 import { FabrixContext, FabrixContextType } from "@context";
-import { FabrixComponentFieldsRenderer, Loader } from "@renderers/shared";
 import { directiveSchemaMap } from "@directive/schema";
 import { mergeFieldConfigs } from "@readers/shared";
-import { buildDefaultViewFieldConfigs, viewFieldMerger } from "@readers/field";
-import { buildDefaultFormFieldConfigs, formFieldMerger } from "@readers/form";
+import { getOutputFields, viewFieldMerger } from "@readers/field";
+import { formFieldMerger, getInputFields } from "@readers/form";
+import { AnyVariables, OperationResult, useMutation } from "urql";
+import {
+  FieldPath,
+  FieldValues,
+  FormProvider,
+  Path,
+  useForm,
+  UseFormRegisterReturn,
+  UseFormReturn,
+} from "react-hook-form";
+import { DirectiveAttributes } from "@registry";
+import { ajvResolver } from "@renderers/form/ajvResolver";
+import { buildAjvSchema } from "@renderers/form/validation";
+import { PartialDeep } from "type-fest";
 import {
   buildRootDocument,
   FieldVariables,
@@ -23,6 +36,14 @@ const decideStrategy = (
 ) => {
   const directive = findDirective(directiveNodes);
   const emptyDirective = { arguments: null } as const;
+
+  if (directive === null) {
+    return {
+      type: "generic",
+      documentType: opType,
+      directive: emptyDirective,
+    };
+  }
 
   switch (opType) {
     case OperationTypeNode.QUERY: {
@@ -56,6 +77,7 @@ const getFieldConfig = (
   opType: OperationTypeNode,
 ) => {
   const strategy = decideStrategy(field.value.directives, opType);
+
   switch (strategy?.type) {
     case "view": {
       const directive = parseDirectiveArguments(
@@ -67,8 +89,9 @@ const getFieldConfig = (
         name: field.getName(),
         type: strategy.type,
         configs: {
-          fields: mergeFieldConfigs(
-            buildDefaultViewFieldConfigs(childFields),
+          inputFields: [],
+          outputFields: mergeFieldConfigs(
+            getOutputFields(childFields),
             directive.input,
             viewFieldMerger,
           ),
@@ -85,11 +108,23 @@ const getFieldConfig = (
         name: field.getName(),
         type: strategy.type,
         configs: {
-          fields: mergeFieldConfigs(
-            buildDefaultFormFieldConfigs(context, fieldVariables),
+          inputFields: [],
+          outputFields: mergeFieldConfigs(
+            getInputFields(context, fieldVariables),
             directive.input,
             formFieldMerger,
           ),
+        },
+      };
+    }
+    case "generic": {
+      return {
+        name: field.getName(),
+        type: strategy.type,
+        configs: {
+          documentType: strategy.documentType,
+          inputFields: getInputFields(context, fieldVariables),
+          outputFields: getOutputFields(childFields),
         },
       };
     }
@@ -102,14 +137,14 @@ const getFieldConfig = (
 export type FieldConfig = ReturnType<typeof getFieldConfig> & {
   document: DocumentNode;
 };
-export type FieldConfigs = {
+export type Operation = {
   name: string;
   document: DocumentNode;
   type: OperationTypeNode;
   fields: FieldConfig[];
 };
 
-export const useFieldConfigs = <
+export const useOperation = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -119,12 +154,12 @@ export const useFieldConfigs = <
 ) => {
   const rootDocument = buildRootDocument(query);
   const context = useContext(FabrixContext);
-  const fieldConfigs = useMemo(() => {
+  const operations = useMemo(() => {
     return rootDocument.map(({ name, document, fields, opType, variables }) =>
       fields
         .unwrap()
         .filter((f) => !f.getParentName())
-        .reduce<FieldConfigs>(
+        .reduce<Operation>(
           (acc, field) => {
             const fieldConfig = getFieldConfig(
               context,
@@ -148,7 +183,7 @@ export const useFieldConfigs = <
     );
   }, [rootDocument, context]);
 
-  return { fieldConfigs };
+  return { operations };
 };
 
 type FabrixComponentCommonProps<
@@ -179,8 +214,7 @@ type FabrixComponentCommonProps<
 export type FabrixComponentProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TVariables = Record<string, any>,
+  TVariables extends AnyVariables = AnyVariables,
 > = FabrixComponentCommonProps<TVariables> & {
   /**
    * The query to render.
@@ -197,38 +231,210 @@ export type FabrixComponentProps<
    */
   query: GeneralDocumentType<TData, TVariables>;
 
-  children?: (props: FabrixComponentChildrenProps<TData>) => ReactNode;
+  /**
+   * The children to render the query
+   */
+  children?: (
+    props: FabrixComponentChildrenProps<TData, TVariables>,
+  ) => ReactNode;
 };
 
-type FabrixComponentChildrenExtraProps = { key?: string; className?: string };
+export type RootFieldName<TData> =
+  TData extends Record<string, unknown>
+    ? Exclude<Extract<keyof TData, string>, "__typename">
+    : string;
 
-export type FabrixComponentChildrenProps<
+export type ChildComponentsExtraProps = Partial<DirectiveAttributes> & {
+  key?: string;
+};
+
+type InputOutputExtraProps = {
+  key?: string;
+  className?: string;
+};
+type GetInputExtraProps<TVariables extends AnyVariables = AnyVariables> =
+  InputOutputExtraProps & {
+    defaultValues?: PartialDeep<TVariables>;
+  };
+type GetOutputExtraProps = InputOutputExtraProps;
+
+export type GetInputFieldsRendererProps<
+  TVariables extends AnyVariables = AnyVariables,
+> = {
+  /**
+   * Direct access to the control object from react-hook-form
+   */
+  formContext: UseFormReturn<
+    TVariables extends FieldValues ? TVariables : Record<string, unknown>
+  >;
+
+  /**
+   * Get the field by name
+   *
+   * @example
+   * ```tsx
+   * <FabrixComponent query={appQuery}>
+   *   {({ getComponent }) => (
+   *     <>
+   *       {getComponent("getEmployee", {}, ({ getField }) => (
+   *         <>
+   *           {getField("displayName")}
+   *           {getField("email")}
+   *         </>
+   *       ))}
+   *     </>
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  getField: (
+    /**
+     * The name of the field
+     */
+    name: Path<TVariables extends FieldValues ? TVariables : FieldValues>,
+    extraProps?: ChildComponentsExtraProps,
+  ) => UseFormRegisterReturn;
+
+  /**
+   * Get the field component by name
+   *
+   * @example
+   * ```tsx
+   * <FabrixComponent query={appQuery}>
+   *   {({ getInput }) => (
+   *     getInput({}, ({ Field }) => (
+   *       <Field name="displayName" />
+   *       <Field name="email" />
+   *     ))
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  Field: (props: {
+    name: Path<TVariables extends FieldValues ? TVariables : FieldValues>;
+    extraProps?: ChildComponentsExtraProps;
+  }) => React.ReactNode;
+
+  /**
+   * Get the action handler for the query
+   *
+   * @example
+   * ```tsx
+   * <FabrixComponent query={appQuery}>
+   *   {({ getInput }) => (
+   *     getInput({}, ({ getAction, Field }) => (
+   *       <Field name="input.name" />
+   *       <Field name="input.email" />
+   *       <Button {...getAction()}>Submit</Button>
+   *     ))
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  getAction: () => {
+    onSubmit: (e: FormEvent) => Promise<void>;
+  };
+};
+export type GetInputFieldsRenderer<
+  TVariables extends AnyVariables = AnyVariables,
+> = (props: GetInputFieldsRendererProps<TVariables>) => ReactNode;
+
+export type GetInputFn<TVariables extends AnyVariables = AnyVariables> = (
+  extraProps?: GetInputExtraProps<TVariables>,
+  fieldsRenderer?: GetInputFieldsRenderer<TVariables>,
+) => React.ReactNode;
+
+/*
+ * An utility type to get the data right under the root field
+ */
+type DataAtTheRoot<TData> =
+  TData extends Record<string, unknown>
+    ? TData[RootFieldName<TData>]
+    : Record<string, unknown>;
+
+type FieldPathsWithoutTypename<T> = Exclude<
+  FieldPath<
+    NonNullable<T> extends FieldValues
+      ? NonNullable<T>
+      : Record<string, unknown>
+  >,
+  "__typename"
+>;
+
+export type GetOutputFieldsRendererProps<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
 > = {
   /**
    * The data fetched from the query
    */
-  data: TData;
+  data: DataAtTheRoot<TData>;
+
+  /**
+   * Get the field component by name
+   *
+   * @example
+   * ```tsx
+   * <FabrixComponent query={appQuery}>
+   *   {({ getOutput }) => (
+   *     getOutput("user", ({ Field }) => (
+   *       <Field name="displayName" />
+   *       <Field name="email" />
+   *     ))
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  Field: (props: {
+    name: FieldPathsWithoutTypename<DataAtTheRoot<TData>>;
+    extraProps?: ChildComponentsExtraProps;
+  }) => React.ReactNode;
+};
+
+export type GetOutputFieldsRenderer<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+> = (props: GetOutputFieldsRendererProps<TData>) => React.ReactNode;
+
+export type GetOutputFn<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+> = (
+  rootFieldName: RootFieldName<TData>,
+  extraProps?: GetOutputExtraProps,
+  fieldsRenderer?: GetOutputFieldsRenderer<TData>,
+) => React.ReactNode;
+
+export type FabrixComponentChildrenProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  TVariables extends AnyVariables = AnyVariables,
+> = {
+  /**
+   * Get the input component by the variable name
+   *
+   * ```tsx
+   * <FabrixComponent query={getUsersQuery}>
+   *   {({ getInput }) => (
+   *     {getInput("input")}
+   *   )}
+   * </FabrixComponent>
+   * ```
+   */
+  getInput: GetInputFn<TVariables>;
 
   /**
    * Get the component by root field name
    *
    * ```tsx
    * <FabrixComponent query={getUsersQuery}>
-   *   {({ getComponent }) => (
-   *     {getComponent("users")}
+   *   {({ getOutput }) => (
+   *     {getInput("users")}
    *   )}
    * </FabrixComponent>
    * ```
    */
-  getComponent: (
-    rootFieldName: TData extends Record<string, unknown>
-      ? Exclude<Extract<keyof TData, string>, "__typename">
-      : string,
-    extraProps?: FabrixComponentChildrenExtraProps,
-    fieldsRenderer?: FabrixComponentFieldsRenderer,
-  ) => ReactNode;
+  getOutput: GetOutputFn<TData>;
 };
 
 /**
@@ -256,135 +462,318 @@ export type FabrixComponentChildrenProps<
 export const FabrixComponent = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TVariables = Record<string, any>,
+  TVariables extends AnyVariables = AnyVariables,
 >(
   props: FabrixComponentProps<TData, TVariables>,
 ) => {
-  const renderComponent = getComponentRendererFn(
-    props,
-    getComponentFn(
-      props,
-      (
-        field: FieldConfig,
-        data: Value,
-        context: FabrixContextType,
-        componentFieldsRenderer?: FabrixComponentFieldsRenderer,
-      ) => {
-        const commonProps = {
-          context,
-          rootField: {
-            name: field.name,
-            fields: field.configs.fields,
-            data,
-            document: field.document,
-            className: props.contentClassName,
-            componentFieldsRenderer,
-          },
-        };
-        switch (field.type) {
-          case "view":
-            return <ViewRenderer {...commonProps} />;
-          case "form": {
-            return <FormRenderer {...commonProps} />;
-          }
-          default:
-            return null;
-        }
+  const buildCommonProps = ({
+    field,
+    fetching,
+    error,
+  }: RendererFnCommonProps) => {
+    return {
+      fetching,
+      error,
+      rootField: {
+        name: field.name,
+        fields: field.configs.outputFields,
+        document: field.document,
+        className: props.contentClassName,
       },
-    ),
-  );
+    };
+  };
 
-  return <div className="fabrix wrapper">{renderComponent()}</div>;
+  const context = useContext(FabrixContext);
+  const { operations } = useOperation(props.query);
+  const operation = operations[0];
+  if (!operation) {
+    throw new Error(`No operation found`);
+  }
+
+  return (
+    <div className={`fabrix-wrapper ${props.containerClassName ?? ""}`}>
+      {getComponentRendererFn(props, operation, (field: FieldConfig) => {
+        switch (field.type) {
+          case "form": {
+            return {
+              getInputComponent: getInputComponentFn((rendererFnProps) => (
+                <FormRenderer
+                  {...buildCommonProps(rendererFnProps)}
+                  context={context}
+                  executeQuery={rendererFnProps.executeQuery}
+                  fieldsRenderer={rendererFnProps.fieldsRenderer}
+                />
+              )),
+              getOutputComponent: getOutputComponentFn(null),
+            };
+          }
+
+          case "view": {
+            return {
+              getInputComponent: getInputComponentFn(null),
+              getOutputComponent: getOutputComponentFn((rendererFnProps) => (
+                <ViewRenderer
+                  {...buildCommonProps(rendererFnProps)}
+                  context={context}
+                  data={rendererFnProps.data}
+                  fieldsRenderer={rendererFnProps.fieldsRenderer}
+                />
+              )),
+            };
+          }
+
+          case "generic": {
+            return {
+              getInputComponent: getInputComponentFn((rendererFnProps) => {
+                const commonProps = buildCommonProps(rendererFnProps);
+
+                return (
+                  <FormRenderer
+                    {...{
+                      ...commonProps,
+                      rootField: {
+                        ...commonProps.rootField,
+                        fields: rendererFnProps.field.configs.inputFields,
+                      },
+                    }}
+                    context={context}
+                    executeQuery={rendererFnProps.executeQuery}
+                    fieldsRenderer={rendererFnProps.fieldsRenderer}
+                  />
+                );
+              }),
+              getOutputComponent: getOutputComponentFn((rendererFnProps) => (
+                <ViewRenderer
+                  {...buildCommonProps(rendererFnProps)}
+                  context={context}
+                  data={rendererFnProps.data}
+                  fieldsRenderer={rendererFnProps.fieldsRenderer}
+                />
+              )),
+            };
+          }
+        }
+      })()}
+    </div>
+  );
 };
 
 export const getComponentRendererFn = <
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TData = any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TVariables = Record<string, any>,
+  TVariables extends AnyVariables = AnyVariables,
 >(
   props: FabrixComponentProps<TData, TVariables>,
-  getComponent: ReturnType<typeof getComponentFn>,
+  operation: Operation,
+  componentsResolver: (field: FieldConfig) => {
+    getInputComponent: ReturnType<
+      typeof getInputComponentFn<TData, TVariables>
+    >;
+    getOutputComponent: ReturnType<typeof getOutputComponentFn<TData>>;
+  },
 ) => {
-  const context = useContext(FabrixContext);
-  const { fieldConfigs } = useFieldConfigs(props.query);
-  const fieldConfig = fieldConfigs[0];
-  if (!fieldConfig) {
-    throw new Error(`No operation found`);
+  const initialField = operation.fields[0];
+  if (!initialField) {
+    throw new Error(`No field found`);
   }
 
   return () => {
-    const { fetching, error, data } = useDataFetch<TData, TVariables>({
-      query: fieldConfig.document,
+    const dataFetch = useDataFetch<TData, TVariables>({
+      query: operation.document,
       variables: props.variables,
-      pause: fieldConfig.type !== OperationTypeNode.QUERY,
+      pause: operation.type !== OperationTypeNode.QUERY,
+    });
+    const [mutationResult, runMutation] = useMutation<TData, TVariables>(
+      operation.document,
+    );
+    const executeQuery = (input: Record<string, unknown>) => {
+      if (operation.type === OperationTypeNode.QUERY) {
+        // Re-executing query ignores the cache and fetches the data from the server again
+        return Promise.resolve(
+          dataFetch.refetch({
+            requestPolicy: "network-only",
+          }),
+        );
+      } else if (operation.type === OperationTypeNode.MUTATION) {
+        return runMutation(input as TVariables);
+      }
+
+      return Promise.resolve();
+    };
+
+    const resolvedComponents = componentsResolver(initialField);
+    const outputComponent = resolvedComponents.getOutputComponent(operation, {
+      fetching: dataFetch.fetching,
+      error: dataFetch.error,
+      data: dataFetch.data ?? {},
+    });
+    const inputComponent = resolvedComponents.getInputComponent(operation, {
+      fetching: mutationResult.fetching,
+      error: mutationResult.error,
+      executeQueryWithInput: executeQuery,
     });
 
-    if (fetching) {
-      return <Loader />;
-    }
-
-    if (error) {
-      throw error;
-    }
-
-    const component = getComponent(fieldConfig, data ?? {}, context);
     if (props.children) {
       return props.children({
-        data: data ?? ({} as TData),
-        getComponent: component,
+        getInput: inputComponent,
+        getOutput: outputComponent,
       });
     }
 
-    return fieldConfig.fields.map((field) =>
-      component(field.name, {
-        key: `fabrix-${fieldConfig.name}-${field.name}`,
+    return operation.fields.map((field) => [
+      inputComponent({
+        key: `fabrix-${operation.name}-input-${field.name}`,
       }),
-    );
+      outputComponent(field.name as RootFieldName<TData>, {
+        key: `fabrix-${operation.name}-output-${field.name}`,
+      }),
+    ]);
   };
 };
 
-type RendererFn = (
-  field: FieldConfig,
-  data: Value,
-  context: FabrixContextType,
-  componentFieldsRenderer?: FabrixComponentFieldsRenderer,
-) => ReactNode;
+type RendererFnCommonProps = {
+  field: FieldConfig;
+  fetching: boolean;
+  error: Error | undefined;
+};
 
-export const getComponentFn =
+type RendererComponentCommonProps = {
+  fetching: boolean;
+  error: Error | undefined;
+};
+
+type OutputComponentRendererFnProps = RendererFnCommonProps & {
+  data: Value;
+  fieldsRenderer?: GetOutputFieldsRenderer;
+};
+type OutputComponentFnProps = RendererComponentCommonProps & {
+  data: FabrixComponentData | undefined;
+};
+
+export type ExecuteQueryResult<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  TVariables extends AnyVariables = AnyVariables,
+> = Promise<void> | Promise<OperationResult<TData, TVariables>>;
+
+type InputComponentRendererFnProps<
+  TVariables extends AnyVariables = AnyVariables,
+> = RendererFnCommonProps & {
+  executeQuery: () => Promise<void>;
+  fieldsRenderer?: GetInputFieldsRenderer<TVariables>;
+};
+type InputComponentFnProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TData = any,
+  TVariables extends AnyVariables = AnyVariables,
+> = RendererComponentCommonProps & {
+  executeQueryWithInput: (
+    input: FieldValues,
+  ) => ExecuteQueryResult<TData, TVariables>;
+};
+
+export const getOutputComponentFn =
   <
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     TData = any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    TVariables = Record<string, any>,
   >(
-    props: FabrixComponentProps<TData, TVariables>,
-    rendererFn: RendererFn,
+    rendererFn:
+      | ((props: OutputComponentRendererFnProps) => React.ReactNode)
+      | null,
   ) =>
-  (
-    fieldConfig: FieldConfigs,
-    data: FabrixComponentData | undefined,
-    context: FabrixContextType,
-  ) =>
-  (
-    name: string,
-    extraProps?: FabrixComponentChildrenExtraProps,
-    componentFieldsRenderer?: FabrixComponentFieldsRenderer,
-  ) => {
-    const field = fieldConfig.fields.find((f) => f.name === name);
-    if (!field) {
-      throw new Error(`No root field found for name: ${name}`);
+  (operation: Operation, componentProps: OutputComponentFnProps) => {
+    if (!rendererFn) {
+      return () => null;
     }
 
-    const dataByName = data ? (name in data ? data[name] : {}) : {};
+    return (...args: Parameters<GetOutputFn<TData>>): React.ReactNode => {
+      const [name, extraProps, fieldsRenderer] = args;
+      const field = operation.fields.find((f) => f.name === name);
+      if (!field) {
+        throw new Error(`No root field found for name: ${name}`);
+      }
 
-    return (
-      <div
-        key={extraProps?.key}
-        className={`fabrix renderer container ${props.containerClassName ?? ""} ${extraProps?.className ?? ""}`}
-      >
-        {rendererFn(field, dataByName, context, componentFieldsRenderer)}
-      </div>
-    );
+      return (
+        <div
+          key={extraProps?.key}
+          role="region"
+          aria-label="fabrix-component-output"
+          className={extraProps?.className}
+        >
+          {rendererFn({
+            field,
+            fetching: componentProps.fetching,
+            error: componentProps.error,
+            data: componentProps.data
+              ? name in componentProps.data
+                ? componentProps.data[name]
+                : {}
+              : {},
+            fieldsRenderer,
+          })}
+        </div>
+      );
+    };
+  };
+
+export const getInputComponentFn =
+  <
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    TData = any,
+    TVariables extends AnyVariables = AnyVariables,
+  >(
+    rendererFn:
+      | ((props: InputComponentRendererFnProps<TVariables>) => React.ReactNode)
+      | null,
+  ) =>
+  (
+    operation: Operation,
+    componentProps: InputComponentFnProps<TData, TVariables>,
+  ) => {
+    if (!rendererFn) {
+      return () => null;
+    }
+
+    return (...args: Parameters<GetInputFn<TVariables>>): React.ReactNode => {
+      const [extraProps, fieldsRenderer] = args;
+      const field = operation.fields[0];
+      const buildSchema = () => {
+        if (field.type === "form") {
+          return buildAjvSchema(field.configs.outputFields);
+        } else if (field.type === "generic") {
+          return buildAjvSchema(field.configs.inputFields);
+        } else {
+          return;
+        }
+      };
+      const schema = buildSchema();
+
+      const a = extraProps?.defaultValues;
+      const formContext = useForm({
+        resolver: schema && ajvResolver(schema),
+        defaultValues: () => Promise.resolve(a ?? {}),
+      });
+
+      return (
+        <div
+          key={extraProps?.key}
+          role="region"
+          aria-label="fabrix-component-input"
+          className={extraProps?.className}
+        >
+          <FormProvider {...formContext}>
+            {rendererFn({
+              field,
+              fetching: componentProps.fetching,
+              error: componentProps.error,
+              executeQuery: () =>
+                formContext.handleSubmit(async (data) =>
+                  componentProps.executeQueryWithInput(data),
+                )(),
+              fieldsRenderer,
+            })}
+          </FormProvider>
+        </div>
+      );
+    };
   };

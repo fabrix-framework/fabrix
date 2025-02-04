@@ -7,24 +7,16 @@ import { Text, Input, Stack, Box, Button } from "@chakra-ui/react";
 import { Switch } from "@components/ui/switch";
 import { Select } from "chakra-react-select";
 import { useController } from "@fabrix-framework/fabrix/rhf";
+import { get } from "es-toolkit/compat";
 import { LabelledHeading } from "./shared";
 
 export const ChakraForm = (props: FormComponentProps) => {
   return (
     <Box className={props.className} rowGap={"20px"}>
-      {props.renderFields()}
-      {props.renderSubmit(({ submit, isSubmitting }) => (
-        <Button
-          className="col-12"
-          colorScheme="blue"
-          marginTop={2}
-          // @ts-expect-error
-          isDisabled={isSubmitting}
-          onClick={() => submit()}
-        >
-          Submit
-        </Button>
-      ))}
+      <form {...props.getAction()}>
+        {props.renderFields()}
+        <Button type="submit">Submit</Button>
+      </form>
     </Box>
   );
 };
@@ -61,7 +53,7 @@ const ErrorField = (props: FormFieldComponentProps) => {
   const { formState } = useController({
     name: props.name,
   });
-  const error = formState.errors[props.name];
+  const error = get(formState.errors, props.name);
 
   return (
     error && (
@@ -157,7 +149,6 @@ const NumberFormField = (props: FormFieldComponentProps) => {
   const { className } = props.attributes;
   const { field } = useController({
     name: props.name,
-    defaultValue: props.value ?? "",
     rules: {
       required: props.isRequired,
     },
