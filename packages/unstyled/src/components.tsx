@@ -60,16 +60,12 @@ const tableView = (props: TableComponentProps) => {
   );
 };
 
-const formView = (props: FormComponentProps) => {
-  return (
-    <div role="form">
-      {props.renderFields()}
-      {props.renderSubmit(({ submit }) => (
-        <button onClick={() => submit()}>Submit</button>
-      ))}
-    </div>
-  );
-};
+const formView = (props: FormComponentProps) => (
+  <form role="form" {...props.getAction()}>
+    {props.renderFields()}
+    <button type="submit">Submit</button>
+  </form>
+);
 
 const FormFieldWrapper = (
   props: React.PropsWithChildren<
