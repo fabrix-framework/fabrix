@@ -1,0 +1,54 @@
+{
+  "name": "@fabrix-framework/unstyled",
+  "private": false,
+  "version": "0.0.0",
+  "description": "Unstyled components for Fabrix",
+  "publishConfig": {
+    "provenance": true
+  },
+  "homepage": "https://fabrix-framework.github.io/docs/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fabrix-framework/fabrix.git"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "dev": "NODE_ENV=development tsup --watch",
+    "build": "tsup",
+    "lint": "eslint '**/*.{ts,tsx}' --ignore-pattern 'dist/*' --max-warnings=0",
+    "type-check": "tsc --incremental",
+    "test": "exit 0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@fabrix-framework/fabrix": "workspace:*",
+    "es-toolkit": "^1.30.1",
+    "react-hook-form": "^7.53.1"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "@fabrix-framework/eslint-config": "workspace:*",
+    "@fabrix-framework/prettier-config": "workspace:*",
+    "@types/node": "^22.7.5",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "eslint": "^9.18.0",
+    "prettier": "^3.4.2",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3"
+  },
+  "prettier": "@fabrix-framework/prettier-config"
+}
