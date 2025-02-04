@@ -14,8 +14,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
-    "\n          mutation createTodo($input: TodoInput!) {\n            addTodo(input: $input) {\n              id\n            }\n          }\n        ": types.CreateTodoDocument,
-    "\n          query todos {\n            allTodos {\n              collection {\n                id\n                name\n                priority\n                dueDate\n                hasDone\n              }\n            }\n          }\n        ": types.TodosDocument,
+    "\n          mutation createTodo($input: TodoInput!) {\n            addTodo(input: $input) @fabrixForm {\n              id\n            }\n          }\n        ": types.CreateTodoDocument,
+    "\n          query todos {\n            allTodos @fabrixView {\n              collection {\n                id\n                name\n                priority\n                dueDate\n                hasDone\n              }\n            }\n          }\n        ": types.TodosDocument,
     "\n        mutation markTodoDone($input: MarkTodoDoneInput!) {\n          markTodoDone(input: $input) {\n            id\n          }\n        }\n      ": types.MarkTodoDoneDocument,
 };
 
@@ -36,11 +36,11 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n          mutation createTodo($input: TodoInput!) {\n            addTodo(input: $input) {\n              id\n            }\n          }\n        "): (typeof documents)["\n          mutation createTodo($input: TodoInput!) {\n            addTodo(input: $input) {\n              id\n            }\n          }\n        "];
+export function graphql(source: "\n          mutation createTodo($input: TodoInput!) {\n            addTodo(input: $input) @fabrixForm {\n              id\n            }\n          }\n        "): (typeof documents)["\n          mutation createTodo($input: TodoInput!) {\n            addTodo(input: $input) @fabrixForm {\n              id\n            }\n          }\n        "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n          query todos {\n            allTodos {\n              collection {\n                id\n                name\n                priority\n                dueDate\n                hasDone\n              }\n            }\n          }\n        "): (typeof documents)["\n          query todos {\n            allTodos {\n              collection {\n                id\n                name\n                priority\n                dueDate\n                hasDone\n              }\n            }\n          }\n        "];
+export function graphql(source: "\n          query todos {\n            allTodos @fabrixView {\n              collection {\n                id\n                name\n                priority\n                dueDate\n                hasDone\n              }\n            }\n          }\n        "): (typeof documents)["\n          query todos {\n            allTodos @fabrixView {\n              collection {\n                id\n                name\n                priority\n                dueDate\n                hasDone\n              }\n            }\n          }\n        "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

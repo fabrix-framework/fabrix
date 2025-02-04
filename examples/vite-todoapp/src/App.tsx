@@ -14,27 +14,17 @@ function App() {
         containerClassName={containerClassName}
         query={graphql(`
           mutation createTodo($input: TodoInput!) {
-            addTodo(input: $input) {
+            addTodo(input: $input) @fabrixForm {
               id
             }
           }
         `)}
-      >
-        {({ getInput }) =>
-          getInput({}, ({ Field, getAction }) => (
-            <form {...getAction()}>
-              <Field name="input.name" />
-              <Field name="input.priority" />
-              <Button type="submit">Add</Button>
-            </form>
-          ))
-        }
-      </FabrixComponent>
+      />
       <FabrixComponent
         containerClassName={containerClassName}
         query={graphql(`
           query todos {
-            allTodos {
+            allTodos @fabrixView {
               collection {
                 id
                 name
