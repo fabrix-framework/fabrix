@@ -1,5 +1,11 @@
 # @fabrix-framework/unstyled
 
+## 0.1.1
+
+### Patch Changes
+
+- [#179](https://github.com/fabrix-framework/fabrix/pull/179) [`94879da`](https://github.com/fabrix-framework/fabrix/commit/94879dadd6c25fe1879338adebcf75379c4c7816) Thanks [@IzumiSy](https://github.com/IzumiSy)! - Fix build error
+
 ## 0.1.0
 
 ### Minor Changes
