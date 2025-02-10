@@ -27,7 +27,7 @@
     "@fabrix-framework/eslint-config": "workspace:*",
     "@fabrix-framework/prettier-config": "workspace:*",
     "@graphql-codegen/cli": "^5.0.4",
-    "@graphql-codegen/client-preset": "^4.6.0",
+    "@graphql-codegen/client-preset": "^4.6.2",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
