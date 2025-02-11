@@ -9,6 +9,7 @@ type Todo = {
   name: string;
   priority: "HIGH" | "MEDIUM" | "LOW";
   hasDone: boolean;
+  dueDate?: string;
 };
 
 // In-memory store for todos
@@ -25,6 +26,8 @@ const todos: Todo[] = [
 
 // Define the GraphQL schema
 const typeDefs = gql`
+  scalar Date
+
   enum TodoPriority {
     LOW
     MEDIUM
@@ -36,6 +39,7 @@ const typeDefs = gql`
     name: String!
     priority: TodoPriority!
     hasDone: Boolean!
+    dueDate: Date
   }
 
   type TodosCollection {
@@ -43,10 +47,9 @@ const typeDefs = gql`
   }
 
   input TodoInput {
-    id: ID
     name: String!
     priority: TodoPriority!
-    hasDone: Boolean
+    dueDate: Date
   }
 
   input MarkTodoDoneInput {
