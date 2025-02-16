@@ -338,8 +338,8 @@ importers:
         specifier: ^5.7.3
         version: 5.7.3
       vite-string-plugin:
-        specifier: ^1.4.3
-        version: 1.4.3
+        specifier: ^1.4.4
+        version: 1.4.4
       vitest:
         specifier: ^3.0.2
         version: 3.0.2(@types/node@22.13.1)(happy-dom@16.8.1)(jiti@2.4.2)(msw@2.7.0(@types/node@22.13.1)(typescript@5.7.3))(tsx@4.19.2)(yaml@2.7.0)
@@ -419,8 +419,8 @@ importers:
 
 packages:
 
-  '@0no-co/graphql.web@1.0.13':
-    resolution: {integrity: sha512-jqYxOevheVTU1S36ZdzAkJIdvRp2m3OYIG5SEoKDw5NI8eVwkoI0D/Q3DYNGmXCxkA6CQuoa7zvMiDPTLqUNuw==}
+  '@0no-co/graphql.web@1.1.1':
+    resolution: {integrity: sha512-F2i3xdycesw78QCOBHmpTn7eaD2iNXGwB2gkfwxcOfBbeauYpr8RBSyJOkDrFtKtVRMclg8Sg3n1ip0ACyUuag==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     peerDependenciesMeta:
@@ -839,6 +839,10 @@ packages:
 
   '@babel/runtime@7.26.7':
     resolution: {integrity: sha512-AOPI3D+a8dXnja+iwsUqGRjr1BbZIe771sXdapOtYI531gSqpi92vXivKcq2asu/DFpdl1ceFAKZyRzK2PCVcQ==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/runtime@7.26.9':
+    resolution: {integrity: sha512-aA63XwOkcl4xxQa3HjPMqOP6LiK0ZDv3mUPYEFXkpHbaFjtGggE1A61FjFzJnB+p7/oy2gA8E+rcBNl/zC1tMg==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.25.9':
@@ -5245,8 +5249,8 @@ packages:
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
-  vite-string-plugin@1.4.3:
-    resolution: {integrity: sha512-srlSRDwWxjG4MwHOmeXA9H8b69VjR3PfQRv2hCkHsotnGbJOLY3gggClSmNTeKUJpnURckgTFeVVVdCXX/Gwpg==}
+  vite-string-plugin@1.4.4:
+    resolution: {integrity: sha512-mHcdjsDaJSBnUrsAb4L+AWamWVWSFwDb5JuBbU5hAOt1w/ixaQ0EwWx2gAZiqFfpl5XlSE0WmCp2ShbdwgqsvQ==}
 
   vite-tsconfig-paths@5.1.4:
     resolution: {integrity: sha512-cYj0LRuLV2c2sMqhqhGpaO3LretdtMn/BVX4cPLanIZuwwrkVl+lK84E/miEXkCHWXuq65rhNN4rXsBcOB3S4w==}
@@ -5461,7 +5465,7 @@ packages:
 
 snapshots:
 
-  '@0no-co/graphql.web@1.0.13(graphql@16.10.0)':
+  '@0no-co/graphql.web@1.1.1(graphql@16.10.0)':
     optionalDependencies:
       graphql: 16.10.0
 
@@ -6020,6 +6024,10 @@ snapshots:
       regenerator-runtime: 0.14.1
 
   '@babel/runtime@7.26.7':
+    dependencies:
+      regenerator-runtime: 0.14.1
+
+  '@babel/runtime@7.26.9':
     dependencies:
       regenerator-runtime: 0.14.1
 
@@ -7421,7 +7429,7 @@ snapshots:
   '@testing-library/dom@10.4.0':
     dependencies:
       '@babel/code-frame': 7.26.2
-      '@babel/runtime': 7.26.7
+      '@babel/runtime': 7.26.9
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -7644,7 +7652,7 @@ snapshots:
 
   '@urql/core@5.0.6(graphql@16.10.0)':
     dependencies:
-      '@0no-co/graphql.web': 1.0.13(graphql@16.10.0)
+      '@0no-co/graphql.web': 1.1.1(graphql@16.10.0)
       wonka: 6.3.4
     transitivePeerDependencies:
       - graphql
@@ -11439,7 +11447,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite-string-plugin@1.4.3: {}
+  vite-string-plugin@1.4.4: {}
 
   vite-tsconfig-paths@5.1.4(typescript@5.7.3)(vite@6.1.0(@types/node@22.13.1)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0)):
     dependencies:
