@@ -39,7 +39,7 @@
   "devDependencies": {
     "@fabrix-framework/eslint-config": "workspace:*",
     "@fabrix-framework/prettier-config": "workspace:*",
-    "@types/node": "^22.13.1",
+    "@types/node": "^22.13.4",
     "eslint": "^9.20.0",
     "memfs": "^4.17.0",
     "prettier": "^3.5.1",
