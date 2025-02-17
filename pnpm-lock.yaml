@@ -338,8 +338,8 @@ importers:
         specifier: ^5.7.3
         version: 5.7.3
       vite-string-plugin:
-        specifier: ^1.4.3
-        version: 1.4.3
+        specifier: ^1.4.4
+        version: 1.4.4
       vitest:
         specifier: ^3.0.2
         version: 3.0.2(@types/node@22.13.1)(happy-dom@16.8.1)(jiti@2.4.2)(msw@2.7.0(@types/node@22.13.1)(typescript@5.7.3))(tsx@4.19.2)(yaml@2.7.0)
@@ -5249,8 +5249,8 @@ packages:
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
-  vite-string-plugin@1.4.3:
-    resolution: {integrity: sha512-srlSRDwWxjG4MwHOmeXA9H8b69VjR3PfQRv2hCkHsotnGbJOLY3gggClSmNTeKUJpnURckgTFeVVVdCXX/Gwpg==}
+  vite-string-plugin@1.4.4:
+    resolution: {integrity: sha512-mHcdjsDaJSBnUrsAb4L+AWamWVWSFwDb5JuBbU5hAOt1w/ixaQ0EwWx2gAZiqFfpl5XlSE0WmCp2ShbdwgqsvQ==}
 
   vite-tsconfig-paths@5.1.4:
     resolution: {integrity: sha512-cYj0LRuLV2c2sMqhqhGpaO3LretdtMn/BVX4cPLanIZuwwrkVl+lK84E/miEXkCHWXuq65rhNN4rXsBcOB3S4w==}
@@ -11447,7 +11447,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite-string-plugin@1.4.3: {}
+  vite-string-plugin@1.4.4: {}
 
   vite-tsconfig-paths@5.1.4(typescript@5.7.3)(vite@6.1.0(@types/node@22.13.1)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.7.0)):
     dependencies:

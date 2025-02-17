@@ -45,7 +45,7 @@
     "prettier": "^3.5.1",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3",
-    "vite-string-plugin": "^1.4.3",
+    "vite-string-plugin": "^1.4.4",
     "vitest": "^3.0.2"
   },
   "prettier": "@fabrix-framework/prettier-config"
