@@ -10,7 +10,7 @@
     "type-check": "tsc --noEmit --incremental --pretty"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.2.5",
+    "@chakra-ui/react": "^3.8.0",
     "@emotion/css": "^11.13.5",
     "@emotion/react": "^11.14.0",
     "@fabrix-framework/chakra-ui": "workspace:*",
