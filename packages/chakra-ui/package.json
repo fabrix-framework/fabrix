@@ -38,7 +38,7 @@
     "chroma-js": "^3.0.0",
     "create-color": "^2.0.6",
     "es-toolkit": "^1.30.1",
-    "zod": "^3.23.8"
+    "zod": "^3.24.2"
   },
   "peerDependencies": {
     "@chakra-ui/react": "^3",
