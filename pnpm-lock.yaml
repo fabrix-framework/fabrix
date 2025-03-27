@@ -60,6 +60,9 @@ importers:
       '@fabrix-framework/fabrix':
         specifier: workspace:*
         version: link:../../packages/fabrix
+      '@fabrix-framework/unstyled':
+        specifier: workspace:*
+        version: link:../../packages/unstyled
       graphql:
         specifier: ^16.9.0
         version: 16.10.0
