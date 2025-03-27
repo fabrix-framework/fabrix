@@ -2,6 +2,7 @@ import { FabrixContextType } from "@context";
 import { Value } from "@fetcher";
 import { TableComponentEntry } from "@registry";
 import { createElement } from "react";
+import { z } from "zod";
 import { RootField, SubFields, ViewFields, getSubFields } from "./fields";
 import { Loader } from "./shared";
 import { buildTypenameExtractor } from "./typename";
@@ -24,18 +25,31 @@ export const getTableMode = (fields: ViewFields) => {
   return keyField.field.getName() == "collection" ? "standard" : "relay";
 };
 
+const collectionValidator = z.object({
+  collection: z.array(z.record(z.unknown())),
+});
+const relayValidator = z.object({
+  edges: z.array(
+    z.object({
+      node: z.record(z.unknown()),
+    }),
+  ),
+});
+
 export const getTableValues = (
   rootValue: Value,
   mode: TableMode,
 ): Record<string, unknown>[] => {
   const value = rootValue as Record<string, unknown>;
   switch (mode) {
-    case "standard":
-      return value.collection as Record<string, unknown>[];
-    case "relay":
-      return (value.edges as { node: Record<string, unknown> }[]).map(
-        ({ node }) => node,
-      );
+    case "standard": {
+      const r = collectionValidator.safeParse(value);
+      return r.success ? r.data.collection : [];
+    }
+    case "relay": {
+      const r = relayValidator.safeParse(value);
+      return r.success ? r.data.edges.map((e) => e.node) : [];
+    }
   }
 };
 
