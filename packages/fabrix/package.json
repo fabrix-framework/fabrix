@@ -48,7 +48,7 @@
     "es-toolkit": "^1.32.0",
     "graphql-tag": "^2.12.6",
     "react-hook-form": "^7.53.1",
-    "type-fest": "^4.33.0",
+    "type-fest": "^5.1.0",
     "urql": "^4.2.1",
     "wonka": "^6.3.4",
     "zod": "^3.24.2"
